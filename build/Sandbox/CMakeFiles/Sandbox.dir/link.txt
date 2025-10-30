@@ -1,0 +1,1 @@
+/usr/bin/c++ CMakeFiles/Sandbox.dir/main.cpp.o -o Sandbox  -Wl,-rpath,/usr/local/lib ../AccelEngine/libAccelEngine.a /usr/local/lib/libSDL3.so.0.3.0 
