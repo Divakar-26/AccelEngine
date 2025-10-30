@@ -10,5 +10,11 @@ namespace AccelEngine
         Vector3 position;
         Vector3 velocity;
         Vector3 acceleration;
+
+
+        real damping = 0.99f;
+        real inverseMass;
+
+        void integrate(real duration);
     };
 } // namespace AccelEngine
