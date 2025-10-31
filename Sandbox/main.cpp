@@ -16,15 +16,15 @@
         Particle p;
         p.inverseMass = 1.0f;
         // p.damping = 0.99f;
-        p.position = Vector3(100, 100, 0);
-        p.acceleration = Vector3(0 , 0 , 0);
-        p.velocity = Vector3(0, 0, 0);
+        p.position = Vector2(100, 100);
+        p.acceleration = Vector2(0 , 0 );
+        p.velocity = Vector2(0, 0);
 
         //make a registry and also a force generator called gravity
         ParticleForceRegistry r;
-        ParticleGravity gravity(Vector3(0, 980, 0));
+        ParticleGravity gravity(Vector2(0, 980));
 
-        ParticleDrag drag(0.05,0.01);
+        ParticleDrag drag(0.20,0.05);
         r.add(&p, &drag);
         //add it in registry
         r.add(&p, &gravity);

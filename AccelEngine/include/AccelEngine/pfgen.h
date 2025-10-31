@@ -35,10 +35,10 @@ namespace AccelEngine
 
     class ParticleGravity : public ParticleForceGenerator
     {
-        Vector3 gravity;
+        Vector2 gravity;
 
     public:
-        ParticleGravity(const Vector3 & gravity) : gravity(gravity) {}
+        ParticleGravity(const Vector2 & gravity) : gravity(gravity) {}
 
         virtual void updateForce(Particle * particle, real duration);
     };

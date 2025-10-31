@@ -34,7 +34,7 @@ void ParticleGravity::updateForce(Particle * p, real duration){
 }
 
 void ParticleDrag::updateForce(Particle * p, real duration){
-    Vector3 force = p->getVelocity();
+    Vector2 force = p->getVelocity();
 
     real dragCoeff = force.magnitude();
     dragCoeff = k1 * dragCoeff + k2 * dragCoeff * dragCoeff;

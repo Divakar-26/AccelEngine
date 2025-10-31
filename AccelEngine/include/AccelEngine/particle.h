@@ -7,18 +7,18 @@ namespace AccelEngine
     class Particle
     {
     public:
-        Vector3 position;
-        Vector3 velocity;
-        Vector3 acceleration;
+        Vector2 position;
+        Vector2 velocity;
+        Vector2 acceleration;
 
-        Vector3 forceAccum;
+        Vector2 forceAccum;
 
         real damping = 0.99f;
         real inverseMass = 1.0f;
 
         void integrate(real duration);
         void clearAccumulator();
-        void addForce(const Vector3 & force);
+        void addForce(const Vector2 & force);
 
         //helper functions
 
@@ -26,7 +26,7 @@ namespace AccelEngine
             return inverseMass > 0.0f;  
         }
 
-        Vector3 getVelocity() {return velocity;}
+        Vector2 getVelocity() {return velocity;}
         real getMass() {return 1.0f / inverseMass;}
 
     };

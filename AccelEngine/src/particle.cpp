@@ -11,7 +11,7 @@ namespace AccelEngine
 
         position.addScaledVector(velocity, duration);
 
-        Vector3 resultingAcc = acceleration;
+        Vector2 resultingAcc = acceleration;
         resultingAcc.addScaledVector(forceAccum, inverseMass);
 
         velocity.addScaledVector(resultingAcc, duration);
@@ -25,7 +25,7 @@ namespace AccelEngine
         forceAccum.clear();
     }
 
-    void Particle::addForce(const Vector3 & force){
+    void Particle::addForce(const Vector2 & force){
         forceAccum += force;
     }
 }

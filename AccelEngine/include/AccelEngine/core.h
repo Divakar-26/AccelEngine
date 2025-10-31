@@ -5,6 +5,127 @@
 namespace AccelEngine
 {
 
+    class Vector2
+    {
+    public:
+        // Constructors
+        Vector2() : x(0), y(0) {}
+        Vector2(const real x, const real y) : x(x), y(y) {}
+
+        // Invert vector
+        void invert()
+        {
+            x = -x;
+            y = -y;
+        }
+
+        // Magnitude and normalization
+        real magnitude() const
+        {
+            return sqrt(x * x + y * y);
+        }
+
+        real squareMagnitude() const
+        {
+            return x * x + y * y;
+        }
+
+        void normalize()
+        {
+            real l = magnitude();
+            if (l > 0)
+            {
+                (*this) *= ((real)1) / l;
+            }
+        }
+
+        // Scaling
+        void operator*=(const real value)
+        {
+            x *= value;
+            y *= value;
+        }
+
+        Vector2 operator*(const real value) const
+        {
+            return Vector2(x * value, y * value);
+        }
+
+        // Addition / subtraction
+        void operator+=(const Vector2 &v)
+        {
+            x += v.x;
+            y += v.y;
+        }
+
+        Vector2 operator+(const Vector2 &v) const
+        {
+            return Vector2(x + v.x, y + v.y);
+        }
+
+        void operator-=(const Vector2 &v)
+        {
+            x -= v.x;
+            y -= v.y;
+        }
+
+        Vector2 operator-(const Vector2 &v) const
+        {
+            return Vector2(x - v.x, y - v.y);
+        }
+
+        // Add scaled vector
+        void addScaledVector(const Vector2 &v, real scale)
+        {
+            x += v.x * scale;
+            y += v.y * scale;
+        }
+
+        // Component-wise operations
+        Vector2 componentProduct(const Vector2 &v) const
+        {
+            return Vector2(x * v.x, y * v.y);
+        }
+
+        void componentProductUpdate(const Vector2 &v)
+        {
+            x *= v.x;
+            y *= v.y;
+        }
+
+        // Dot product
+        real scalarProduct(const Vector2 &v) const
+        {
+            return x * v.x + y * v.y;
+        }
+
+        real operator*(const Vector2 &v) const
+        {
+            return x * v.x + y * v.y;
+        }
+
+        // 2D "cross product" helper (returns scalar)
+        real cross(const Vector2 &v) const
+        {
+            return x * v.y - y * v.x;
+        }
+
+        // Perpendicular vector (useful for physics)
+        Vector2 perpendicular() const
+        {
+            return Vector2(-y, x);
+        }
+
+        // Clear to zero
+        void clear()
+        {
+            x = y = 0;
+        }
+
+        // Components
+        real x, y;
+    };
+
     class Vector3
     {
     public:
