@@ -12,11 +12,11 @@
         SDL_Renderer *renderer = SDL_CreateRenderer(window, nullptr);
 
         Particle p;
-        p.inverseMass = 1.0f;
+        p.inverseMass = 10000.0f;
         // p.damping = 0.99f;
         p.position = Vector3(100, 100, 0);
-        p.acceleration = Vector3(0,980,0);
-        p.velocity = Vector3(100, 0, 0);
+        p.acceleration = Vector3(0,0,0);
+        p.velocity = Vector3(0, 0, 0);
 
         
 
@@ -42,9 +42,8 @@
             float duration = (currentTime - lastTime) / 1000.0f;
             lastTime = currentTime;
 
-            p.addForce(Vector3(0, 10, 0));
-            p.addForce(Vector3(0, -10, 0));
-
+            p.addForce(Vector3(20, 2000, 0));
+            p.addForce(Vector3(-20, 2000,0));
             // Integrate physics
             p.integrate(duration);
 
