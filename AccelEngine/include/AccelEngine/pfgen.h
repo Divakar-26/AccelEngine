@@ -6,6 +6,7 @@
 
 namespace AccelEngine
 {
+    //generic class for particleForces like, gravity, friction etc etc
     class ParticleForceGenerator
     {
     public:
@@ -53,5 +54,17 @@ namespace AccelEngine
         public:
             ParticleDrag(real k1, real k2) : k1(k1), k2(k2) {}
             virtual void updateForce(Particle * particle, real duration);
+    };
+
+    // spring force generator, takes other particle sprint constant and rest lenght as argument
+    class ParticleSpring : public ParticleForceGenerator{
+        Particle * other;
+        real springConstant;
+        real restLenght;
+
+        public:
+            ParticleSpring(Particle * other, real sC, real rL) :  other(other), springConstant(sC), restLenght(rL) {}
+
+            virtual void updateForce(Particle * p, real duration);             
     };
 }

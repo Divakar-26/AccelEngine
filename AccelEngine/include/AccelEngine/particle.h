@@ -27,7 +27,9 @@ namespace AccelEngine
         }
 
         Vector2 getVelocity() {return velocity;}
+        Vector2 getPosition() {return position;}
         real getMass() {return 1.0f / inverseMass;}
+
 
     };
 } // namespace AccelEngine
