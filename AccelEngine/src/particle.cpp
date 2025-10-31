@@ -12,9 +12,20 @@ namespace AccelEngine
         position.addScaledVector(velocity, duration);
 
         Vector3 resultingAcc = acceleration;
+        resultingAcc.addScaledVector(forceAccum, inverseMass);
 
         velocity.addScaledVector(resultingAcc, duration);
 
         velocity *= pow(damping, duration);
+
+        clearAccumulator();
+    }
+
+    void Particle::clearAccumulator(){
+        forceAccum.clear();
+    }
+
+    void Particle::addForce(const Vector3 & force){
+        forceAccum += force;
     }
 }

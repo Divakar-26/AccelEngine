@@ -130,30 +130,6 @@ AccelEngine/fast:
 	cd /home/divakar/Desktop/AccelPhysics/build && $(MAKE) $(MAKESILENT) -f AccelEngine/CMakeFiles/AccelEngine.dir/build.make AccelEngine/CMakeFiles/AccelEngine.dir/build
 .PHONY : AccelEngine/fast
 
-src/main.o: src/main.cpp.o
-.PHONY : src/main.o
-
-# target to build an object file
-src/main.cpp.o:
-	cd /home/divakar/Desktop/AccelPhysics/build && $(MAKE) $(MAKESILENT) -f AccelEngine/CMakeFiles/AccelEngine.dir/build.make AccelEngine/CMakeFiles/AccelEngine.dir/src/main.cpp.o
-.PHONY : src/main.cpp.o
-
-src/main.i: src/main.cpp.i
-.PHONY : src/main.i
-
-# target to preprocess a source file
-src/main.cpp.i:
-	cd /home/divakar/Desktop/AccelPhysics/build && $(MAKE) $(MAKESILENT) -f AccelEngine/CMakeFiles/AccelEngine.dir/build.make AccelEngine/CMakeFiles/AccelEngine.dir/src/main.cpp.i
-.PHONY : src/main.cpp.i
-
-src/main.s: src/main.cpp.s
-.PHONY : src/main.s
-
-# target to generate assembly for a file
-src/main.cpp.s:
-	cd /home/divakar/Desktop/AccelPhysics/build && $(MAKE) $(MAKESILENT) -f AccelEngine/CMakeFiles/AccelEngine.dir/build.make AccelEngine/CMakeFiles/AccelEngine.dir/src/main.cpp.s
-.PHONY : src/main.cpp.s
-
 src/particle.o: src/particle.cpp.o
 .PHONY : src/particle.o
 
@@ -187,9 +163,6 @@ help:
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
 	@echo "... AccelEngine"
-	@echo "... src/main.o"
-	@echo "... src/main.i"
-	@echo "... src/main.s"
 	@echo "... src/particle.o"
 	@echo "... src/particle.i"
 	@echo "... src/particle.s"

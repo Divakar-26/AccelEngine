@@ -124,6 +124,9 @@ namespace AccelEngine
                            x * v.y - y * v.x);
         }
 
+        void clear(){
+            x = y = z = 0;
+        }
         // actual components
         real x, y, z;
 

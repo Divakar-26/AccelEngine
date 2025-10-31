@@ -1,5 +1,4 @@
 add_library(AccelEngine STATIC 
-    src/main.cpp
     src/particle.cpp
 )
 

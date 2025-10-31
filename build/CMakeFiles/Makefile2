@@ -114,12 +114,12 @@ Sandbox/clean: Sandbox/CMakeFiles/Sandbox.dir/clean
 AccelEngine/CMakeFiles/AccelEngine.dir/all:
 	$(MAKE) $(MAKESILENT) -f AccelEngine/CMakeFiles/AccelEngine.dir/build.make AccelEngine/CMakeFiles/AccelEngine.dir/depend
 	$(MAKE) $(MAKESILENT) -f AccelEngine/CMakeFiles/AccelEngine.dir/build.make AccelEngine/CMakeFiles/AccelEngine.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/divakar/Desktop/AccelPhysics/build/CMakeFiles --progress-num=1,2,3 "Built target AccelEngine"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/divakar/Desktop/AccelPhysics/build/CMakeFiles --progress-num=1,2 "Built target AccelEngine"
 .PHONY : AccelEngine/CMakeFiles/AccelEngine.dir/all
 
 # Build rule for subdir invocation for target.
 AccelEngine/CMakeFiles/AccelEngine.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/divakar/Desktop/AccelPhysics/build/CMakeFiles 3
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/divakar/Desktop/AccelPhysics/build/CMakeFiles 2
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 AccelEngine/CMakeFiles/AccelEngine.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/divakar/Desktop/AccelPhysics/build/CMakeFiles 0
 .PHONY : AccelEngine/CMakeFiles/AccelEngine.dir/rule
@@ -140,12 +140,12 @@ AccelEngine/CMakeFiles/AccelEngine.dir/clean:
 Sandbox/CMakeFiles/Sandbox.dir/all: AccelEngine/CMakeFiles/AccelEngine.dir/all
 	$(MAKE) $(MAKESILENT) -f Sandbox/CMakeFiles/Sandbox.dir/build.make Sandbox/CMakeFiles/Sandbox.dir/depend
 	$(MAKE) $(MAKESILENT) -f Sandbox/CMakeFiles/Sandbox.dir/build.make Sandbox/CMakeFiles/Sandbox.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/divakar/Desktop/AccelPhysics/build/CMakeFiles --progress-num=4,5 "Built target Sandbox"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/divakar/Desktop/AccelPhysics/build/CMakeFiles --progress-num=3,4 "Built target Sandbox"
 .PHONY : Sandbox/CMakeFiles/Sandbox.dir/all
 
 # Build rule for subdir invocation for target.
 Sandbox/CMakeFiles/Sandbox.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/divakar/Desktop/AccelPhysics/build/CMakeFiles 5
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/divakar/Desktop/AccelPhysics/build/CMakeFiles 4
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 Sandbox/CMakeFiles/Sandbox.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/divakar/Desktop/AccelPhysics/build/CMakeFiles 0
 .PHONY : Sandbox/CMakeFiles/Sandbox.dir/rule

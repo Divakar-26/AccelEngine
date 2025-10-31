@@ -1,2 +1,2 @@
-/usr/bin/ar qc libAccelEngine.a CMakeFiles/AccelEngine.dir/src/main.cpp.o CMakeFiles/AccelEngine.dir/src/particle.cpp.o
+/usr/bin/ar qc libAccelEngine.a CMakeFiles/AccelEngine.dir/src/particle.cpp.o
 /usr/bin/ranlib libAccelEngine.a
