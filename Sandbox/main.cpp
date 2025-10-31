@@ -30,9 +30,8 @@ int main()
     ParticleForceRegistry r;
     ParticleGravity gravity(Vector2(0, 0));
 
-    // k = 100 and rest lenght = 300 px -> 100 = more spring like
-    ParticleSpring spring1(&p1, 1.0f, 300.0f);
-    ParticleSpring spring2(&p, 1.0f, 300.0f);
+    ParticleBungee spring1(&p1, 10.0f, 300.0f);
+    ParticleBungee spring2(&p, 10.0f, 300.0f);
     r.add(&p, &spring1);
     r.add(&p1, &spring2);
 

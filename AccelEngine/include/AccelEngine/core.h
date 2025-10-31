@@ -116,6 +116,13 @@ namespace AccelEngine
             return Vector2(-y, x);
         }
 
+        static real distance(const Vector2 &a, const Vector2 &b)
+        {
+            float dx = a.x - b.x;
+            float dy = a.y - b.y;
+            return sqrtf(dx * dx + dy * dy);
+        }
+
         // Clear to zero
         void clear()
         {
@@ -245,7 +252,8 @@ namespace AccelEngine
                            x * v.y - y * v.x);
         }
 
-        void clear(){
+        void clear()
+        {
             x = y = z = 0;
         }
         // actual components
