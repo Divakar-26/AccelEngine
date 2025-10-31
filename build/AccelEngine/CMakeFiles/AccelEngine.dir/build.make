@@ -83,17 +83,33 @@ AccelEngine/CMakeFiles/AccelEngine.dir/src/particle.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/AccelEngine.dir/src/particle.cpp.s"
 	cd /home/divakar/Desktop/AccelPhysics/build/AccelEngine && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/divakar/Desktop/AccelPhysics/AccelEngine/src/particle.cpp -o CMakeFiles/AccelEngine.dir/src/particle.cpp.s
 
+AccelEngine/CMakeFiles/AccelEngine.dir/src/pfgen.cpp.o: AccelEngine/CMakeFiles/AccelEngine.dir/flags.make
+AccelEngine/CMakeFiles/AccelEngine.dir/src/pfgen.cpp.o: /home/divakar/Desktop/AccelPhysics/AccelEngine/src/pfgen.cpp
+AccelEngine/CMakeFiles/AccelEngine.dir/src/pfgen.cpp.o: AccelEngine/CMakeFiles/AccelEngine.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/divakar/Desktop/AccelPhysics/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object AccelEngine/CMakeFiles/AccelEngine.dir/src/pfgen.cpp.o"
+	cd /home/divakar/Desktop/AccelPhysics/build/AccelEngine && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT AccelEngine/CMakeFiles/AccelEngine.dir/src/pfgen.cpp.o -MF CMakeFiles/AccelEngine.dir/src/pfgen.cpp.o.d -o CMakeFiles/AccelEngine.dir/src/pfgen.cpp.o -c /home/divakar/Desktop/AccelPhysics/AccelEngine/src/pfgen.cpp
+
+AccelEngine/CMakeFiles/AccelEngine.dir/src/pfgen.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/AccelEngine.dir/src/pfgen.cpp.i"
+	cd /home/divakar/Desktop/AccelPhysics/build/AccelEngine && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/divakar/Desktop/AccelPhysics/AccelEngine/src/pfgen.cpp > CMakeFiles/AccelEngine.dir/src/pfgen.cpp.i
+
+AccelEngine/CMakeFiles/AccelEngine.dir/src/pfgen.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/AccelEngine.dir/src/pfgen.cpp.s"
+	cd /home/divakar/Desktop/AccelPhysics/build/AccelEngine && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/divakar/Desktop/AccelPhysics/AccelEngine/src/pfgen.cpp -o CMakeFiles/AccelEngine.dir/src/pfgen.cpp.s
+
 # Object files for target AccelEngine
 AccelEngine_OBJECTS = \
-"CMakeFiles/AccelEngine.dir/src/particle.cpp.o"
+"CMakeFiles/AccelEngine.dir/src/particle.cpp.o" \
+"CMakeFiles/AccelEngine.dir/src/pfgen.cpp.o"
 
 # External object files for target AccelEngine
 AccelEngine_EXTERNAL_OBJECTS =
 
 AccelEngine/libAccelEngine.a: AccelEngine/CMakeFiles/AccelEngine.dir/src/particle.cpp.o
+AccelEngine/libAccelEngine.a: AccelEngine/CMakeFiles/AccelEngine.dir/src/pfgen.cpp.o
 AccelEngine/libAccelEngine.a: AccelEngine/CMakeFiles/AccelEngine.dir/build.make
 AccelEngine/libAccelEngine.a: AccelEngine/CMakeFiles/AccelEngine.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/divakar/Desktop/AccelPhysics/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Linking CXX static library libAccelEngine.a"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/divakar/Desktop/AccelPhysics/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Linking CXX static library libAccelEngine.a"
 	cd /home/divakar/Desktop/AccelPhysics/build/AccelEngine && $(CMAKE_COMMAND) -P CMakeFiles/AccelEngine.dir/cmake_clean_target.cmake
 	cd /home/divakar/Desktop/AccelPhysics/build/AccelEngine && $(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/AccelEngine.dir/link.txt --verbose=$(VERBOSE)
 

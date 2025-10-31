@@ -42,4 +42,16 @@ namespace AccelEngine
 
         virtual void updateForce(Particle * particle, real duration);
     };
+
+    class ParticleDrag : public ParticleForceGenerator{
+        //k1 is for linear drag like, table or road
+        real k1;
+
+        //k2 is for quadratic drag used when drag changes with speed like air or water
+        real k2;
+
+        public:
+            ParticleDrag(real k1, real k2) : k1(k1), k2(k2) {}
+            virtual void updateForce(Particle * particle, real duration);
+    };
 }

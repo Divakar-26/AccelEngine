@@ -1,4 +1,4 @@
-#include "pfgen.h"
+#include "AccelEngine/pfgen.h"
 
 using namespace AccelEngine;
 
@@ -30,6 +30,17 @@ void ParticleGravity::updateForce(Particle * p, real duration){
         return;
     }
 
-    p->addForce(gravity * p->getMass());
+    p->addForce(gravity * (1.0f / p->inverseMass));
+}
+
+void ParticleDrag::updateForce(Particle * p, real duration){
+    Vector3 force = p->getVelocity();
+
+    real dragCoeff = force.magnitude();
+    dragCoeff = k1 * dragCoeff + k2 * dragCoeff * dragCoeff;
+
+    force.normalize();
+    force *= -dragCoeff;
+    p->addForce(force);
 }
 

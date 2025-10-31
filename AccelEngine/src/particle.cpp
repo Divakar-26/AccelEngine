@@ -12,7 +12,7 @@ namespace AccelEngine
         position.addScaledVector(velocity, duration);
 
         Vector3 resultingAcc = acceleration;
-        resultingAcc.addScaledVector(forceAccum, 1 / inverseMass);
+        resultingAcc.addScaledVector(forceAccum, inverseMass);
 
         velocity.addScaledVector(resultingAcc, duration);
 
@@ -29,3 +29,5 @@ namespace AccelEngine
         forceAccum += force;
     }
 }
+
+

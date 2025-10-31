@@ -2,6 +2,8 @@
     #include <iostream>
     #include <AccelEngine/core.h>
     #include <AccelEngine/particle.h>
+    #include <AccelEngine/pfgen.h>
+
 
     using namespace AccelEngine;
 
@@ -12,13 +14,20 @@
         SDL_Renderer *renderer = SDL_CreateRenderer(window, nullptr);
 
         Particle p;
-        p.inverseMass = 10000.0f;
+        p.inverseMass = 1.0f;
         // p.damping = 0.99f;
         p.position = Vector3(100, 100, 0);
-        p.acceleration = Vector3(0,0,0);
+        p.acceleration = Vector3(0 , 0 , 0);
         p.velocity = Vector3(0, 0, 0);
 
-        
+        //make a registry and also a force generator called gravity
+        ParticleForceRegistry r;
+        ParticleGravity gravity(Vector3(0, 980, 0));
+
+        ParticleDrag drag(0.05,0.01);
+        r.add(&p, &drag);
+        //add it in registry
+        r.add(&p, &gravity);
 
         bool running = true;
         Uint64 lastTime = SDL_GetTicks();
@@ -42,9 +51,8 @@
             float duration = (currentTime - lastTime) / 1000.0f;
             lastTime = currentTime;
 
-            p.addForce(Vector3(20, 2000, 0));
-            p.addForce(Vector3(-20, 2000,0));
-            // Integrate physics
+            
+            r.updateForces(duration);
             p.integrate(duration);
 
             SDL_SetRenderDrawColor(renderer, 20, 20, 30, 255);

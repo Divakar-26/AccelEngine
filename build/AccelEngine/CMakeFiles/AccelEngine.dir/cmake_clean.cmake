@@ -1,6 +1,8 @@
 file(REMOVE_RECURSE
   "CMakeFiles/AccelEngine.dir/src/particle.cpp.o"
   "CMakeFiles/AccelEngine.dir/src/particle.cpp.o.d"
+  "CMakeFiles/AccelEngine.dir/src/pfgen.cpp.o"
+  "CMakeFiles/AccelEngine.dir/src/pfgen.cpp.o.d"
   "libAccelEngine.a"
   "libAccelEngine.pdb"
 )

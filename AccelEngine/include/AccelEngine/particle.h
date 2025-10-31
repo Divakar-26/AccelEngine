@@ -21,12 +21,13 @@ namespace AccelEngine
         void addForce(const Vector3 & force);
 
         //helper functions
-        real getMass(){
-            return 1 / inverseMass;
-        }
 
         bool hasFiniteMass(){
-            return inverseMass != 0;
+            return inverseMass > 0.0f;  
         }
+
+        Vector3 getVelocity() {return velocity;}
+        real getMass() {return 1.0f / inverseMass;}
+
     };
 } // namespace AccelEngine
