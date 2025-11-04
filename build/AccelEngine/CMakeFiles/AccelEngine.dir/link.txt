@@ -1,2 +1,2 @@
-/usr/bin/ar qc libAccelEngine.a CMakeFiles/AccelEngine.dir/src/particle.cpp.o CMakeFiles/AccelEngine.dir/src/pfgen.cpp.o
+/usr/bin/ar qc libAccelEngine.a CMakeFiles/AccelEngine.dir/src/particle.cpp.o CMakeFiles/AccelEngine.dir/src/pfgen.cpp.o CMakeFiles/AccelEngine.dir/src/ParticleContact.cpp.o
 /usr/bin/ranlib libAccelEngine.a

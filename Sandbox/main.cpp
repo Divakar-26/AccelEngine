@@ -3,6 +3,7 @@
 #include <AccelEngine/core.h>
 #include <AccelEngine/particle.h>
 #include <AccelEngine/pfgen.h>
+#include <AccelEngine/ParticleContact.h>
 
 using namespace AccelEngine;
 
@@ -20,25 +21,22 @@ int main()
     p.velocity = Vector2(0, 0);
 
     Particle p1;
-    p1.inverseMass = 1.0f;
+    p1.inverseMass = 0.00000001f;
     // p.damping = 0.99f;
-    p1.position = Vector2(500, 100);
+    p1.position = Vector2(100, 500);
     p1.acceleration = Vector2(0, 0);
     p1.velocity = Vector2(0, 0);
 
     // make a registry and also a force generator called gravity
     ParticleForceRegistry r;
-    ParticleGravity gravity(Vector2(0, 0));
-
-    ParticleBungee spring1(&p1, 10.0f, 300.0f);
-    ParticleBungee spring2(&p, 10.0f, 300.0f);
-    r.add(&p, &spring1);
-    r.add(&p1, &spring2);
+    ParticleGravity gravity(Vector2(0, 980));
 
     // add it in registry
-    ParticleDrag drag(0.5f, 0.1f);
+    ParticleDrag drag(0, 0);
     r.add(&p, &drag);
     r.add(&p, &gravity);
+
+    ParticleContact contact;
 
     bool running = true;
     Uint64 lastTime = SDL_GetTicks();
@@ -56,10 +54,10 @@ int main()
                 {
                     p.position.x += 10.0f;
                 }
-                else if(e.key.key == SDLK_R){
-                    p.position = Vector2(100,100);
+                else if (e.key.key == SDLK_R)
+                {
+                    p.velocity.x += 10;
                 }
-                
             }
         }
 
@@ -70,6 +68,36 @@ int main()
         r.updateForces(duration);
         p.integrate(duration);
         p1.integrate(duration);
+
+        // simple AABB collision detection
+        float size = 100.0f;
+        if (p.position.x < p1.position.x + size &&
+            p.position.x + size > p1.position.x &&
+            p.position.y < p1.position.y + size &&
+            p.position.y + size > p1.position.y)
+        {
+
+            contact.particle[0] = &p;
+            contact.particle[1] = &p1;
+
+            Vector2 normal = (p.position - p1.position);
+            normal.normalize();
+
+            Vector2 relativeVel = p.getVelocity() - p1.getVelocity();
+            if (relativeVel * normal > 0)
+                normal.invert();
+
+            contact.contactNormal = normal;
+
+            // Estimate penetration (optional)
+            // contact.penetration = (size - std::abs(p.position.y - p1.position.x)) * 0.5f;
+
+            // Restitution controls bounciness (0 = sticky, 1 = bouncy)
+            contact.restitution = 0.99f;
+            contact.resolve(duration);
+        }
+
+        std::cout<<p.getVelocity().x << " " << p.getVelocity().y<<" , "<<p1.getVelocity().x << " " << p1.getVelocity().y<<std::endl;
 
         SDL_SetRenderDrawColor(renderer, 20, 20, 30, 255);
         SDL_RenderClear(renderer);

@@ -130,6 +130,30 @@ AccelEngine/fast:
 	cd /home/divakar/Desktop/AccelPhysics/build && $(MAKE) $(MAKESILENT) -f AccelEngine/CMakeFiles/AccelEngine.dir/build.make AccelEngine/CMakeFiles/AccelEngine.dir/build
 .PHONY : AccelEngine/fast
 
+src/ParticleContact.o: src/ParticleContact.cpp.o
+.PHONY : src/ParticleContact.o
+
+# target to build an object file
+src/ParticleContact.cpp.o:
+	cd /home/divakar/Desktop/AccelPhysics/build && $(MAKE) $(MAKESILENT) -f AccelEngine/CMakeFiles/AccelEngine.dir/build.make AccelEngine/CMakeFiles/AccelEngine.dir/src/ParticleContact.cpp.o
+.PHONY : src/ParticleContact.cpp.o
+
+src/ParticleContact.i: src/ParticleContact.cpp.i
+.PHONY : src/ParticleContact.i
+
+# target to preprocess a source file
+src/ParticleContact.cpp.i:
+	cd /home/divakar/Desktop/AccelPhysics/build && $(MAKE) $(MAKESILENT) -f AccelEngine/CMakeFiles/AccelEngine.dir/build.make AccelEngine/CMakeFiles/AccelEngine.dir/src/ParticleContact.cpp.i
+.PHONY : src/ParticleContact.cpp.i
+
+src/ParticleContact.s: src/ParticleContact.cpp.s
+.PHONY : src/ParticleContact.s
+
+# target to generate assembly for a file
+src/ParticleContact.cpp.s:
+	cd /home/divakar/Desktop/AccelPhysics/build && $(MAKE) $(MAKESILENT) -f AccelEngine/CMakeFiles/AccelEngine.dir/build.make AccelEngine/CMakeFiles/AccelEngine.dir/src/ParticleContact.cpp.s
+.PHONY : src/ParticleContact.cpp.s
+
 src/particle.o: src/particle.cpp.o
 .PHONY : src/particle.o
 
@@ -187,6 +211,9 @@ help:
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
 	@echo "... AccelEngine"
+	@echo "... src/ParticleContact.o"
+	@echo "... src/ParticleContact.i"
+	@echo "... src/ParticleContact.s"
 	@echo "... src/particle.o"
 	@echo "... src/particle.i"
 	@echo "... src/particle.s"
