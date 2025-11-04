@@ -154,6 +154,30 @@ src/ParticleContact.cpp.s:
 	cd /home/divakar/Desktop/AccelPhysics/build && $(MAKE) $(MAKESILENT) -f AccelEngine/CMakeFiles/AccelEngine.dir/build.make AccelEngine/CMakeFiles/AccelEngine.dir/src/ParticleContact.cpp.s
 .PHONY : src/ParticleContact.cpp.s
 
+src/ParticleWorld.o: src/ParticleWorld.cpp.o
+.PHONY : src/ParticleWorld.o
+
+# target to build an object file
+src/ParticleWorld.cpp.o:
+	cd /home/divakar/Desktop/AccelPhysics/build && $(MAKE) $(MAKESILENT) -f AccelEngine/CMakeFiles/AccelEngine.dir/build.make AccelEngine/CMakeFiles/AccelEngine.dir/src/ParticleWorld.cpp.o
+.PHONY : src/ParticleWorld.cpp.o
+
+src/ParticleWorld.i: src/ParticleWorld.cpp.i
+.PHONY : src/ParticleWorld.i
+
+# target to preprocess a source file
+src/ParticleWorld.cpp.i:
+	cd /home/divakar/Desktop/AccelPhysics/build && $(MAKE) $(MAKESILENT) -f AccelEngine/CMakeFiles/AccelEngine.dir/build.make AccelEngine/CMakeFiles/AccelEngine.dir/src/ParticleWorld.cpp.i
+.PHONY : src/ParticleWorld.cpp.i
+
+src/ParticleWorld.s: src/ParticleWorld.cpp.s
+.PHONY : src/ParticleWorld.s
+
+# target to generate assembly for a file
+src/ParticleWorld.cpp.s:
+	cd /home/divakar/Desktop/AccelPhysics/build && $(MAKE) $(MAKESILENT) -f AccelEngine/CMakeFiles/AccelEngine.dir/build.make AccelEngine/CMakeFiles/AccelEngine.dir/src/ParticleWorld.cpp.s
+.PHONY : src/ParticleWorld.cpp.s
+
 src/particle.o: src/particle.cpp.o
 .PHONY : src/particle.o
 
@@ -214,6 +238,9 @@ help:
 	@echo "... src/ParticleContact.o"
 	@echo "... src/ParticleContact.i"
 	@echo "... src/ParticleContact.s"
+	@echo "... src/ParticleWorld.o"
+	@echo "... src/ParticleWorld.i"
+	@echo "... src/ParticleWorld.s"
 	@echo "... src/particle.o"
 	@echo "... src/particle.i"
 	@echo "... src/particle.s"

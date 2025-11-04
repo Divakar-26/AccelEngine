@@ -38,4 +38,9 @@ namespace AccelEngine
             }
             void resolveContact(ParticleContact * contactArray, unsigned numContact, real duration);
     };
+
+    class ParticleContactGenerator{
+        public:
+            virtual unsigned addContact(ParticleContact * contact, unsigned limit) const = 0;
+    };
 }

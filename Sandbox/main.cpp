@@ -4,115 +4,122 @@
 #include <AccelEngine/particle.h>
 #include <AccelEngine/pfgen.h>
 #include <AccelEngine/ParticleContact.h>
+#include <AccelEngine/ParticleWorld.h>
 
 using namespace AccelEngine;
 
 int main()
 {
-    SDL_Init(SDL_INIT_VIDEO);
+    if (SDL_Init(SDL_INIT_VIDEO) == 0)
+    {
+        std::cerr << "SDL failed: " << SDL_GetError() << std::endl;
+        return -1;
+    }
+
     SDL_Window *window = SDL_CreateWindow("Physics Test", 800, 600, SDL_WINDOW_RESIZABLE);
     SDL_Renderer *renderer = SDL_CreateRenderer(window, nullptr);
 
     Particle p;
     p.inverseMass = 1.0f;
-    // p.damping = 0.99f;
     p.position = Vector2(100, 100);
     p.acceleration = Vector2(0, 0);
     p.velocity = Vector2(0, 0);
 
-    Particle p1;
-    p1.inverseMass = 0.00000001f;
-    // p.damping = 0.99f;
-    p1.position = Vector2(100, 500);
-    p1.acceleration = Vector2(0, 0);
-    p1.velocity = Vector2(0, 0);
+    Particle ground;
+    ground.inverseMass = 0.00001f; 
+    ground.position = Vector2(120, 500);
+    ground.acceleration = Vector2(0, 0);
+    ground.velocity = Vector2(0, 0);
 
-    // make a registry and also a force generator called gravity
-    ParticleForceRegistry r;
-    ParticleGravity gravity(Vector2(0, 980));
 
-    // add it in registry
+    ParticleGravity gravity(Vector2(0, 980)); 
     ParticleDrag drag(0, 0);
-    r.add(&p, &drag);
-    r.add(&p, &gravity);
+
+    ParticleWorld world(100, 100);
+    world.addParticle(&p);
+    world.addParticle(&ground);
+    world.getForceRegistry().add(&p, &gravity);
+    world.getForceRegistry().add(&p, &drag);
 
     ParticleContact contact;
 
     bool running = true;
+
+
+    const float FIXED_DT = 1.0f / 60.0f; 
+    float accumulator = 0.0f;
     Uint64 lastTime = SDL_GetTicks();
-    bool upHeld = false;
+
+    const float size = 100.0f;
+
     while (running)
     {
+
         SDL_Event e;
         while (SDL_PollEvent(&e))
         {
             if (e.type == SDL_EVENT_QUIT)
                 running = false;
+
             if (e.type == SDL_EVENT_KEY_DOWN)
             {
                 if (e.key.key == SDLK_RIGHT)
-                {
-                    p.position.x += 10.0f;
-                }
+                    p.velocity.x += 200.0f;
+                else if (e.key.key == SDLK_LEFT)
+                    p.velocity.x -= 200.0f;
                 else if (e.key.key == SDLK_R)
                 {
-                    p.velocity.x += 10;
+                    p.position = Vector2(100, 100);
+                    p.velocity = Vector2(0, 0);
                 }
             }
         }
 
         Uint64 currentTime = SDL_GetTicks();
-        float duration = (currentTime - lastTime) / 1000.0f;
+        float frameTime = (currentTime - lastTime) / 1000.0f;
+        if (frameTime > 0.25f) frameTime = 0.25f;
         lastTime = currentTime;
+        accumulator += frameTime;
 
-        r.updateForces(duration);
-        p.integrate(duration);
-        p1.integrate(duration);
 
-        // simple AABB collision detection
-        float size = 100.0f;
-        if (p.position.x < p1.position.x + size &&
-            p.position.x + size > p1.position.x &&
-            p.position.y < p1.position.y + size &&
-            p.position.y + size > p1.position.y)
+        while (accumulator >= FIXED_DT)
         {
+            world.startFrame();
 
-            contact.particle[0] = &p;
-            contact.particle[1] = &p1;
 
-            Vector2 normal = (p.position - p1.position);
-            normal.normalize();
+            if (p.position.x < ground.position.x + size &&
+                p.position.x + size > ground.position.x &&
+                p.position.y < ground.position.y + size &&
+                p.position.y + size > ground.position.y)
+            {
+                contact.particle[0] = &p;
+                contact.particle[1] = &ground;
 
-            Vector2 relativeVel = p.getVelocity() - p1.getVelocity();
-            if (relativeVel * normal > 0)
-                normal.invert();
+                Vector2 normal = (p.position - ground.position);
+                normal.normalize();
+                Vector2 relativeVel = p.getVelocity() - ground.getVelocity();
+                if (relativeVel * normal > 0)
+                    normal.invert();
 
-            contact.contactNormal = normal;
+                contact.contactNormal = normal;
+                contact.restitution = 0.0f;
+                contact.resolve(FIXED_DT);
+            }
 
-            // Estimate penetration (optional)
-            // contact.penetration = (size - std::abs(p.position.y - p1.position.x)) * 0.5f;
-
-            // Restitution controls bounciness (0 = sticky, 1 = bouncy)
-            contact.restitution = 0.99f;
-            contact.resolve(duration);
+            world.runPhysics(FIXED_DT);
+            accumulator -= FIXED_DT;
         }
-
-        std::cout<<p.getVelocity().x << " " << p.getVelocity().y<<" , "<<p1.getVelocity().x << " " << p1.getVelocity().y<<std::endl;
 
         SDL_SetRenderDrawColor(renderer, 20, 20, 30, 255);
         SDL_RenderClear(renderer);
 
         SDL_SetRenderDrawColor(renderer, 255, 200, 0, 255);
-        SDL_FRect rect = {p.position.x, p.position.y, 100, 100};
-        SDL_RenderFillRect(renderer, &rect);
+        SDL_FRect rectP = {p.position.x, p.position.y, size, size};
+        SDL_RenderFillRect(renderer, &rectP);
 
         SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
-        SDL_FRect rect2 = {p1.position.x, p1.position.y, 100, 100};
-        SDL_RenderFillRect(renderer, &rect2);
-
-        SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);
-        SDL_RenderLine(renderer, p.position.x + 50, p.position.y + 50,
-                       p1.position.x + 50, p1.position.y + 50);
+        SDL_FRect rectG = {ground.position.x, ground.position.y, size, size};
+        SDL_RenderFillRect(renderer, &rectG);
 
         SDL_RenderPresent(renderer);
     }
@@ -120,4 +127,5 @@ int main()
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);
     SDL_Quit();
+    return 0;
 }

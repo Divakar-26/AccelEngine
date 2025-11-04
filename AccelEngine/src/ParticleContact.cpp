@@ -23,7 +23,6 @@ void ParticleContact::resolveVelocity(real duration)
 {
   real seperatingVelocity = calculateSeperatingVelocity();
 
-  /* either seperatjng \or stationary */
   if (seperatingVelocity > 0)
   {
     return;
@@ -100,7 +99,6 @@ void ParticleContactResolver::resolveContact(ParticleContact *contactArray, unsi
         maxIndex = i;
       }
     }
-
 
     contactArray[maxIndex].resolve(duration);
     itertaionsUsed++;
