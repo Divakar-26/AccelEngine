@@ -133,6 +133,139 @@ namespace AccelEngine
         real x, y;
     };
 
+    class Matrix2
+    {
+    public:
+        /**
+         * Matrix elements in array form.
+         * 0 1
+         * 2 3
+         */
+        real data[4];
+
+        Matrix2()
+        {
+            data[0] = data[3] = (real)1;
+            data[1] = data[2] = (real)0;
+        }
+
+        Matrix2(real m00, real m01, real m10, real m11)
+        {
+            data[0] = m00;
+            data[1] = m01;
+            data[2] = m10;
+            data[3] = m11;
+        }
+
+        void setIdentity()
+        {
+            data[0] = data[3] = (real)1;
+            data[1] = data[2] = (real)0;
+        }
+
+        void set(real m00, real m01, real m10, real m11)
+        {
+            data[0] = m00;
+            data[1] = m01;
+            data[2] = m10;
+            data[3] = m11;
+        }
+
+        void setOrientation(real radians)
+        {
+            real c = (real)std::cos(radians);
+            real s = (real)std::sin(radians);
+            data[0] = c;
+            data[1] = -s;
+            data[2] = s;
+            data[3] = c;
+        }
+
+        Vector2 operator*(const Vector2 &v) const
+        {
+            return Vector2(
+                data[0] * v.x + data[1] * v.y,
+                data[2] * v.x + data[3] * v.y);
+        }
+
+        Matrix2 operator*(const Matrix2 &o) const
+        {
+            return Matrix2(
+                data[0] * o.data[0] + data[1] * o.data[2],
+                data[0] * o.data[1] + data[1] * o.data[3],
+                data[2] * o.data[0] + data[3] * o.data[2],
+                data[2] * o.data[1] + data[3] * o.data[3]);
+        }
+
+        Matrix2 operator*(real scalar) const
+        {
+            return Matrix2(
+                data[0] * scalar, data[1] * scalar,
+                data[2] * scalar, data[3] * scalar);
+        }
+
+        Vector2 transformTranspose(const Vector2 &v) const
+        {
+            return Vector2(
+                data[0] * v.x + data[2] * v.y,
+                data[1] * v.x + data[3] * v.y);
+        }
+
+        void invert()
+        {
+            real det = data[0] * data[3] - data[1] * data[2];
+            if (det == (real)0.0f)
+                return;
+
+            real invDet = ((real)1.0f) / det;
+            Matrix2 tmp = *this;
+
+            data[0] = tmp.data[3] * invDet;
+            data[1] = -tmp.data[1] * invDet;
+            data[2] = -tmp.data[2] * invDet;
+            data[3] = tmp.data[0] * invDet;
+        }
+
+        real getDeterminant() const
+        {
+            return data[0] * data[3] - data[1] * data[2];
+        }
+
+        void setInverse(const Matrix2 &m)
+        {
+            real det = m.getDeterminant();
+            if (det == (real)0.0f)
+            {
+                setIdentity();
+                return;
+            }
+
+            real invDet = ((real)1.0f) / det;
+            data[0] = m.data[3] * invDet;
+            data[1] = -m.data[1] * invDet;
+            data[2] = -m.data[2] * invDet;
+            data[3] = m.data[0] * invDet;
+        }
+
+        void transpose()
+        {
+            std::swap(data[1], data[2]);
+        }
+
+        Matrix2 &operator*=(const Matrix2 &o)
+        {
+            *this = *this * o;
+            return *this;
+        }
+
+        Vector2 transform(const Vector2 &v) const
+        {
+            return Vector2(
+                data[0] * v.x + data[1] * v.y,
+                data[2] * v.x + data[3] * v.y);
+        }
+    };
+
     class Vector3
     {
     public:
@@ -263,4 +396,4 @@ namespace AccelEngine
         real pad;
     };
 
-}
+}   

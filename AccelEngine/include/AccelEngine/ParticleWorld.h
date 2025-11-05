@@ -21,11 +21,18 @@ namespace AccelEngine
             ContactGenRegistration *next;
         };
 
+        //holds particle
         ParticleRegistration *firstParticle;
+        //holds contact genration
         ContactGenRegistration *firstContactGen;
 
+        //holds force registry
         ParticleForceRegistry registry;
+
+        //holds resolver for contact
         ParticleContactResolver resolver;
+
+        //holds the contacts between particle
         ParticleContact *contacts;
 
         unsigned maxContacts;

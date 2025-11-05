@@ -1,10 +1,9 @@
 #include <SDL3/SDL.h>
 #include <iostream>
 #include <AccelEngine/core.h>
-#include <AccelEngine/particle.h>
-#include <AccelEngine/pfgen.h>
-#include <AccelEngine/ParticleContact.h>
-#include <AccelEngine/ParticleWorld.h>
+#include <AccelEngine/body.h>
+#include <AccelEngine/ForceGenerator.h>
+#include <AccelEngine/world.h>
 
 using namespace AccelEngine;
 
@@ -16,45 +15,52 @@ int main()
         return -1;
     }
 
-    SDL_Window *window = SDL_CreateWindow("Physics Test", 800, 600, SDL_WINDOW_RESIZABLE);
+    SDL_Window *window = SDL_CreateWindow("RigidBody World", 800, 600, SDL_WINDOW_RESIZABLE);
     SDL_Renderer *renderer = SDL_CreateRenderer(window, nullptr);
 
-    Particle p;
-    p.inverseMass = 1.0f;
-    p.position = Vector2(100, 100);
-    p.acceleration = Vector2(0, 0);
-    p.velocity = Vector2(0, 0);
+    // =========================
+    // SETUP PHYSICS WORLD
+    // =========================
+    World world;
 
-    Particle ground;
-    ground.inverseMass = 0.00001f; 
-    ground.position = Vector2(120, 500);
-    ground.acceleration = Vector2(0, 0);
-    ground.velocity = Vector2(0, 0);
+    // --- Create one rigid body ---
+    RigidBody body;
+    body.inverseMass = 1.0f / 5.0f;    // 5 kg
+    body.inverseInertia = 1.0f / 2.0f; // rotational inertia
+    body.position = Vector2(400, 100);
+    body.orientation = 0;
+    body.linearDamping = 0.99f;
+    body.angularDamping = 0.9995f;
+    body.velocity = Vector2(0, 0);
 
+    world.addBody(&body);
 
-    ParticleGravity gravity(Vector2(0, 980)); 
-    ParticleDrag drag(0, 0);
+    // --- Create environment forces ---
+    Gravity gravity(Vector2(0, 100)); // Downward force
 
-    ParticleWorld world(100, 100);
-    world.addParticle(&p);
-    world.addParticle(&ground);
-    world.getForceRegistry().add(&p, &gravity);
-    world.getForceRegistry().add(&p, &drag);
+    // Waterline at y = 400
+    Buoyancy buoy(Vector2(0, 0), 50.0f, 2.0f, 400.0f, 1000.0f);
 
-    ParticleContact contact;
+    // Aerodynamic drag-like surface
+    Matrix2 dragTensor;
+    dragTensor.set(-0.5f, 0.0f, 0.0f, -0.5f);
+    Aero aero(dragTensor, Vector2(0, 0));
 
-    bool running = true;
+    // Optional simple wind
+    Vector2 wind(5000.0f, 0.0f);
 
-
-    const float FIXED_DT = 1.0f / 60.0f; 
-    float accumulator = 0.0f;
+    // =========================
+    // SDL LOOP
+    // =========================
+    const float FIXED_DT = 1.0f / 60.0f;
     Uint64 lastTime = SDL_GetTicks();
-
-    const float size = 100.0f;
+    bool running = true;
 
     while (running)
     {
-
+        // ------------------------
+        // EVENT HANDLING
+        // ------------------------
         SDL_Event e;
         while (SDL_PollEvent(&e))
         {
@@ -64,64 +70,68 @@ int main()
             if (e.type == SDL_EVENT_KEY_DOWN)
             {
                 if (e.key.key == SDLK_RIGHT)
-                    p.velocity.x += 200.0f;
+                    body.addForce(Vector2(500.0f, 0));
                 else if (e.key.key == SDLK_LEFT)
-                    p.velocity.x -= 200.0f;
-                else if (e.key.key == SDLK_R)
-                {
-                    p.position = Vector2(100, 100);
-                    p.velocity = Vector2(0, 0);
-                }
+                    body.addForce(Vector2(-500.0f, 0));
+                else if (e.key.key == SDLK_UP)
+                    body.addForce(Vector2(0, -1500.0f));
+                else if (e.key.key == SDLK_SPACE)
+                    body.addForceAtBodyPoint(Vector2(0, -2000.0f), Vector2(25, 0));
             }
         }
 
-        Uint64 currentTime = SDL_GetTicks();
-        float frameTime = (currentTime - lastTime) / 1000.0f;
-        if (frameTime > 0.25f) frameTime = 0.25f;
-        lastTime = currentTime;
-        accumulator += frameTime;
+        // ------------------------
+        // FIXED TIMESTEP
+        // ------------------------
+        Uint64 now = SDL_GetTicks();
+        float frameTime = (now - lastTime) / 1000.0f;
+        lastTime = now;
 
+        // ------------------------
+        // PHYSICS UPDATE
+        // ------------------------
+        world.startFrame();
 
-        while (accumulator >= FIXED_DT)
-        {
-            world.startFrame();
+        Vector2 localPoint(-30, -15); // top-right corner of box
+        body.velocity.x += 1;
+        // Apply forces manually (no registry yet)
+        gravity.updateForce(&body, FIXED_DT);
+        buoy.updateForce(&body, FIXED_DT);
+        aero.updateForce(&body, FIXED_DT);
 
+        // Run physics on all bodies
+        world.runPhysics(FIXED_DT);
 
-            if (p.position.x < ground.position.x + size &&
-                p.position.x + size > ground.position.x &&
-                p.position.y < ground.position.y + size &&
-                p.position.y + size > ground.position.y)
-            {
-                contact.particle[0] = &p;
-                contact.particle[1] = &ground;
-
-                Vector2 normal = (p.position - ground.position);
-                normal.normalize();
-                Vector2 relativeVel = p.getVelocity() - ground.getVelocity();
-                if (relativeVel * normal > 0)
-                    normal.invert();
-
-                contact.contactNormal = normal;
-                contact.restitution = 0.0f;
-                contact.resolve(FIXED_DT);
-            }
-
-            world.runPhysics(FIXED_DT);
-            accumulator -= FIXED_DT;
-        }
-
-        SDL_SetRenderDrawColor(renderer, 20, 20, 30, 255);
+        // ------------------------
+        // RENDERING
+        // ------------------------
+        SDL_SetRenderDrawColor(renderer, 25, 25, 40, 255);
         SDL_RenderClear(renderer);
 
-        SDL_SetRenderDrawColor(renderer, 255, 200, 0, 255);
-        SDL_FRect rectP = {p.position.x, p.position.y, size, size};
-        SDL_RenderFillRect(renderer, &rectP);
+        std::cout << "y: " << body.position.y;
 
+        SDL_Texture *boxTex = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, 60, 60);
+        SDL_SetRenderTarget(renderer, boxTex);
+        SDL_SetRenderDrawColor(renderer, 255, 200, 0, 255);
+        SDL_RenderClear(renderer);
+        SDL_SetRenderTarget(renderer, nullptr);
+
+        // Draw waterline
+        SDL_SetRenderDrawColor(renderer, 60, 80, 180, 180);
+        SDL_RenderLine(renderer, 0, 400, 800, 400);
+
+        Vector2 worldPoint = body.getPointInWorldSpace(Vector2(-30, -15));
         SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
-        SDL_FRect rectG = {ground.position.x, ground.position.y, size, size};
-        SDL_RenderFillRect(renderer, &rectG);
+        SDL_RenderLine(renderer, worldPoint.x, worldPoint.y,
+                       worldPoint.x + 50, worldPoint.y); // short line showing force dir
+
+        // Draw rigid body
+        SDL_FRect dst = {body.position.x, body.position.y, 60, 60};
+        SDL_FPoint center = {30, 30}; // rotation pivot = center of box
+        SDL_RenderTextureRotated(renderer, boxTex, nullptr, &dst, body.orientation, &center, SDL_FLIP_NONE);
 
         SDL_RenderPresent(renderer);
+        SDL_Delay(16); // ~60 FPS
     }
 
     SDL_DestroyRenderer(renderer);
