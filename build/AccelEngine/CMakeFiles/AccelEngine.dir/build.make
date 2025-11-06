@@ -139,13 +139,43 @@ AccelEngine/CMakeFiles/AccelEngine.dir/src/collision_coarse.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/AccelEngine.dir/src/collision_coarse.cpp.s"
 	cd /home/divakar/Desktop/AccelPhysics/build/AccelEngine && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/divakar/Desktop/AccelPhysics/AccelEngine/src/collision_coarse.cpp -o CMakeFiles/AccelEngine.dir/src/collision_coarse.cpp.s
 
+AccelEngine/CMakeFiles/AccelEngine.dir/src/narrow_collision.cpp.o: AccelEngine/CMakeFiles/AccelEngine.dir/flags.make
+AccelEngine/CMakeFiles/AccelEngine.dir/src/narrow_collision.cpp.o: /home/divakar/Desktop/AccelPhysics/AccelEngine/src/narrow_collision.cpp
+AccelEngine/CMakeFiles/AccelEngine.dir/src/narrow_collision.cpp.o: AccelEngine/CMakeFiles/AccelEngine.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/divakar/Desktop/AccelPhysics/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_6) "Building CXX object AccelEngine/CMakeFiles/AccelEngine.dir/src/narrow_collision.cpp.o"
+	cd /home/divakar/Desktop/AccelPhysics/build/AccelEngine && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT AccelEngine/CMakeFiles/AccelEngine.dir/src/narrow_collision.cpp.o -MF CMakeFiles/AccelEngine.dir/src/narrow_collision.cpp.o.d -o CMakeFiles/AccelEngine.dir/src/narrow_collision.cpp.o -c /home/divakar/Desktop/AccelPhysics/AccelEngine/src/narrow_collision.cpp
+
+AccelEngine/CMakeFiles/AccelEngine.dir/src/narrow_collision.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/AccelEngine.dir/src/narrow_collision.cpp.i"
+	cd /home/divakar/Desktop/AccelPhysics/build/AccelEngine && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/divakar/Desktop/AccelPhysics/AccelEngine/src/narrow_collision.cpp > CMakeFiles/AccelEngine.dir/src/narrow_collision.cpp.i
+
+AccelEngine/CMakeFiles/AccelEngine.dir/src/narrow_collision.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/AccelEngine.dir/src/narrow_collision.cpp.s"
+	cd /home/divakar/Desktop/AccelPhysics/build/AccelEngine && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/divakar/Desktop/AccelPhysics/AccelEngine/src/narrow_collision.cpp -o CMakeFiles/AccelEngine.dir/src/narrow_collision.cpp.s
+
+AccelEngine/CMakeFiles/AccelEngine.dir/src/collision_resolver.cpp.o: AccelEngine/CMakeFiles/AccelEngine.dir/flags.make
+AccelEngine/CMakeFiles/AccelEngine.dir/src/collision_resolver.cpp.o: /home/divakar/Desktop/AccelPhysics/AccelEngine/src/collision_resolver.cpp
+AccelEngine/CMakeFiles/AccelEngine.dir/src/collision_resolver.cpp.o: AccelEngine/CMakeFiles/AccelEngine.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/divakar/Desktop/AccelPhysics/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_7) "Building CXX object AccelEngine/CMakeFiles/AccelEngine.dir/src/collision_resolver.cpp.o"
+	cd /home/divakar/Desktop/AccelPhysics/build/AccelEngine && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT AccelEngine/CMakeFiles/AccelEngine.dir/src/collision_resolver.cpp.o -MF CMakeFiles/AccelEngine.dir/src/collision_resolver.cpp.o.d -o CMakeFiles/AccelEngine.dir/src/collision_resolver.cpp.o -c /home/divakar/Desktop/AccelPhysics/AccelEngine/src/collision_resolver.cpp
+
+AccelEngine/CMakeFiles/AccelEngine.dir/src/collision_resolver.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/AccelEngine.dir/src/collision_resolver.cpp.i"
+	cd /home/divakar/Desktop/AccelPhysics/build/AccelEngine && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/divakar/Desktop/AccelPhysics/AccelEngine/src/collision_resolver.cpp > CMakeFiles/AccelEngine.dir/src/collision_resolver.cpp.i
+
+AccelEngine/CMakeFiles/AccelEngine.dir/src/collision_resolver.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/AccelEngine.dir/src/collision_resolver.cpp.s"
+	cd /home/divakar/Desktop/AccelPhysics/build/AccelEngine && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/divakar/Desktop/AccelPhysics/AccelEngine/src/collision_resolver.cpp -o CMakeFiles/AccelEngine.dir/src/collision_resolver.cpp.s
+
 # Object files for target AccelEngine
 AccelEngine_OBJECTS = \
 "CMakeFiles/AccelEngine.dir/src/particle.cpp.o" \
 "CMakeFiles/AccelEngine.dir/src/pfgen.cpp.o" \
 "CMakeFiles/AccelEngine.dir/src/ParticleContact.cpp.o" \
 "CMakeFiles/AccelEngine.dir/src/ParticleWorld.cpp.o" \
-"CMakeFiles/AccelEngine.dir/src/collision_coarse.cpp.o"
+"CMakeFiles/AccelEngine.dir/src/collision_coarse.cpp.o" \
+"CMakeFiles/AccelEngine.dir/src/narrow_collision.cpp.o" \
+"CMakeFiles/AccelEngine.dir/src/collision_resolver.cpp.o"
 
 # External object files for target AccelEngine
 AccelEngine_EXTERNAL_OBJECTS =
@@ -155,9 +185,11 @@ AccelEngine/libAccelEngine.a: AccelEngine/CMakeFiles/AccelEngine.dir/src/pfgen.c
 AccelEngine/libAccelEngine.a: AccelEngine/CMakeFiles/AccelEngine.dir/src/ParticleContact.cpp.o
 AccelEngine/libAccelEngine.a: AccelEngine/CMakeFiles/AccelEngine.dir/src/ParticleWorld.cpp.o
 AccelEngine/libAccelEngine.a: AccelEngine/CMakeFiles/AccelEngine.dir/src/collision_coarse.cpp.o
+AccelEngine/libAccelEngine.a: AccelEngine/CMakeFiles/AccelEngine.dir/src/narrow_collision.cpp.o
+AccelEngine/libAccelEngine.a: AccelEngine/CMakeFiles/AccelEngine.dir/src/collision_resolver.cpp.o
 AccelEngine/libAccelEngine.a: AccelEngine/CMakeFiles/AccelEngine.dir/build.make
 AccelEngine/libAccelEngine.a: AccelEngine/CMakeFiles/AccelEngine.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/divakar/Desktop/AccelPhysics/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_6) "Linking CXX static library libAccelEngine.a"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/divakar/Desktop/AccelPhysics/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_8) "Linking CXX static library libAccelEngine.a"
 	cd /home/divakar/Desktop/AccelPhysics/build/AccelEngine && $(CMAKE_COMMAND) -P CMakeFiles/AccelEngine.dir/cmake_clean_target.cmake
 	cd /home/divakar/Desktop/AccelPhysics/build/AccelEngine && $(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/AccelEngine.dir/link.txt --verbose=$(VERBOSE)
 

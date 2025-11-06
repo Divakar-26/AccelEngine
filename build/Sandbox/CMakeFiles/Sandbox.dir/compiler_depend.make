@@ -1437,7 +1437,9 @@ Sandbox/CMakeFiles/Sandbox.dir/src/game.cpp.o: /home/divakar/Desktop/AccelPhysic
   /usr/include/c++/12/bits/istream.tcc \
   /home/divakar/Desktop/AccelPhysics/AccelEngine/include/AccelEngine/collision_coarse.h \
   /usr/include/c++/12/utility \
-  /usr/include/c++/12/bits/stl_relops.h
+  /usr/include/c++/12/bits/stl_relops.h \
+  /home/divakar/Desktop/AccelPhysics/AccelEngine/include/AccelEngine/narrow_collision.h \
+  /home/divakar/Desktop/AccelPhysics/AccelEngine/include/AccelEngine/collision_resolver.h
 
 Sandbox/CMakeFiles/Sandbox.dir/src/main.cpp.o: /home/divakar/Desktop/AccelPhysics/Sandbox/src/main.cpp \
   /usr/include/stdc-predef.h \
@@ -1652,6 +1654,8 @@ Sandbox/CMakeFiles/Sandbox.dir/src/main.cpp.o: /home/divakar/Desktop/AccelPhysic
   /usr/include/x86_64-linux-gnu/bits/types/struct_tm.h \
   /usr/include/x86_64-linux-gnu/bits/types/struct_itimerspec.h
 
+
+/home/divakar/Desktop/AccelPhysics/AccelEngine/include/AccelEngine/collision_resolver.h:
 
 /usr/include/c++/12/bits/stl_relops.h:
 
@@ -1874,6 +1878,8 @@ Sandbox/CMakeFiles/Sandbox.dir/src/main.cpp.o: /home/divakar/Desktop/AccelPhysic
 /usr/lib/gcc/x86_64-linux-gnu/12/include/avx512vnnivlintrin.h:
 
 /usr/lib/gcc/x86_64-linux-gnu/12/include/avx512vnniintrin.h:
+
+/home/divakar/Desktop/AccelPhysics/AccelEngine/include/AccelEngine/narrow_collision.h:
 
 /usr/lib/gcc/x86_64-linux-gnu/12/include/avx512vbmi2vlintrin.h:
 

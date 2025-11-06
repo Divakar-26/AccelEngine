@@ -55,6 +55,7 @@ void CoarseCollision::FindPotentialPairs(World *world, std::vector<std::pair<Rig
         bodies.push_back(reg->body);
     }
 
+
     for (RigidBody *b : bodies)
     {
         b->c = {255, 0, 0, 255};
@@ -70,8 +71,6 @@ void CoarseCollision::FindPotentialPairs(World *world, std::vector<std::pair<Rig
             computeAABB(bodies[j], minB, maxB);
             if (AABBOverlap(minA, maxA, minB, maxB))
             {
-                bodies[i]->c = {0, 255, 255, 255};
-                bodies[j]->c = {0, 255, 255, 255};
                 pairs.emplace_back(bodies[i], bodies[j]);
             }
         }

@@ -45,4 +45,7 @@ private:
 
     RigidBody body;
     RigidBody ground;
+
+    float fps = 0.0f;
+    float frameTimeMs = 0.0f;
 };

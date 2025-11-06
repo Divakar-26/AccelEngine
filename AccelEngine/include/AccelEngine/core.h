@@ -39,6 +39,16 @@ namespace AccelEngine
             }
         }
 
+        Vector2 normalized() const
+        {
+            real l = magnitude();
+            if (l > 0)
+            {
+                return Vector2(x / l, y / l);
+            }
+            return Vector2(0, 0);
+        }
+
         // Scaling
         void operator*=(const real value)
         {
