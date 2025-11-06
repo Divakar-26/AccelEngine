@@ -3,6 +3,7 @@ add_library(AccelEngine STATIC
     src/pfgen.cpp
     src/ParticleContact.cpp
     src/ParticleWorld.cpp
+    src/collision_coarse.cpp
 )
 
 target_include_directories(AccelEngine PUBLIC include)

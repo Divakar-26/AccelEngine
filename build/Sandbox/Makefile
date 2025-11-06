@@ -130,29 +130,197 @@ Sandbox/fast:
 	cd /home/divakar/Desktop/AccelPhysics/build && $(MAKE) $(MAKESILENT) -f Sandbox/CMakeFiles/Sandbox.dir/build.make Sandbox/CMakeFiles/Sandbox.dir/build
 .PHONY : Sandbox/fast
 
-main.o: main.cpp.o
-.PHONY : main.o
+include/imgui/backends/imgui_impl_sdl3.o: include/imgui/backends/imgui_impl_sdl3.cpp.o
+.PHONY : include/imgui/backends/imgui_impl_sdl3.o
 
 # target to build an object file
-main.cpp.o:
-	cd /home/divakar/Desktop/AccelPhysics/build && $(MAKE) $(MAKESILENT) -f Sandbox/CMakeFiles/Sandbox.dir/build.make Sandbox/CMakeFiles/Sandbox.dir/main.cpp.o
-.PHONY : main.cpp.o
+include/imgui/backends/imgui_impl_sdl3.cpp.o:
+	cd /home/divakar/Desktop/AccelPhysics/build && $(MAKE) $(MAKESILENT) -f Sandbox/CMakeFiles/Sandbox.dir/build.make Sandbox/CMakeFiles/Sandbox.dir/include/imgui/backends/imgui_impl_sdl3.cpp.o
+.PHONY : include/imgui/backends/imgui_impl_sdl3.cpp.o
 
-main.i: main.cpp.i
-.PHONY : main.i
+include/imgui/backends/imgui_impl_sdl3.i: include/imgui/backends/imgui_impl_sdl3.cpp.i
+.PHONY : include/imgui/backends/imgui_impl_sdl3.i
 
 # target to preprocess a source file
-main.cpp.i:
-	cd /home/divakar/Desktop/AccelPhysics/build && $(MAKE) $(MAKESILENT) -f Sandbox/CMakeFiles/Sandbox.dir/build.make Sandbox/CMakeFiles/Sandbox.dir/main.cpp.i
-.PHONY : main.cpp.i
+include/imgui/backends/imgui_impl_sdl3.cpp.i:
+	cd /home/divakar/Desktop/AccelPhysics/build && $(MAKE) $(MAKESILENT) -f Sandbox/CMakeFiles/Sandbox.dir/build.make Sandbox/CMakeFiles/Sandbox.dir/include/imgui/backends/imgui_impl_sdl3.cpp.i
+.PHONY : include/imgui/backends/imgui_impl_sdl3.cpp.i
 
-main.s: main.cpp.s
-.PHONY : main.s
+include/imgui/backends/imgui_impl_sdl3.s: include/imgui/backends/imgui_impl_sdl3.cpp.s
+.PHONY : include/imgui/backends/imgui_impl_sdl3.s
 
 # target to generate assembly for a file
-main.cpp.s:
-	cd /home/divakar/Desktop/AccelPhysics/build && $(MAKE) $(MAKESILENT) -f Sandbox/CMakeFiles/Sandbox.dir/build.make Sandbox/CMakeFiles/Sandbox.dir/main.cpp.s
-.PHONY : main.cpp.s
+include/imgui/backends/imgui_impl_sdl3.cpp.s:
+	cd /home/divakar/Desktop/AccelPhysics/build && $(MAKE) $(MAKESILENT) -f Sandbox/CMakeFiles/Sandbox.dir/build.make Sandbox/CMakeFiles/Sandbox.dir/include/imgui/backends/imgui_impl_sdl3.cpp.s
+.PHONY : include/imgui/backends/imgui_impl_sdl3.cpp.s
+
+include/imgui/backends/imgui_impl_sdlrenderer3.o: include/imgui/backends/imgui_impl_sdlrenderer3.cpp.o
+.PHONY : include/imgui/backends/imgui_impl_sdlrenderer3.o
+
+# target to build an object file
+include/imgui/backends/imgui_impl_sdlrenderer3.cpp.o:
+	cd /home/divakar/Desktop/AccelPhysics/build && $(MAKE) $(MAKESILENT) -f Sandbox/CMakeFiles/Sandbox.dir/build.make Sandbox/CMakeFiles/Sandbox.dir/include/imgui/backends/imgui_impl_sdlrenderer3.cpp.o
+.PHONY : include/imgui/backends/imgui_impl_sdlrenderer3.cpp.o
+
+include/imgui/backends/imgui_impl_sdlrenderer3.i: include/imgui/backends/imgui_impl_sdlrenderer3.cpp.i
+.PHONY : include/imgui/backends/imgui_impl_sdlrenderer3.i
+
+# target to preprocess a source file
+include/imgui/backends/imgui_impl_sdlrenderer3.cpp.i:
+	cd /home/divakar/Desktop/AccelPhysics/build && $(MAKE) $(MAKESILENT) -f Sandbox/CMakeFiles/Sandbox.dir/build.make Sandbox/CMakeFiles/Sandbox.dir/include/imgui/backends/imgui_impl_sdlrenderer3.cpp.i
+.PHONY : include/imgui/backends/imgui_impl_sdlrenderer3.cpp.i
+
+include/imgui/backends/imgui_impl_sdlrenderer3.s: include/imgui/backends/imgui_impl_sdlrenderer3.cpp.s
+.PHONY : include/imgui/backends/imgui_impl_sdlrenderer3.s
+
+# target to generate assembly for a file
+include/imgui/backends/imgui_impl_sdlrenderer3.cpp.s:
+	cd /home/divakar/Desktop/AccelPhysics/build && $(MAKE) $(MAKESILENT) -f Sandbox/CMakeFiles/Sandbox.dir/build.make Sandbox/CMakeFiles/Sandbox.dir/include/imgui/backends/imgui_impl_sdlrenderer3.cpp.s
+.PHONY : include/imgui/backends/imgui_impl_sdlrenderer3.cpp.s
+
+include/imgui/imgui.o: include/imgui/imgui.cpp.o
+.PHONY : include/imgui/imgui.o
+
+# target to build an object file
+include/imgui/imgui.cpp.o:
+	cd /home/divakar/Desktop/AccelPhysics/build && $(MAKE) $(MAKESILENT) -f Sandbox/CMakeFiles/Sandbox.dir/build.make Sandbox/CMakeFiles/Sandbox.dir/include/imgui/imgui.cpp.o
+.PHONY : include/imgui/imgui.cpp.o
+
+include/imgui/imgui.i: include/imgui/imgui.cpp.i
+.PHONY : include/imgui/imgui.i
+
+# target to preprocess a source file
+include/imgui/imgui.cpp.i:
+	cd /home/divakar/Desktop/AccelPhysics/build && $(MAKE) $(MAKESILENT) -f Sandbox/CMakeFiles/Sandbox.dir/build.make Sandbox/CMakeFiles/Sandbox.dir/include/imgui/imgui.cpp.i
+.PHONY : include/imgui/imgui.cpp.i
+
+include/imgui/imgui.s: include/imgui/imgui.cpp.s
+.PHONY : include/imgui/imgui.s
+
+# target to generate assembly for a file
+include/imgui/imgui.cpp.s:
+	cd /home/divakar/Desktop/AccelPhysics/build && $(MAKE) $(MAKESILENT) -f Sandbox/CMakeFiles/Sandbox.dir/build.make Sandbox/CMakeFiles/Sandbox.dir/include/imgui/imgui.cpp.s
+.PHONY : include/imgui/imgui.cpp.s
+
+include/imgui/imgui_draw.o: include/imgui/imgui_draw.cpp.o
+.PHONY : include/imgui/imgui_draw.o
+
+# target to build an object file
+include/imgui/imgui_draw.cpp.o:
+	cd /home/divakar/Desktop/AccelPhysics/build && $(MAKE) $(MAKESILENT) -f Sandbox/CMakeFiles/Sandbox.dir/build.make Sandbox/CMakeFiles/Sandbox.dir/include/imgui/imgui_draw.cpp.o
+.PHONY : include/imgui/imgui_draw.cpp.o
+
+include/imgui/imgui_draw.i: include/imgui/imgui_draw.cpp.i
+.PHONY : include/imgui/imgui_draw.i
+
+# target to preprocess a source file
+include/imgui/imgui_draw.cpp.i:
+	cd /home/divakar/Desktop/AccelPhysics/build && $(MAKE) $(MAKESILENT) -f Sandbox/CMakeFiles/Sandbox.dir/build.make Sandbox/CMakeFiles/Sandbox.dir/include/imgui/imgui_draw.cpp.i
+.PHONY : include/imgui/imgui_draw.cpp.i
+
+include/imgui/imgui_draw.s: include/imgui/imgui_draw.cpp.s
+.PHONY : include/imgui/imgui_draw.s
+
+# target to generate assembly for a file
+include/imgui/imgui_draw.cpp.s:
+	cd /home/divakar/Desktop/AccelPhysics/build && $(MAKE) $(MAKESILENT) -f Sandbox/CMakeFiles/Sandbox.dir/build.make Sandbox/CMakeFiles/Sandbox.dir/include/imgui/imgui_draw.cpp.s
+.PHONY : include/imgui/imgui_draw.cpp.s
+
+include/imgui/imgui_tables.o: include/imgui/imgui_tables.cpp.o
+.PHONY : include/imgui/imgui_tables.o
+
+# target to build an object file
+include/imgui/imgui_tables.cpp.o:
+	cd /home/divakar/Desktop/AccelPhysics/build && $(MAKE) $(MAKESILENT) -f Sandbox/CMakeFiles/Sandbox.dir/build.make Sandbox/CMakeFiles/Sandbox.dir/include/imgui/imgui_tables.cpp.o
+.PHONY : include/imgui/imgui_tables.cpp.o
+
+include/imgui/imgui_tables.i: include/imgui/imgui_tables.cpp.i
+.PHONY : include/imgui/imgui_tables.i
+
+# target to preprocess a source file
+include/imgui/imgui_tables.cpp.i:
+	cd /home/divakar/Desktop/AccelPhysics/build && $(MAKE) $(MAKESILENT) -f Sandbox/CMakeFiles/Sandbox.dir/build.make Sandbox/CMakeFiles/Sandbox.dir/include/imgui/imgui_tables.cpp.i
+.PHONY : include/imgui/imgui_tables.cpp.i
+
+include/imgui/imgui_tables.s: include/imgui/imgui_tables.cpp.s
+.PHONY : include/imgui/imgui_tables.s
+
+# target to generate assembly for a file
+include/imgui/imgui_tables.cpp.s:
+	cd /home/divakar/Desktop/AccelPhysics/build && $(MAKE) $(MAKESILENT) -f Sandbox/CMakeFiles/Sandbox.dir/build.make Sandbox/CMakeFiles/Sandbox.dir/include/imgui/imgui_tables.cpp.s
+.PHONY : include/imgui/imgui_tables.cpp.s
+
+include/imgui/imgui_widgets.o: include/imgui/imgui_widgets.cpp.o
+.PHONY : include/imgui/imgui_widgets.o
+
+# target to build an object file
+include/imgui/imgui_widgets.cpp.o:
+	cd /home/divakar/Desktop/AccelPhysics/build && $(MAKE) $(MAKESILENT) -f Sandbox/CMakeFiles/Sandbox.dir/build.make Sandbox/CMakeFiles/Sandbox.dir/include/imgui/imgui_widgets.cpp.o
+.PHONY : include/imgui/imgui_widgets.cpp.o
+
+include/imgui/imgui_widgets.i: include/imgui/imgui_widgets.cpp.i
+.PHONY : include/imgui/imgui_widgets.i
+
+# target to preprocess a source file
+include/imgui/imgui_widgets.cpp.i:
+	cd /home/divakar/Desktop/AccelPhysics/build && $(MAKE) $(MAKESILENT) -f Sandbox/CMakeFiles/Sandbox.dir/build.make Sandbox/CMakeFiles/Sandbox.dir/include/imgui/imgui_widgets.cpp.i
+.PHONY : include/imgui/imgui_widgets.cpp.i
+
+include/imgui/imgui_widgets.s: include/imgui/imgui_widgets.cpp.s
+.PHONY : include/imgui/imgui_widgets.s
+
+# target to generate assembly for a file
+include/imgui/imgui_widgets.cpp.s:
+	cd /home/divakar/Desktop/AccelPhysics/build && $(MAKE) $(MAKESILENT) -f Sandbox/CMakeFiles/Sandbox.dir/build.make Sandbox/CMakeFiles/Sandbox.dir/include/imgui/imgui_widgets.cpp.s
+.PHONY : include/imgui/imgui_widgets.cpp.s
+
+src/game.o: src/game.cpp.o
+.PHONY : src/game.o
+
+# target to build an object file
+src/game.cpp.o:
+	cd /home/divakar/Desktop/AccelPhysics/build && $(MAKE) $(MAKESILENT) -f Sandbox/CMakeFiles/Sandbox.dir/build.make Sandbox/CMakeFiles/Sandbox.dir/src/game.cpp.o
+.PHONY : src/game.cpp.o
+
+src/game.i: src/game.cpp.i
+.PHONY : src/game.i
+
+# target to preprocess a source file
+src/game.cpp.i:
+	cd /home/divakar/Desktop/AccelPhysics/build && $(MAKE) $(MAKESILENT) -f Sandbox/CMakeFiles/Sandbox.dir/build.make Sandbox/CMakeFiles/Sandbox.dir/src/game.cpp.i
+.PHONY : src/game.cpp.i
+
+src/game.s: src/game.cpp.s
+.PHONY : src/game.s
+
+# target to generate assembly for a file
+src/game.cpp.s:
+	cd /home/divakar/Desktop/AccelPhysics/build && $(MAKE) $(MAKESILENT) -f Sandbox/CMakeFiles/Sandbox.dir/build.make Sandbox/CMakeFiles/Sandbox.dir/src/game.cpp.s
+.PHONY : src/game.cpp.s
+
+src/main.o: src/main.cpp.o
+.PHONY : src/main.o
+
+# target to build an object file
+src/main.cpp.o:
+	cd /home/divakar/Desktop/AccelPhysics/build && $(MAKE) $(MAKESILENT) -f Sandbox/CMakeFiles/Sandbox.dir/build.make Sandbox/CMakeFiles/Sandbox.dir/src/main.cpp.o
+.PHONY : src/main.cpp.o
+
+src/main.i: src/main.cpp.i
+.PHONY : src/main.i
+
+# target to preprocess a source file
+src/main.cpp.i:
+	cd /home/divakar/Desktop/AccelPhysics/build && $(MAKE) $(MAKESILENT) -f Sandbox/CMakeFiles/Sandbox.dir/build.make Sandbox/CMakeFiles/Sandbox.dir/src/main.cpp.i
+.PHONY : src/main.cpp.i
+
+src/main.s: src/main.cpp.s
+.PHONY : src/main.s
+
+# target to generate assembly for a file
+src/main.cpp.s:
+	cd /home/divakar/Desktop/AccelPhysics/build && $(MAKE) $(MAKESILENT) -f Sandbox/CMakeFiles/Sandbox.dir/build.make Sandbox/CMakeFiles/Sandbox.dir/src/main.cpp.s
+.PHONY : src/main.cpp.s
 
 # Help Target
 help:
@@ -163,9 +331,30 @@ help:
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
 	@echo "... Sandbox"
-	@echo "... main.o"
-	@echo "... main.i"
-	@echo "... main.s"
+	@echo "... include/imgui/backends/imgui_impl_sdl3.o"
+	@echo "... include/imgui/backends/imgui_impl_sdl3.i"
+	@echo "... include/imgui/backends/imgui_impl_sdl3.s"
+	@echo "... include/imgui/backends/imgui_impl_sdlrenderer3.o"
+	@echo "... include/imgui/backends/imgui_impl_sdlrenderer3.i"
+	@echo "... include/imgui/backends/imgui_impl_sdlrenderer3.s"
+	@echo "... include/imgui/imgui.o"
+	@echo "... include/imgui/imgui.i"
+	@echo "... include/imgui/imgui.s"
+	@echo "... include/imgui/imgui_draw.o"
+	@echo "... include/imgui/imgui_draw.i"
+	@echo "... include/imgui/imgui_draw.s"
+	@echo "... include/imgui/imgui_tables.o"
+	@echo "... include/imgui/imgui_tables.i"
+	@echo "... include/imgui/imgui_tables.s"
+	@echo "... include/imgui/imgui_widgets.o"
+	@echo "... include/imgui/imgui_widgets.i"
+	@echo "... include/imgui/imgui_widgets.s"
+	@echo "... src/game.o"
+	@echo "... src/game.i"
+	@echo "... src/game.s"
+	@echo "... src/main.o"
+	@echo "... src/main.i"
+	@echo "... src/main.s"
 .PHONY : help
 
 

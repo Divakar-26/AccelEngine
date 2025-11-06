@@ -33,6 +33,8 @@ namespace AccelEngine
             clear();
         }
 
+        BodyRegistration *getFirstBody() { return firstBody; }
+
         /**
          * Adds a new rigid body to the world.
          */
@@ -79,6 +81,7 @@ namespace AccelEngine
          */
         void runPhysics(real duration)
         {
+            // Integrate motion
             BodyRegistration *reg = firstBody;
             while (reg)
             {

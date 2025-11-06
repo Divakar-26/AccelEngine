@@ -69,6 +69,18 @@ namespace AccelEngine
             y -= v.y;
         }
 
+        Vector2 operator/(const real value) const
+        {
+            return Vector2(x / value, y / value);
+        }
+
+        Vector2 &operator/=(const real value)
+        {
+            x /= value;
+            y /= value;
+            return *this;
+        }
+
         Vector2 operator-(const Vector2 &v) const
         {
             return Vector2(x - v.x, y - v.y);
@@ -396,4 +408,4 @@ namespace AccelEngine
         real pad;
     };
 
-}   
+}

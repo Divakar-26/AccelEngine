@@ -4,7 +4,7 @@
 # compile CXX with /usr/bin/c++
 CXX_DEFINES = 
 
-CXX_INCLUDES = -I/home/divakar/Desktop/AccelPhysics/AccelEngine/include
+CXX_INCLUDES = -I/home/divakar/Desktop/AccelPhysics/AccelEngine/include -I/home/divakar/Desktop/AccelPhysics/Sandbox/include -I/home/divakar/Desktop/AccelPhysics/Sandbox/include/imgui
 
 CXX_FLAGS = -std=gnu++20
 

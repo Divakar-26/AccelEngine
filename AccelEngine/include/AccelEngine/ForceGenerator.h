@@ -1,6 +1,7 @@
 #pragma once
 #include <AccelEngine/core.h>
 #include <AccelEngine/body.h>
+#include <iostream>
 
 namespace AccelEngine
 {
@@ -25,6 +26,7 @@ namespace AccelEngine
         virtual void updateForce(RigidBody *body, real duration) override
         {
             if (body->inverseMass <= 0.0f)
+                std::cout<<"HElLo"<<std::endl;
                 return; // infinite mass → no gravity
 
             // F = m * g
@@ -289,15 +291,24 @@ namespace AccelEngine
             Vector2 point = body->getPointInWorldSpace(centerOfBuoyancy);
 
             // Depth relative to water surface (positive = below surface)
-            real depth = point.y - waterHeight;
+            real depth = waterHeight - point.y;
+
+            // Not in water
             if (depth <= 0.0f)
-                return; // above water
+                return;
 
             Vector2 force(0, 0);
+
             if (depth >= maxDepth)
-                force.y = -liquidDensity * volume; // full upward
+            {
+                // Fully submerged
+                force.y = liquidDensity * volume;
+            }
             else
-                force.y = -liquidDensity * volume * (depth / maxDepth); // partial upward
+            {
+                // Partially submerged
+                force.y = liquidDensity * volume * (depth / maxDepth);
+            }
 
             body->addForceAtPoint(force, point);
         }

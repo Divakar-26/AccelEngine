@@ -3,6 +3,8 @@ file(REMOVE_RECURSE
   "CMakeFiles/AccelEngine.dir/src/ParticleContact.cpp.o.d"
   "CMakeFiles/AccelEngine.dir/src/ParticleWorld.cpp.o"
   "CMakeFiles/AccelEngine.dir/src/ParticleWorld.cpp.o.d"
+  "CMakeFiles/AccelEngine.dir/src/collision_coarse.cpp.o"
+  "CMakeFiles/AccelEngine.dir/src/collision_coarse.cpp.o.d"
   "CMakeFiles/AccelEngine.dir/src/particle.cpp.o"
   "CMakeFiles/AccelEngine.dir/src/particle.cpp.o.d"
   "CMakeFiles/AccelEngine.dir/src/pfgen.cpp.o"

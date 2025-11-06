@@ -178,6 +178,30 @@ src/ParticleWorld.cpp.s:
 	cd /home/divakar/Desktop/AccelPhysics/build && $(MAKE) $(MAKESILENT) -f AccelEngine/CMakeFiles/AccelEngine.dir/build.make AccelEngine/CMakeFiles/AccelEngine.dir/src/ParticleWorld.cpp.s
 .PHONY : src/ParticleWorld.cpp.s
 
+src/collision_coarse.o: src/collision_coarse.cpp.o
+.PHONY : src/collision_coarse.o
+
+# target to build an object file
+src/collision_coarse.cpp.o:
+	cd /home/divakar/Desktop/AccelPhysics/build && $(MAKE) $(MAKESILENT) -f AccelEngine/CMakeFiles/AccelEngine.dir/build.make AccelEngine/CMakeFiles/AccelEngine.dir/src/collision_coarse.cpp.o
+.PHONY : src/collision_coarse.cpp.o
+
+src/collision_coarse.i: src/collision_coarse.cpp.i
+.PHONY : src/collision_coarse.i
+
+# target to preprocess a source file
+src/collision_coarse.cpp.i:
+	cd /home/divakar/Desktop/AccelPhysics/build && $(MAKE) $(MAKESILENT) -f AccelEngine/CMakeFiles/AccelEngine.dir/build.make AccelEngine/CMakeFiles/AccelEngine.dir/src/collision_coarse.cpp.i
+.PHONY : src/collision_coarse.cpp.i
+
+src/collision_coarse.s: src/collision_coarse.cpp.s
+.PHONY : src/collision_coarse.s
+
+# target to generate assembly for a file
+src/collision_coarse.cpp.s:
+	cd /home/divakar/Desktop/AccelPhysics/build && $(MAKE) $(MAKESILENT) -f AccelEngine/CMakeFiles/AccelEngine.dir/build.make AccelEngine/CMakeFiles/AccelEngine.dir/src/collision_coarse.cpp.s
+.PHONY : src/collision_coarse.cpp.s
+
 src/particle.o: src/particle.cpp.o
 .PHONY : src/particle.o
 
@@ -241,6 +265,9 @@ help:
 	@echo "... src/ParticleWorld.o"
 	@echo "... src/ParticleWorld.i"
 	@echo "... src/ParticleWorld.s"
+	@echo "... src/collision_coarse.o"
+	@echo "... src/collision_coarse.i"
+	@echo "... src/collision_coarse.s"
 	@echo "... src/particle.o"
 	@echo "... src/particle.i"
 	@echo "... src/particle.s"

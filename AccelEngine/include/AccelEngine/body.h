@@ -2,11 +2,37 @@
 
 #include <AccelEngine/core.h>
 
+struct Color{
+    float r, g,b,a;
+};
+
 namespace AccelEngine
 {
+    enum class ShapeType
+    {
+        CIRCLE,
+        AABB
+    };
+
+    struct Circle
+    {
+        real radius;
+    };
+
+    struct AABB
+    {
+        Vector2 halfSize;
+    };
+
     class RigidBody
     {
     public:
+        Color c;
+
+        ShapeType shapeType;
+        Circle circle;
+        AABB aabb;
+
         real inverseMass;
         real inverseInertia;
 
@@ -111,6 +137,21 @@ namespace AccelEngine
 
             // Clear accumulators
             clearAccumulators();
+        }
+
+        Vector2 getPosition()
+        {
+            return position;
+        }
+
+        real getInverseMass()
+        {
+            return inverseMass;
+        }
+
+        Vector2 getVelocity()
+        {
+            return velocity;
         }
 
     private:
