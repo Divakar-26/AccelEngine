@@ -5,7 +5,7 @@ add_library(AccelEngine STATIC
     src/ParticleWorld.cpp
     src/collision_coarse.cpp
     src/narrow_collision.cpp
-    src/collision_resolver.cpp
+    src/collision_resolve.cpp
 )
 
 target_include_directories(AccelEngine PUBLIC include)

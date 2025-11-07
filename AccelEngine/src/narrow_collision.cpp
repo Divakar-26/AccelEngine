@@ -2,210 +2,127 @@
 #include <limits>
 #include <cmath>
 #include <algorithm>
+#include <iostream>
 
 using namespace AccelEngine;
 
-static void getTransformedCorners(const RigidBody *body, Vector2 corners[4])
+bool NarrowCollision::IntersectRectangles(std::vector<Vector2> verticesA, std::vector<Vector2> verticesB, Contact &contacts)
 {
-    const Vector2 &half = body->aabb.halfSize;
-    Vector2 localCorners[4] = {
-        Vector2(-half.x, -half.y),
-        Vector2(half.x, -half.y),
-        Vector2(half.x, half.y),
-        Vector2(-half.x, half.y)};
+    Vector2 normal(0, 0);
+    real depth = std::numeric_limits<real>::max();
 
-    for (int i = 0; i < 4; ++i)
+    for (int i = 0; i < verticesA.size(); i++)
     {
-        corners[i] = body->transformMatrix * localCorners[i] + body->position;
-    }
-}
+        Vector2 va = verticesA[i];
+        Vector2 vb = verticesA[(i + 1) % verticesA.size()];
 
-static void projectOntoAxis(const Vector2 corners[4], const Vector2 &axis, float &min, float &max)
-{
-    min = max = corners[0].scalarProduct(axis);
-    for (int i = 1; i < 4; ++i)
-    {
-        float proj = corners[i].scalarProduct(axis);
-        if (proj < min)
-            min = proj;
-        if (proj > max)
-            max = proj;
-    }
-}
+        Vector2 edge = vb - va;
+        Vector2 axis(-edge.y, edge.x);
+        axis.normalize();
 
-// Find the contact points between two OBBs
-static void findContactPoints(const Vector2 cornersA[4], const Vector2 cornersB[4], 
-                              const Vector2 &normal, Contact &contact)
-{
-    // Find the incident face (face from B that's most anti-parallel to normal)
-    int incidentFace = 0;
-    float minDot = std::numeric_limits<float>::max();
-    
-    Vector2 faceNormalsB[4];
-    for (int i = 0; i < 4; ++i)
-    {
-        Vector2 edge = cornersB[(i + 1) % 4] - cornersB[i];
-        faceNormalsB[i] = edge.perpendicular().normalized();
-        
-        float dot = faceNormalsB[i].scalarProduct(normal);
-        if (dot < minDot)
+        std::pair<real, real> minMaxA = projectOnAxis(verticesA, axis);
+        std::pair<real, real> minMaxB = projectOnAxis(verticesB, axis);
+
+        if (minMaxA.second < minMaxB.first || minMaxB.second < minMaxA.first)
         {
-            minDot = dot;
-            incidentFace = i;
+            return false;
         }
-    }
-    
-    // Get the incident face vertices
-    Vector2 incidentFaceVertices[2] = {
-        cornersB[incidentFace],
-        cornersB[(incidentFace + 1) % 4]
-    };
-    
-    // Clip the incident face against the reference face (from A)
-    Vector2 referenceFaceNormal = normal;
-    
-    // Find the reference face (face from A that's most parallel to normal)
-    int referenceFace = 0;
-    float maxDot = -std::numeric_limits<float>::max();
-    
-    Vector2 faceNormalsA[4];
-    for (int i = 0; i < 4; ++i)
-    {
-        Vector2 edge = cornersA[(i + 1) % 4] - cornersA[i];
-        faceNormalsA[i] = edge.perpendicular().normalized();
-        
-        float dot = faceNormalsA[i].scalarProduct(normal);
-        if (dot > maxDot)
+
+        real axisDepth = std::min(minMaxB.second - minMaxA.first, minMaxA.second - minMaxB.first);
+
+        if (axisDepth < depth)
         {
-            maxDot = dot;
-            referenceFace = i;
-        }
-    }
-    
-    // Get the reference face vertices and normal
-    Vector2 refFaceVertices[2] = {
-        cornersA[referenceFace],
-        cornersA[(referenceFace + 1) % 4]
-    };
-    Vector2 refFaceNormal = faceNormalsA[referenceFace];
-    
-    // Simple contact point calculation: use the deepest points
-    // This is a simplified approach - for a more robust solution, implement Sutherland-Hodgman clipping
-    
-    contact.contactCount = 0;
-    
-    // Check which vertices from B are inside A
-    for (int i = 0; i < 4 && contact.contactCount < 2; ++i)
-    {
-        Vector2 vertex = cornersB[i];
-        Vector2 toVertex = vertex - cornersA[0];
-        
-        // Simple inside test (not perfect but works for convex shapes)
-        bool inside = true;
-        for (int j = 0; j < 4; ++j)
-        {
-            Vector2 edge = cornersA[(j + 1) % 4] - cornersA[j];
-            Vector2 faceNormal = edge.perpendicular().normalized();
-            
-            if (faceNormal.scalarProduct(vertex - cornersA[j]) > 0)
-            {
-                inside = false;
-                break;
-            }
-        }
-        
-        if (inside)
-        {
-            contact.contactPoints[contact.contactCount++] = vertex;
-        }
-    }
-    
-    // Check which vertices from A are inside B
-    for (int i = 0; i < 4 && contact.contactCount < 2; ++i)
-    {
-        Vector2 vertex = cornersA[i];
-        Vector2 toVertex = vertex - cornersB[0];
-        
-        bool inside = true;
-        for (int j = 0; j < 4; ++j)
-        {
-            Vector2 edge = cornersB[(j + 1) % 4] - cornersB[j];
-            Vector2 faceNormal = edge.perpendicular().normalized();
-            
-            if (faceNormal.scalarProduct(vertex - cornersB[j]) > 0)
-            {
-                inside = false;
-                break;
-            }
-        }
-        
-        if (inside)
-        {
-            contact.contactPoints[contact.contactCount++] = vertex;
-        }
-    }
-    
-    // If no vertices found, use the center points as fallback
-    if (contact.contactCount == 0)
-    {
-        // Simple midpoint on the penetration vector
-        Vector2 centerA = (cornersA[0] + cornersA[1] + cornersA[2] + cornersA[3]) / 4.0f;
-        Vector2 centerB = (cornersB[0] + cornersB[1] + cornersB[2] + cornersB[3]) / 4.0f;
-        Vector2 direction = centerB - centerA;
-        
-        contact.contactPoints[0] = centerA + direction * 0.5f;
-        contact.contactCount = 1;
-    }
-}
-
-bool NarrowCollision::SATCollision(const RigidBody *A, const RigidBody *B, Contact &contact)
-{
-    Vector2 cornersA[4], cornersB[4];
-    getTransformedCorners(A, cornersA);
-    getTransformedCorners(B, cornersB);
-
-    // Test axes from both shapes
-    Vector2 axes[4] = {
-        (cornersA[1] - cornersA[0]).normalized(),
-        (cornersA[3] - cornersA[0]).normalized(),
-        (cornersB[1] - cornersB[0]).normalized(),
-        (cornersB[3] - cornersB[0]).normalized()};
-
-    float penetration = std::numeric_limits<float>::max();
-    Vector2 normal;
-
-    for (int i = 0; i < 4; ++i)
-    {
-        Vector2 axis = axes[i].perpendicular().normalized();
-
-        float minA, maxA, minB, maxB;
-        projectOntoAxis(cornersA, axis, minA, maxA);
-        projectOntoAxis(cornersB, axis, minB, maxB);
-
-        if (maxA < minB || maxB < minA)
-            return false; // Separating axis found
-
-        float overlap = std::min(maxA, maxB) - std::max(minA, minB);
-        if (overlap < penetration)
-        {
-            penetration = overlap;
+            depth = axisDepth;
             normal = axis;
         }
     }
 
-    // Ensure normal points from A → B
-    Vector2 direction = B->position - A->position;
-    if (direction.scalarProduct(normal) < 0)
-        normal.invert();
+    for (int i = 0; i < verticesB.size(); i++)
+    {
+        Vector2 va = verticesB[i];
+        Vector2 vb = verticesB[(i + 1) % verticesB.size()];
 
-    contact.a = const_cast<RigidBody*>(A);
-    contact.b = const_cast<RigidBody*>(B);
-    contact.normal = normal;
-    contact.penetration = penetration;
-    
-    // Find the actual contact points
-    findContactPoints(cornersA, cornersB, normal, contact);
+        Vector2 edge = vb - va;
+        Vector2 axis(-edge.y, edge.x);
+        axis.normalize();
 
+        std::pair<real, real> minMaxA = projectOnAxis(verticesA, axis);
+        std::pair<real, real> minMaxB = projectOnAxis(verticesB, axis);
+
+        if (minMaxA.second < minMaxB.first || minMaxB.second < minMaxA.first)
+        {
+            return false;
+        }
+
+        real axisDepth = std::min(minMaxB.second - minMaxA.first, minMaxA.second - minMaxB.first);
+
+        if (axisDepth < depth)
+        {
+            depth = axisDepth;
+            normal = axis;
+        }
+    }
+
+    Vector2 centerA = (verticesA[0] + verticesA[1] + verticesA[2] + verticesA[3]) * 0.25f;
+    Vector2 centerB = (verticesB[0] + verticesB[1] + verticesB[2] + verticesB[3]) * 0.25f;
+    Vector2 direction = centerB - centerA;
+
+    if (direction.scalarProduct(normal) < 0.0f)
+    {
+        normal = normal * -1.0f;
+    }
+
+    contacts.normal = normal;
+    contacts.penetration = depth;
+
+    return true;
+}
+
+std::pair<real, real> NarrowCollision::projectOnAxis(std::vector<Vector2> vertices, Vector2 axis)
+{
+    real min = std::numeric_limits<real>::max();
+    real max = std::numeric_limits<real>::lowest();
+
+    for (int i = 0; i < vertices.size(); i++)
+    {
+        Vector2 v = vertices[i];
+        real proj = v.scalarProduct(axis);
+
+        if (proj < min)
+        {
+            min = proj;
+        }
+        if (proj > max)
+        {
+            max = proj;
+        }
+    }
+
+    return {min, max};
+}
+
+bool NarrowCollision::SATCollision(const RigidBody *A, const RigidBody *B, Contact &contact)
+{
+    // Get transformed vertices for both rectangles
+    Vector2 verticesA[4];
+    Vector2 verticesB[4];
+
+    RigidBody::getTransformedVertices(A, verticesA);
+    RigidBody::getTransformedVertices(B, verticesB);
+
+    // Convert to vectors for the existing function
+    std::vector<Vector2> vecA(verticesA, verticesA + 4);
+    std::vector<Vector2> vecB(verticesB, verticesB + 4);
+
+    // Check for intersection using SAT
+    if (!IntersectRectangles(vecA, vecB, contact))
+    {
+        return false;
+    }
+
+    contact.a = const_cast<RigidBody *>(A);
+    contact.b = const_cast<RigidBody *>(B);
+    contact.contactCount = 0;
     return true;
 }
 
@@ -217,17 +134,11 @@ void NarrowCollision::FindContacts(World *world,
 
     for (auto &pair : potentialPairs)
     {
-        RigidBody *A = pair.first;
-        RigidBody *B = pair.second;
-
         Contact contact;
-        if (SATCollision(A, B, contact))
+        if (SATCollision(pair.first, pair.second, contact))
         {
-            contacts.push_back(contact);
 
-            // Optional: color for debug
-            A->c = {0, 255, 0, 255};
-            B->c = {0, 255, 0, 255};
+            contacts.push_back(contact);
         }
     }
 }

@@ -21,6 +21,9 @@ namespace AccelEngine
     {
     public:
         static bool SATCollision(const RigidBody *A, const RigidBody *B, Contact &contact);
+        static bool IntersectRectangles(std::vector<Vector2> verticesA, std::vector<Vector2> verticesB, Contact &contacts);
+
+        static std::pair<real, real> projectOnAxis(std::vector<Vector2> vertices, Vector2 axis);
         static void FindContacts(World *world,
                                  const std::vector<std::pair<RigidBody *, RigidBody *>> &potentialPairs,
                                  std::vector<Contact> &contacts);

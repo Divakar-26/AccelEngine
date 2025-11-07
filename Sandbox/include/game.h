@@ -32,6 +32,8 @@ public:
     }
 
     void addBody();
+    void showFPS(float dt);
+    void imguiAddBodyMenu();
 
 private:
     int WINDOW_W, WINDOW_H;

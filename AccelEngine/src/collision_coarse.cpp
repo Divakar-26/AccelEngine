@@ -56,11 +56,6 @@ void CoarseCollision::FindPotentialPairs(World *world, std::vector<std::pair<Rig
     }
 
 
-    for (RigidBody *b : bodies)
-    {
-        b->c = {255, 0, 0, 255};
-    }
-
     Vector2 minA, maxA, minB, maxB;
 
     for (size_t i = 0; i < bodies.size(); ++i)

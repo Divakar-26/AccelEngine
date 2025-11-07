@@ -2,8 +2,9 @@
 
 #include <AccelEngine/core.h>
 
-struct Color{
-    float r, g,b,a;
+struct Color
+{
+    float r, g, b, a;
 };
 
 namespace AccelEngine
@@ -152,6 +153,25 @@ namespace AccelEngine
         Vector2 getVelocity()
         {
             return velocity;
+        }
+
+        static void getTransformedVertices(const RigidBody *body, Vector2 outVertices[4])
+        {
+            if (body->shapeType != ShapeType::AABB)
+                return;
+
+            const Vector2 &half = body->aabb.halfSize;
+
+            Vector2 localCorners[4] = {
+                Vector2(-half.x, -half.y),
+                Vector2(half.x, -half.y),
+                Vector2(half.x, half.y),
+                Vector2(-half.x, half.y)};
+
+            for (int i = 0; i < 4; ++i)
+            {
+                outVertices[i] = body->transformMatrix * localCorners[i] + body->position;
+            }
         }
 
     private:

@@ -2,11 +2,13 @@
 #include <iostream>
 #include <AccelEngine/collision_coarse.h>
 #include <AccelEngine/narrow_collision.h>
-#include <AccelEngine/collision_resolver.h>
+#include <AccelEngine/collision_resolve.h>
 
 using namespace AccelEngine;
 
 SDL_Texture *boxTex;
+
+void DrawCircle(SDL_Renderer *, float, float, int);
 
 Game::Game(int W_W, int W_H)
 {
@@ -49,9 +51,8 @@ bool Game::Init(const char *title)
     body.linearDamping = 0.98f;
     body.inverseInertia = 1.0f / 30.0f;
 
-    // FIXED: Position ground at bottom of screen
-    ground.position = Vector2(WINDOW_W / 2.0f, WINDOW_H - 25.0f); // Center at bottom
-    ground.inverseMass = 0.0f; // Use 0 for truly static objects
+    ground.position = Vector2(WINDOW_W / 2.0f, WINDOW_H / 2); // Center at bottom
+    ground.inverseMass = 0.0f;                                // Use 0 for truly static objects
     ground.shapeType = ShapeType::AABB;
     ground.aabb.halfSize = Vector2(400.0f, 50.0f);
 
@@ -69,9 +70,6 @@ bool Game::Init(const char *title)
     running = true;
     return true;
 }
-
-
-
 
 void Game::handleEvent()
 {
@@ -121,24 +119,7 @@ void Game::handleEvent()
 
 void Game::update(float dt)
 {
-    // ADD GRAVITY to all dynamic bodies
-    for (auto *b : bodies)
-    {
-        if (b->inverseMass > 0.0001f) // Only apply gravity to dynamic bodies
-        {
-            b->velocity = (Vector2(0, 100.0f));
-        }
-    }
-    
-    fps = 1.0f / dt;
-    frameTimeMs = dt * 1000.0f;
-
-    char title[128];
-    snprintf(title, sizeof(title),
-             "AccelEngine | FPS: %.1f | Frame: %.2f ms | Bodies: %zu",
-             fps, frameTimeMs, bodies.size());
-
-    SDL_SetWindowTitle(window, title);
+    showFPS(dt);
 
     world.startFrame();
     world.runPhysics(dt);
@@ -151,47 +132,35 @@ void Game::update(float dt)
 
     if (!contacts.empty())
     {
-        ContactResolver::ResolveContacts(contacts, dt); // ENABLE THIS!
         std::cout << "Actual collisions: " << contacts.size() << std::endl;
+
+        // Reset all bodies to default color first
+        for (auto *b : bodies)
+        {
+            b->c = {255, 255, 255, 255}; // Default white
+        }
+
+        // Color only the colliding bodies
+        for (auto &contact : contacts)
+        {
+            contact.a->c = {0, 255, 0, 255};
+            contact.b->c = {0, 255, 0, 255};
+
+            CollisionResolve::Solve(contact, dt);
+        }
+    }
+    else
+    {
+        for (auto *b : bodies)
+        {
+            b->c = {255, 255, 255, 255}; // Default white
+        }
     }
 }
 
 void Game::render()
 {
-    // --- Start ImGui frame ---
-    ImGui_ImplSDLRenderer3_NewFrame();
-    ImGui_ImplSDL3_NewFrame();
-    ImGui::NewFrame();
-
-    // --- Scene Editor UI ---
-    ImGui::Begin("Scene Editor");
-
-    if (ImGui::Button("Add Body"))
-        addBody();
-
-    static int selectedIndex = -1;
-    ImGui::Separator();
-    ImGui::Text("Bodies:");
-
-    for (int i = 0; i < bodies.size(); ++i)
-    {
-        char label[32];
-        snprintf(label, sizeof(label), "Body %d", i);
-        if (ImGui::Selectable(label, selectedIndex == i))
-            selectedIndex = i;
-    }
-
-    if (selectedIndex >= 0 && selectedIndex < bodies.size())
-    {
-        RigidBody *selected = bodies[selectedIndex];
-        ImGui::Separator();
-        ImGui::Text("Transform");
-        ImGui::DragFloat2("Position", (float *)&selected->position, 1.0f);
-        ImGui::SliderAngle("Orientation", (float *)&selected->orientation, -180.0f, 180.0f);
-        ImGui::DragFloat2("Velocity", (float *)&selected->velocity, 0.5f);
-    }
-
-    ImGui::End();
+    imguiAddBodyMenu();
 
     // --- Render scene ---
     SDL_SetRenderDrawColor(renderer, 25, 25, 40, 255);
@@ -206,9 +175,7 @@ void Game::render()
             b->aabb.halfSize.x * 2,
             b->aabb.halfSize.y * 2};
 
-        SDL_FPoint center = {30, 30};
-
-        // apply per-body tint color
+        SDL_FPoint center = {b->aabb.halfSize.x, b->aabb.halfSize.y};
         SDL_SetTextureColorMod(boxTex, b->c.r, b->c.g, b->c.b);
         SDL_SetTextureAlphaMod(boxTex, b->c.a);
 
@@ -216,47 +183,19 @@ void Game::render()
         SDL_RenderTextureRotated(renderer, boxTex, nullptr, &dst, degrees, &center, SDL_FLIP_NONE);
     }
 
-    // --- Find and draw contact points ---
     std::vector<std::pair<RigidBody *, RigidBody *>> potentialPairs;
     CoarseCollision::FindPotentialPairs(&world, potentialPairs);
 
-    std::vector<Contact> contacts;
-    NarrowCollision::FindContacts(&world, potentialPairs, contacts);
+    // std::vector<Contact> contacts;
+    // NarrowCollision::FindContacts(&world, potentialPairs, contacts);
 
-    // Draw contact points as small green circles
-    SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);
-    for (const auto &contact : contacts)
-    {
-        for (int i = 0; i < contact.contactCount; ++i)
-        {
-            const Vector2 &point = contact.contactPoints[i];
-            
-            // Draw a small circle at the contact point
-            const float radius = 4.0f;
-            const int segments = 12;
-            
-            for (int j = 0; j < segments; ++j)
-            {
-                float angle1 = 2.0f * M_PI * j / segments;
-                float angle2 = 2.0f * M_PI * (j + 1) / segments;
-                
-                SDL_FPoint p1 = {
-                    point.x + radius * cosf(angle1),
-                    point.y + radius * sinf(angle1)
-                };
-                SDL_FPoint p2 = {
-                    point.x + radius * cosf(angle2),
-                    point.y + radius * sinf(angle2)
-                };
-                
-                SDL_RenderLine(renderer, p1.x, p1.y, p2.x, p2.y);
-            }
-            
-            // Optional: Draw a small cross for better visibility
-            SDL_RenderLine(renderer, point.x - 3, point.y, point.x + 3, point.y);
-            SDL_RenderLine(renderer, point.x, point.y - 3, point.x, point.y + 3);
-        }
-    }
+    // for (auto it : contacts)
+    // {
+    //     for(auto it2 : it.contactPoints){
+    //         std::cout<<it2.x<<" "<<it2.y<<std::endl;
+    //         DrawCircle(renderer, it2.x, it2.y, 5);
+    //     }
+    // }
 
     // --- Draw ImGui ---
     ImGui::Render();
@@ -300,4 +239,69 @@ void Game::addBody()
 
     world.addBody(b);
     bodies.push_back(b);
+}
+
+void Game::showFPS(float dt)
+{
+    fps = 1.0f / dt;
+    frameTimeMs = dt * 1000.0f;
+
+    char title[128];
+    snprintf(title, sizeof(title),
+             "AccelEngine | FPS: %.1f | Frame: %.2f ms | Bodies: %zu",
+             fps, frameTimeMs, bodies.size());
+
+    SDL_SetWindowTitle(window, title);
+}
+
+void DrawCircle(SDL_Renderer *renderer, float x, float y, int r)
+{
+    SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);
+    for (int i = -r; i <= r; i++)
+    {
+        for (int j = -r; j <= r; j++)
+        {
+            if (i * i + j * j <= r * r)
+            {
+                SDL_RenderPoint(renderer, i + x, j + y);
+            }
+        }
+    }
+}
+
+void Game::imguiAddBodyMenu()
+{
+    ImGui_ImplSDLRenderer3_NewFrame();
+    ImGui_ImplSDL3_NewFrame();
+    ImGui::NewFrame();
+
+    // --- Scene Editor UI ---
+    ImGui::Begin("Scene Editor");
+
+    if (ImGui::Button("Add Body"))
+        addBody();
+
+    static int selectedIndex = -1;
+    ImGui::Separator();
+    ImGui::Text("Bodies:");
+
+    for (int i = 0; i < bodies.size(); ++i)
+    {
+        char label[32];
+        snprintf(label, sizeof(label), "Body %d", i);
+        if (ImGui::Selectable(label, selectedIndex == i))
+            selectedIndex = i;
+    }
+
+    if (selectedIndex >= 0 && selectedIndex < bodies.size())
+    {
+        RigidBody *selected = bodies[selectedIndex];
+        ImGui::Separator();
+        ImGui::Text("Transform");
+        ImGui::DragFloat2("Position", (float *)&selected->position, 1.0f);
+        ImGui::SliderAngle("Orientation", (float *)&selected->orientation, -180.0f, 180.0f);
+        ImGui::DragFloat2("Velocity", (float *)&selected->velocity, 0.5f);
+    }
+
+    ImGui::End();
 }

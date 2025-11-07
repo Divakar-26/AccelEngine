@@ -202,29 +202,29 @@ src/collision_coarse.cpp.s:
 	cd /home/divakar/Desktop/AccelPhysics/build && $(MAKE) $(MAKESILENT) -f AccelEngine/CMakeFiles/AccelEngine.dir/build.make AccelEngine/CMakeFiles/AccelEngine.dir/src/collision_coarse.cpp.s
 .PHONY : src/collision_coarse.cpp.s
 
-src/collision_resolver.o: src/collision_resolver.cpp.o
-.PHONY : src/collision_resolver.o
+src/collision_resolve.o: src/collision_resolve.cpp.o
+.PHONY : src/collision_resolve.o
 
 # target to build an object file
-src/collision_resolver.cpp.o:
-	cd /home/divakar/Desktop/AccelPhysics/build && $(MAKE) $(MAKESILENT) -f AccelEngine/CMakeFiles/AccelEngine.dir/build.make AccelEngine/CMakeFiles/AccelEngine.dir/src/collision_resolver.cpp.o
-.PHONY : src/collision_resolver.cpp.o
+src/collision_resolve.cpp.o:
+	cd /home/divakar/Desktop/AccelPhysics/build && $(MAKE) $(MAKESILENT) -f AccelEngine/CMakeFiles/AccelEngine.dir/build.make AccelEngine/CMakeFiles/AccelEngine.dir/src/collision_resolve.cpp.o
+.PHONY : src/collision_resolve.cpp.o
 
-src/collision_resolver.i: src/collision_resolver.cpp.i
-.PHONY : src/collision_resolver.i
+src/collision_resolve.i: src/collision_resolve.cpp.i
+.PHONY : src/collision_resolve.i
 
 # target to preprocess a source file
-src/collision_resolver.cpp.i:
-	cd /home/divakar/Desktop/AccelPhysics/build && $(MAKE) $(MAKESILENT) -f AccelEngine/CMakeFiles/AccelEngine.dir/build.make AccelEngine/CMakeFiles/AccelEngine.dir/src/collision_resolver.cpp.i
-.PHONY : src/collision_resolver.cpp.i
+src/collision_resolve.cpp.i:
+	cd /home/divakar/Desktop/AccelPhysics/build && $(MAKE) $(MAKESILENT) -f AccelEngine/CMakeFiles/AccelEngine.dir/build.make AccelEngine/CMakeFiles/AccelEngine.dir/src/collision_resolve.cpp.i
+.PHONY : src/collision_resolve.cpp.i
 
-src/collision_resolver.s: src/collision_resolver.cpp.s
-.PHONY : src/collision_resolver.s
+src/collision_resolve.s: src/collision_resolve.cpp.s
+.PHONY : src/collision_resolve.s
 
 # target to generate assembly for a file
-src/collision_resolver.cpp.s:
-	cd /home/divakar/Desktop/AccelPhysics/build && $(MAKE) $(MAKESILENT) -f AccelEngine/CMakeFiles/AccelEngine.dir/build.make AccelEngine/CMakeFiles/AccelEngine.dir/src/collision_resolver.cpp.s
-.PHONY : src/collision_resolver.cpp.s
+src/collision_resolve.cpp.s:
+	cd /home/divakar/Desktop/AccelPhysics/build && $(MAKE) $(MAKESILENT) -f AccelEngine/CMakeFiles/AccelEngine.dir/build.make AccelEngine/CMakeFiles/AccelEngine.dir/src/collision_resolve.cpp.s
+.PHONY : src/collision_resolve.cpp.s
 
 src/narrow_collision.o: src/narrow_collision.cpp.o
 .PHONY : src/narrow_collision.o
@@ -316,9 +316,9 @@ help:
 	@echo "... src/collision_coarse.o"
 	@echo "... src/collision_coarse.i"
 	@echo "... src/collision_coarse.s"
-	@echo "... src/collision_resolver.o"
-	@echo "... src/collision_resolver.i"
-	@echo "... src/collision_resolver.s"
+	@echo "... src/collision_resolve.o"
+	@echo "... src/collision_resolve.i"
+	@echo "... src/collision_resolve.s"
 	@echo "... src/narrow_collision.o"
 	@echo "... src/narrow_collision.i"
 	@echo "... src/narrow_collision.s"

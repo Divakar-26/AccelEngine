@@ -1438,8 +1438,7 @@ Sandbox/CMakeFiles/Sandbox.dir/src/game.cpp.o: /home/divakar/Desktop/AccelPhysic
   /home/divakar/Desktop/AccelPhysics/AccelEngine/include/AccelEngine/collision_coarse.h \
   /usr/include/c++/12/utility \
   /usr/include/c++/12/bits/stl_relops.h \
-  /home/divakar/Desktop/AccelPhysics/AccelEngine/include/AccelEngine/narrow_collision.h \
-  /home/divakar/Desktop/AccelPhysics/AccelEngine/include/AccelEngine/collision_resolver.h
+  /home/divakar/Desktop/AccelPhysics/AccelEngine/include/AccelEngine/narrow_collision.h
 
 Sandbox/CMakeFiles/Sandbox.dir/src/main.cpp.o: /home/divakar/Desktop/AccelPhysics/Sandbox/src/main.cpp \
   /usr/include/stdc-predef.h \
@@ -1654,8 +1653,6 @@ Sandbox/CMakeFiles/Sandbox.dir/src/main.cpp.o: /home/divakar/Desktop/AccelPhysic
   /usr/include/x86_64-linux-gnu/bits/types/struct_tm.h \
   /usr/include/x86_64-linux-gnu/bits/types/struct_itimerspec.h
 
-
-/home/divakar/Desktop/AccelPhysics/AccelEngine/include/AccelEngine/collision_resolver.h:
 
 /usr/include/c++/12/bits/stl_relops.h:
 
