@@ -1,6 +1,5 @@
 #pragma once
 #include <AccelEngine/body.h>
-#include <AccelEngine/world.h>
 #include <vector>
 #include <utility>
 
@@ -28,8 +27,8 @@ namespace AccelEngine
         static std::pair<real, real> projectOnAxis(std::vector<Vector2> vertices, Vector2 axis);
         static std::pair<real, real> projectOnCircle(Vector2 center, real radius, std::vector<Vector2> vertices, Vector2 axis);
         static int FindClosestPointOnRectangle(Vector2 center, std::vector<Vector2> vertices);
-        static void FindContacts(World *world,
-                                 const std::vector<std::pair<RigidBody *, RigidBody *>> &potentialPairs,
-                                 std::vector<Contact> &contacts);
+        static void FindContacts(
+            const std::vector<std::pair<RigidBody *, RigidBody *>> &potentialPairs,
+            std::vector<Contact> &contacts);
     };
 };

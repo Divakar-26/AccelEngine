@@ -10,7 +10,7 @@ namespace AccelEngine
         static void SolvePosition(Contact& contact, float correctionFactor = 0.8f, float slop = 0.01f);
         
 
-        static void SolveVelocity(Contact& contact, float restitution = 0.2f, float friction = 0.4f);
+        static void SolveVelocity(Contact& contact, float friction = 0.4f);
         
         // Complete resolution (position + velocity)
         static void Solve(Contact& contact, float dt);

@@ -1,6 +1,9 @@
 #pragma once
 #include <AccelEngine/core.h>
 #include <AccelEngine/body.h>
+#include <AccelEngine/collision_coarse.h>
+#include <AccelEngine/collision_narrow.h>
+#include <AccelEngine/collision_resolve.h>
 
 namespace AccelEngine
 {
@@ -70,15 +73,12 @@ namespace AccelEngine
             BodyRegistration *reg = firstBody;
             while (reg)
             {
-                // reg->body->clearAccumulators();
+                reg->body->clearAccumulators();
                 reg->body->calculateDerivativeData();
                 reg = reg->next;
             }
         }
 
-        /**
-         * Runs the physics update for all rigid bodies.
-         */
         void runPhysics(real duration)
         {
             // Integrate motion
@@ -87,6 +87,41 @@ namespace AccelEngine
             {
                 reg->body->integrate(duration);
                 reg = reg->next;
+            }
+        }
+
+        void step(float dt, int iteration)
+        {
+            const real subdt = dt / iteration;
+
+            std::vector<RigidBody *> bodies;
+            bodies.reserve(64);
+
+            for (auto *reg = firstBody; reg; reg = reg->next)
+                bodies.push_back(reg->body);
+
+            std::vector<std::pair<RigidBody *, RigidBody *>> potentialPairs;
+            potentialPairs.reserve(256);
+
+            std::vector<Contact> contacts;
+            contacts.reserve(256);
+
+            for (int i = 0; i < iteration; ++i)
+            {
+                for (auto *b : bodies)
+                    b->integrate(subdt);
+
+                // broadphase
+                potentialPairs.clear();
+                CoarseCollision::FindPotentialPairs(bodies, potentialPairs);
+
+                // narrowphase
+                contacts.clear();
+                NarrowCollision::FindContacts(potentialPairs, contacts);
+
+                // resolve
+                for (auto &c : contacts)
+                    CollisionResolve::Solve(c, subdt);
             }
         }
     };

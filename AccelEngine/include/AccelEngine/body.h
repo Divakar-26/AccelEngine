@@ -54,6 +54,8 @@ namespace AccelEngine
         real linearDamping;
         real angularDamping;
 
+        real restitution;
+
         RigidBody() : inverseMass(0.0f),
                       inverseInertia(0.0f),
                       position(0, 0),
@@ -135,11 +137,7 @@ namespace AccelEngine
             position += velocity * duration;
             orientation += rotation * duration;
 
-            // Recompute transform
-            calculateDerivativeData();
 
-            // Clear accumulators
-            clearAccumulators();
         }
 
         Vector2 getPosition()

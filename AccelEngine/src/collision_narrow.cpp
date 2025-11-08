@@ -288,19 +288,16 @@ bool NarrowCollision::SATCollision(const RigidBody *A, const RigidBody *B, Conta
     return true;
 }
 
-void NarrowCollision::FindContacts(World *world,
-                                   const std::vector<std::pair<RigidBody *, RigidBody *>> &potentialPairs,
-                                   std::vector<Contact> &contacts)
+void NarrowCollision::FindContacts(
+    const std::vector<std::pair<RigidBody*, RigidBody*>>& potentialPairs,
+    std::vector<Contact>& contacts)
 {
     contacts.clear();
 
-    for (auto &pair : potentialPairs)
+    for (auto& pair : potentialPairs)
     {
-        Contact contact;
-        if (SATCollision(pair.first, pair.second, contact))
-        {
-
-            contacts.push_back(contact);
-        }
+        Contact c;
+        if (SATCollision(pair.first, pair.second, c))
+            contacts.push_back(c);
     }
 }

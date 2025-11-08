@@ -47,17 +47,18 @@ bool Game::Init(const char *title)
     body.inverseMass = 1.0f;
     body.orientation = 0;
     body.velocity = Vector2(0, 0);
-    body.angularDamping = 0.99f;
+    body.angularDamping = 1.0f;
     body.rotation = 0.0f;
     body.shapeType = ShapeType::AABB;
     body.aabb.halfSize = Vector2(30.0f, 30.0f);
-    body.linearDamping = 0.98f;
+    body.linearDamping = 1.0f;
     body.inverseInertia = 1.0f / 30.0f;
 
     ground.position = Vector2(927, -247); // Center at bottom
-    ground.inverseMass = 0.0f;                                // Use 0 for truly static objects
+    ground.inverseMass = 0.0f;            // Use 0 for truly static objects
     ground.shapeType = ShapeType::AABB;
     ground.aabb.halfSize = Vector2(800.0f, 50.0f);
+    ground.restitution = 0.8f;
 
     world.addBody(&ground);
     world.addBody(&body);
@@ -134,43 +135,43 @@ void Game::update(float dt)
 {
     showFPS(dt);
 
-    for(auto & it : bodies){
-        if(it->inverseMass > 0.0f){
-            it->addForce(Vector2(0, -500));
+    world.startFrame();
+
+    for (auto &it : bodies)
+    {
+        if (it->inverseMass > 0.0f)
+        {
+            it->addForce(Vector2(0, 0));
         }
     }
-    world.runPhysics(dt);
 
-    std::vector<std::pair<RigidBody *, RigidBody *>> potentialPairs;
-    CoarseCollision::FindPotentialPairs(&world, potentialPairs);
-
-    std::vector<Contact> contacts;
-    NarrowCollision::FindContacts(&world, potentialPairs, contacts);
-
-    if (!contacts.empty())
-    {
-        std::cout << "Actual collisions: " << contacts.size() << std::endl;
+    world.step(dt, 6);
 
         for (auto *b : bodies)
         {
             b->c = {255, 255, 255, 255};
         }
+    // if (!contacts.empty())
+    // {
+    //     std::cout << "Actual collisions: " << contacts.size() << std::endl;
 
-        for (auto &contact : contacts)
-        {
-            contact.a->c = {0, 255, 0, 255};
-            contact.b->c = {0, 255, 0, 255};
+    //     for (auto *b : bodies)
+    //     {
+    //         b->c = {255, 255, 255, 255};
+    //     }
 
-            CollisionResolve::Solve(contact, dt);
-        }
-    }
-    else
-    {
-        for (auto *b : bodies)
-        {
-            b->c = {255, 255, 255, 255};
-        }
-    }
+    //     for (auto &contact : contacts)
+    //     {
+    //         contact.a->c = {0, 255, 0, 255};
+    //         contact.b->c = {0, 255, 0, 255};
+
+    //         CollisionResolve::Solve(contact, dt);
+    //     }
+    // }
+    // else
+    // {
+
+    // }
 }
 
 void Game::render()
@@ -313,7 +314,8 @@ void Game::addCircle(float x, float y)
 {
     RigidBody *b = new RigidBody();
     b->position = {x, y};
-    b->inverseMass = 1.0f;
+    b->inverseMass = 1.0f;  
+    b->restitution = 0.8f;
 
     b->shapeType = ShapeType::CIRCLE;
     b->circle.radius = 10 + rand() % 50;

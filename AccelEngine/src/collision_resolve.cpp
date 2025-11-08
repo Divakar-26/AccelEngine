@@ -33,7 +33,7 @@ void CollisionResolve::SolvePosition(Contact& contact, float correctionFactor, f
     }
 }
 
-void CollisionResolve::SolveVelocity(Contact& contact, float restitution, float friction)
+void CollisionResolve::SolveVelocity(Contact& contact, float friction)
 {
     RigidBody* A = contact.a;
     RigidBody* B = contact.b;
@@ -50,7 +50,8 @@ void CollisionResolve::SolveVelocity(Contact& contact, float restitution, float 
     
     // restitution = 0.0f -> completely inelastic (no bounce)
     // restitution = 1.0f -> completely elastic (perfect bounce)
-    float j = -(1.0f + restitution) * velocityAlongNormal;
+    real restituion = std::min(A->restitution , B->restitution);
+    float j = -(1.0f + restituion) * velocityAlongNormal;
     j /= totalInverseMass;
     
     // Apply impulse
