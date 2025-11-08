@@ -22,27 +22,15 @@ bool Game::Init(const char *title)
     window = SDL_CreateWindow(title, WINDOW_W, WINDOW_H, SDL_WINDOW_RESIZABLE);
     renderer = SDL_CreateRenderer(window, NULL);
 
-    IMGUI_CHECKVERSION();
-    ImGui::CreateContext();
-    ImGuiIO &io = ImGui::GetIO();
-    (void)io;
-    ImGui::StyleColorsDark();
-
-    if (!ImGui_ImplSDL3_InitForSDLRenderer(window, renderer))
-    {
-        SDL_Log("ImGui SDL3 init failed!");
-        return false;
-    }
-    if (!ImGui_ImplSDLRenderer3_Init(renderer))
-    {
-        SDL_Log("ImGui SDL3 renderer init failed!");
+    // init UI
+    if(!ui.init(window, renderer)){
+        std::cout<<"Somethine wrong with IMGUI ----- Cannot Initialised"<<std::endl;
         return false;
     }
 
     Renderer2D::init(renderer, WINDOW_W, WINDOW_H);
 
-    // ----------------------------------------
-    // FIXED: Position body in visible area (middle-top)
+    //body
     body.position = Vector2(WINDOW_W / 2.0f, 100.0f);
     body.inverseMass = 1.0f;
     body.orientation = 0;
@@ -54,22 +42,18 @@ bool Game::Init(const char *title)
     body.linearDamping = 1.0f;
     body.inverseInertia = 1.0f / 30.0f;
 
-    ground.position = Vector2(927, -247); // Center at bottom
-    ground.inverseMass = 0.0f;            // Use 0 for truly static objects
+    // ground
+    ground.position = Vector2(927, -247);
+    ground.inverseMass = 0.0f;            
     ground.shapeType = ShapeType::AABB;
     ground.aabb.halfSize = Vector2(800.0f, 50.0f);
     ground.restitution = 0.8f;
 
+    // adding bodies to world and bodies
     world.addBody(&ground);
     world.addBody(&body);
     bodies.push_back(&body);
     bodies.push_back(&ground);
-
-    boxTex = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, 60, 60);
-    SDL_SetRenderTarget(renderer, boxTex);
-    SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
-    SDL_RenderClear(renderer);
-    SDL_SetRenderTarget(renderer, nullptr);
 
     running = true;
     return true;
@@ -78,15 +62,16 @@ bool Game::Init(const char *title)
 void Game::handleEvent()
 {
     SDL_Event e;
+    //handle ui
+
+    
     while (SDL_PollEvent(&e))
     {
-        ImGui_ImplSDL3_ProcessEvent(&e);
-
-        ImGuiIO &io = ImGui::GetIO();
-        if (io.WantCaptureMouse)
-        {
+        if(ui.handleEvent(e)){
             continue;
         }
+        
+        
         if (e.type == SDL_EVENT_QUIT)
         {
             running = false;
@@ -108,7 +93,7 @@ void Game::handleEvent()
                 body.velocity = Vector2(0, 100);
                 break;
             case SDLK_LCTRL:
-                addBody();
+                ui.addBody(world,bodies);
                 break;
             default:
                 break;
@@ -129,6 +114,8 @@ void Game::handleEvent()
             }
         }
     }
+
+    
 }
 
 void Game::update(float dt)
@@ -152,32 +139,11 @@ void Game::update(float dt)
     {
         b->c = {255, 255, 255, 255};
     }
-    // if (!contacts.empty())
-    // {
-    //     std::cout << "Actual collisions: " << contacts.size() << std::endl;
-
-    //     for (auto *b : bodies)
-    //     {
-    //         b->c = {255, 255, 255, 255};
-    //     }
-
-    //     for (auto &contact : contacts)
-    //     {
-    //         contact.a->c = {0, 255, 0, 255};
-    //         contact.b->c = {0, 255, 0, 255};
-
-    //         CollisionResolve::Solve(contact, dt);
-    //     }
-    // }
-    // else
-    // {
-
-    // }
 }
 
 void Game::render()
 {
-    imguiAddBodyMenu();
+    ui.DrawAddBody(world, bodies);
 
     SDL_SetRenderDrawColor(renderer, 25, 25, 40, 255);
     SDL_RenderClear(renderer);
@@ -207,53 +173,9 @@ void Game::render()
         }
     }
 
-    ImGui::Render();
-    ImGui_ImplSDLRenderer3_RenderDrawData(ImGui::GetDrawData(), renderer);
 
+    ui.DrawFrame();
     SDL_RenderPresent(renderer);
-}
-
-void Game::addBody()
-{
-    static bool seeded = false;
-    if (!seeded)
-    {
-        std::srand((unsigned)std::time(nullptr));
-        seeded = true;
-    }
-
-    RigidBody *b = new RigidBody();
-
-    float margin = 60.0f;
-    float x = margin + static_cast<float>(std::rand()) / RAND_MAX * (WINDOW_W - 2 * margin);
-    float y = margin + static_cast<float>(std::rand()) / RAND_MAX * (WINDOW_H * 0.4f);
-
-    b->position = Vector2(x, y);
-
-    b->inverseMass = 1.0f;
-    // Calculate proper inertia for a rectangle: I = (1/12) * m * (w² + h²)
-
-    // {
-    //     float width = b->aabb.halfSize.x * 2;
-    //     float height = b->aabb.halfSize.y * 2;
-    //     float mass = 1.0f / b->inverseMass;
-    //     float inertia = (1.0f / 12.0f) * mass * (width * width + height * height);
-    //     b->inverseInertia = 1.0f / inertia;
-    // }
-    // else
-    {
-        b->shapeType = ShapeType::CIRCLE;
-        b->circle.radius = 10 + rand() % 50;
-    }
-
-    b->velocity = Vector2(0, 0);
-    b->angularDamping = 0.99f;
-    b->rotation = 0.0f;
-
-    b->calculateDerivativeData();
-
-    world.addBody(b);
-    bodies.push_back(b);
 }
 
 void Game::showFPS(float realDt, float fixedDt)
@@ -268,43 +190,6 @@ void Game::showFPS(float realDt, float fixedDt)
              fps, frameMs, fixedMs, bodies.size());
 
     SDL_SetWindowTitle(window, title);
-}
-
-void Game::imguiAddBodyMenu()
-{
-    ImGui_ImplSDLRenderer3_NewFrame();
-    ImGui_ImplSDL3_NewFrame();
-    ImGui::NewFrame();
-
-    // --- Scene Editor UI ---
-    ImGui::Begin("Scene Editor");
-
-    if (ImGui::Button("Add Body"))
-        addBody();
-
-    static int selectedIndex = -1;
-    ImGui::Separator();
-    ImGui::Text("Bodies:");
-
-    for (int i = 0; i < bodies.size(); ++i)
-    {
-        char label[32];
-        snprintf(label, sizeof(label), "Body %d", i);
-        if (ImGui::Selectable(label, selectedIndex == i))
-            selectedIndex = i;
-    }
-
-    if (selectedIndex >= 0 && selectedIndex < bodies.size())
-    {
-        RigidBody *selected = bodies[selectedIndex];
-        ImGui::Separator();
-        ImGui::Text("Transform");
-        ImGui::DragFloat2("Position", (float *)&selected->position, 1.0f);
-        ImGui::SliderAngle("Orientation", (float *)&selected->orientation, -180.0f, 180.0f);
-        ImGui::DragFloat2("Velocity", (float *)&selected->velocity, 0.5f);
-    }
-
-    ImGui::End();
 }
 
 void Game::addCircle(float x, float y)

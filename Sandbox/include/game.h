@@ -5,12 +5,9 @@
 #include <AccelEngine/core.h>
 #include <AccelEngine/body.h>
 #include <AccelEngine/world.h>
-#include "imgui.h"
-#include "backends/imgui_impl_sdl3.h"
-#include "backends/imgui_impl_sdlrenderer3.h"
+#include "UI.h"
 
-#include <cstdlib> // for rand()
-#include <ctime>   // for time()
+
 
 using namespace AccelEngine;
 
@@ -24,16 +21,12 @@ public:
     void update(float dt);
     void render();
 
-    SDL_Texture *getRotatedTexture(float w, float h, float rotation, SDL_Color c);
-
     bool isRunning()
     {
         return running;
     }
 
-    void addBody();
     void showFPS(float realDt, float fixedDt);
-    void imguiAddBodyMenu();
 
     inline Vector2 WorldToScreen(const Vector2 &w, float screenHeight)
     {
@@ -51,6 +44,8 @@ private:
     int WINDOW_W, WINDOW_H;
     SDL_Window *window = nullptr;
     SDL_Renderer *renderer = nullptr;
+
+    UI ui;
 
     bool running;
 

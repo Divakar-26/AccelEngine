@@ -30,31 +30,31 @@ namespace AccelEngine
     public:
         Color c;
 
-        ShapeType shapeType;
-        Circle circle;
-        AABB aabb;
+        // ---- Transform ----
+        Vector2 position;
+        real orientation;
+        Matrix2 transformMatrix;
 
+        real restitution;
         real inverseMass;
         real inverseInertia;
 
-        Vector2 position;
-
-        // in radians
-        real orientation;
-
+        // ---- Velocities ----
         Vector2 velocity;
         real rotation;
 
-        // local -> world
-        Matrix2 transformMatrix;
-
+        // ---- Acumulating Force ----
         Vector2 forceAccum;
         real torqueAccum;
 
+        // ---- Damping ----
         real linearDamping;
         real angularDamping;
 
-        real restitution;
+        // ---- Shape ----
+        ShapeType shapeType;
+        Circle circle;
+        AABB aabb;
 
         RigidBody() : inverseMass(0.0f),
                       inverseInertia(0.0f),
@@ -74,7 +74,7 @@ namespace AccelEngine
         // recalculates derived data from the body's state. call this after manually changing position or orientation
         void calculateDerivativeData()
         {
-            _calculateTransformMatrix(transformMatrix, position, orientation);
+            updateTransformMatrix(transformMatrix, position, orientation);
         }
 
         void addForce(const Vector2 &force)
@@ -132,15 +132,12 @@ namespace AccelEngine
             velocity *= std::pow(linearDamping, duration);
             rotation *= std::pow(angularDamping, duration);
 
-            
             // Integrate position & orientation
             position += velocity * duration;
             orientation += rotation * duration;
-
-
         }
 
-        Vector2 getPosition()
+        Vector2 getPosition() const
         {
             return position;
         }
@@ -150,7 +147,7 @@ namespace AccelEngine
             return inverseMass;
         }
 
-        Vector2 getVelocity()
+        Vector2 getVelocity() const
         {
             return velocity;
         }
@@ -175,7 +172,7 @@ namespace AccelEngine
         }
 
     private:
-        static inline void _calculateTransformMatrix(Matrix2 &transformMatrix, const Vector2 &position, const real orientation)
+        static inline void updateTransformMatrix(Matrix2 &transformMatrix, const Vector2 &position, const real orientation)
         {
             transformMatrix.setOrientation(orientation);
         }

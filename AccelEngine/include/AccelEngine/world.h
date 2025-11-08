@@ -7,46 +7,26 @@
 
 namespace AccelEngine
 {
-    /**
-     * The world represents an independent simulation of physics.
-     * It manages all rigid bodies and updates them each frame.
-     */
+
     class World
     {
     protected:
-        /**
-         * Holds a single rigid body in a linked list.
-         */
-        struct BodyRegistration
-        {
-            RigidBody *body;
-            BodyRegistration *next;
-        };
-
-        /**
-         * The head of the list of registered bodies.
-         */
-        BodyRegistration *firstBody;
+        std::vector<RigidBody *> bodies;
+        std::vector<std::pair<RigidBody *, RigidBody *>> potentialPairs;
+        std::vector<Contact> contacts;
+        std::vector<Contact> contactsThisFrame;
 
     public:
-        World() : firstBody(nullptr) {}
+        World() {}
 
         ~World()
         {
             clear();
         }
 
-        BodyRegistration *getFirstBody() { return firstBody; }
-
-        /**
-         * Adds a new rigid body to the world.
-         */
         void addBody(RigidBody *body)
         {
-            BodyRegistration *registration = new BodyRegistration();
-            registration->body = body;
-            registration->next = firstBody;
-            firstBody = registration;
+            bodies.push_back(body);
         }
 
         /**
@@ -54,35 +34,12 @@ namespace AccelEngine
          */
         void clear()
         {
-            BodyRegistration *reg = firstBody;
-            while (reg)
-            {
-                BodyRegistration *next = reg->next;
-                delete reg;
-                reg = next;
-            }
-            firstBody = nullptr;
+            bodies.clear();
         }
 
-        std::vector<Contact> getContacts()
+        const std::vector<Contact> getContacts() const
         {
-            std::vector<RigidBody *> bodies;
-            bodies.reserve(64);
-
-            for (auto *reg = firstBody; reg; reg = reg->next)
-                bodies.push_back(reg->body);
-
-            std::vector<std::pair<RigidBody *, RigidBody *>> potentialPairs;
-            std::vector<Contact> contacts;
-
-            potentialPairs.clear();
-            CoarseCollision::FindPotentialPairs(bodies, potentialPairs);
-
-            // narrowphase
-            contacts.clear();
-            NarrowCollision::FindContacts(potentialPairs, contacts);
-
-            return contacts;
+            return contactsThisFrame;
         }
 
         /**
@@ -91,59 +48,42 @@ namespace AccelEngine
          */
         void startFrame()
         {
-            BodyRegistration *reg = firstBody;
-            while (reg)
+
+            for (RigidBody *r : bodies)
             {
-                reg->body->clearAccumulators();
-                reg->body->calculateDerivativeData();
-                reg = reg->next;
+                r->clearAccumulators();
+                r->calculateDerivativeData();
             }
         }
 
         void runPhysics(real duration)
         {
-            // Integrate motion
-            BodyRegistration *reg = firstBody;
-            while (reg)
+            for (RigidBody *r : bodies)
             {
-                reg->body->integrate(duration);
-                reg = reg->next;
+                r->integrate(duration);
             }
         }
 
-        void step(float dt, int iteration)
+        void step(float dt, int substeps)
         {
-            const real subdt = dt / iteration;
+            float subdt = dt / substeps;
 
-            std::vector<RigidBody *> bodies;
-            bodies.reserve(64);
-
-            for (auto *reg = firstBody; reg; reg = reg->next)
-                bodies.push_back(reg->body);
-
-            std::vector<std::pair<RigidBody *, RigidBody *>> potentialPairs;
-            potentialPairs.reserve(256);
-
-            std::vector<Contact> contacts;
-            contacts.reserve(256);
-
-            for (int i = 0; i < iteration; ++i)
+            for (int i = 0; i < substeps; i++)
             {
                 for (auto *b : bodies)
                     b->integrate(subdt);
 
-                // broadphase
                 potentialPairs.clear();
-                CoarseCollision::FindPotentialPairs(bodies, potentialPairs);
-
-                // narrowphase
                 contacts.clear();
+
+                CoarseCollision::FindPotentialPairs(bodies, potentialPairs);
                 NarrowCollision::FindContacts(potentialPairs, contacts);
 
-                // resolve
                 for (auto &c : contacts)
                     CollisionResolve::Solve(c, subdt);
-            }
+                
+                }
+            contactsThisFrame = contacts;
         }
     };
 }

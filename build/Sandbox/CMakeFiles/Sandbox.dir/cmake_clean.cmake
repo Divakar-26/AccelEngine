@@ -11,6 +11,8 @@ file(REMOVE_RECURSE
   "CMakeFiles/Sandbox.dir/include/imgui/imgui_tables.cpp.o.d"
   "CMakeFiles/Sandbox.dir/include/imgui/imgui_widgets.cpp.o"
   "CMakeFiles/Sandbox.dir/include/imgui/imgui_widgets.cpp.o.d"
+  "CMakeFiles/Sandbox.dir/src/UI.cpp.o"
+  "CMakeFiles/Sandbox.dir/src/UI.cpp.o.d"
   "CMakeFiles/Sandbox.dir/src/game.cpp.o"
   "CMakeFiles/Sandbox.dir/src/game.cpp.o.d"
   "CMakeFiles/Sandbox.dir/src/main.cpp.o"

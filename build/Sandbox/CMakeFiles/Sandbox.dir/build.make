@@ -111,10 +111,24 @@ Sandbox/CMakeFiles/Sandbox.dir/src/renderer2D.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/Sandbox.dir/src/renderer2D.cpp.s"
 	cd /home/divakar/Desktop/AccelPhysics/build/Sandbox && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/divakar/Desktop/AccelPhysics/Sandbox/src/renderer2D.cpp -o CMakeFiles/Sandbox.dir/src/renderer2D.cpp.s
 
+Sandbox/CMakeFiles/Sandbox.dir/src/UI.cpp.o: Sandbox/CMakeFiles/Sandbox.dir/flags.make
+Sandbox/CMakeFiles/Sandbox.dir/src/UI.cpp.o: /home/divakar/Desktop/AccelPhysics/Sandbox/src/UI.cpp
+Sandbox/CMakeFiles/Sandbox.dir/src/UI.cpp.o: Sandbox/CMakeFiles/Sandbox.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/divakar/Desktop/AccelPhysics/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building CXX object Sandbox/CMakeFiles/Sandbox.dir/src/UI.cpp.o"
+	cd /home/divakar/Desktop/AccelPhysics/build/Sandbox && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT Sandbox/CMakeFiles/Sandbox.dir/src/UI.cpp.o -MF CMakeFiles/Sandbox.dir/src/UI.cpp.o.d -o CMakeFiles/Sandbox.dir/src/UI.cpp.o -c /home/divakar/Desktop/AccelPhysics/Sandbox/src/UI.cpp
+
+Sandbox/CMakeFiles/Sandbox.dir/src/UI.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/Sandbox.dir/src/UI.cpp.i"
+	cd /home/divakar/Desktop/AccelPhysics/build/Sandbox && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/divakar/Desktop/AccelPhysics/Sandbox/src/UI.cpp > CMakeFiles/Sandbox.dir/src/UI.cpp.i
+
+Sandbox/CMakeFiles/Sandbox.dir/src/UI.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/Sandbox.dir/src/UI.cpp.s"
+	cd /home/divakar/Desktop/AccelPhysics/build/Sandbox && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/divakar/Desktop/AccelPhysics/Sandbox/src/UI.cpp -o CMakeFiles/Sandbox.dir/src/UI.cpp.s
+
 Sandbox/CMakeFiles/Sandbox.dir/include/imgui/imgui.cpp.o: Sandbox/CMakeFiles/Sandbox.dir/flags.make
 Sandbox/CMakeFiles/Sandbox.dir/include/imgui/imgui.cpp.o: /home/divakar/Desktop/AccelPhysics/Sandbox/include/imgui/imgui.cpp
 Sandbox/CMakeFiles/Sandbox.dir/include/imgui/imgui.cpp.o: Sandbox/CMakeFiles/Sandbox.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/divakar/Desktop/AccelPhysics/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building CXX object Sandbox/CMakeFiles/Sandbox.dir/include/imgui/imgui.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/divakar/Desktop/AccelPhysics/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Building CXX object Sandbox/CMakeFiles/Sandbox.dir/include/imgui/imgui.cpp.o"
 	cd /home/divakar/Desktop/AccelPhysics/build/Sandbox && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT Sandbox/CMakeFiles/Sandbox.dir/include/imgui/imgui.cpp.o -MF CMakeFiles/Sandbox.dir/include/imgui/imgui.cpp.o.d -o CMakeFiles/Sandbox.dir/include/imgui/imgui.cpp.o -c /home/divakar/Desktop/AccelPhysics/Sandbox/include/imgui/imgui.cpp
 
 Sandbox/CMakeFiles/Sandbox.dir/include/imgui/imgui.cpp.i: cmake_force
@@ -128,7 +142,7 @@ Sandbox/CMakeFiles/Sandbox.dir/include/imgui/imgui.cpp.s: cmake_force
 Sandbox/CMakeFiles/Sandbox.dir/include/imgui/imgui_draw.cpp.o: Sandbox/CMakeFiles/Sandbox.dir/flags.make
 Sandbox/CMakeFiles/Sandbox.dir/include/imgui/imgui_draw.cpp.o: /home/divakar/Desktop/AccelPhysics/Sandbox/include/imgui/imgui_draw.cpp
 Sandbox/CMakeFiles/Sandbox.dir/include/imgui/imgui_draw.cpp.o: Sandbox/CMakeFiles/Sandbox.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/divakar/Desktop/AccelPhysics/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Building CXX object Sandbox/CMakeFiles/Sandbox.dir/include/imgui/imgui_draw.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/divakar/Desktop/AccelPhysics/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_6) "Building CXX object Sandbox/CMakeFiles/Sandbox.dir/include/imgui/imgui_draw.cpp.o"
 	cd /home/divakar/Desktop/AccelPhysics/build/Sandbox && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT Sandbox/CMakeFiles/Sandbox.dir/include/imgui/imgui_draw.cpp.o -MF CMakeFiles/Sandbox.dir/include/imgui/imgui_draw.cpp.o.d -o CMakeFiles/Sandbox.dir/include/imgui/imgui_draw.cpp.o -c /home/divakar/Desktop/AccelPhysics/Sandbox/include/imgui/imgui_draw.cpp
 
 Sandbox/CMakeFiles/Sandbox.dir/include/imgui/imgui_draw.cpp.i: cmake_force
@@ -142,7 +156,7 @@ Sandbox/CMakeFiles/Sandbox.dir/include/imgui/imgui_draw.cpp.s: cmake_force
 Sandbox/CMakeFiles/Sandbox.dir/include/imgui/imgui_tables.cpp.o: Sandbox/CMakeFiles/Sandbox.dir/flags.make
 Sandbox/CMakeFiles/Sandbox.dir/include/imgui/imgui_tables.cpp.o: /home/divakar/Desktop/AccelPhysics/Sandbox/include/imgui/imgui_tables.cpp
 Sandbox/CMakeFiles/Sandbox.dir/include/imgui/imgui_tables.cpp.o: Sandbox/CMakeFiles/Sandbox.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/divakar/Desktop/AccelPhysics/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_6) "Building CXX object Sandbox/CMakeFiles/Sandbox.dir/include/imgui/imgui_tables.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/divakar/Desktop/AccelPhysics/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_7) "Building CXX object Sandbox/CMakeFiles/Sandbox.dir/include/imgui/imgui_tables.cpp.o"
 	cd /home/divakar/Desktop/AccelPhysics/build/Sandbox && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT Sandbox/CMakeFiles/Sandbox.dir/include/imgui/imgui_tables.cpp.o -MF CMakeFiles/Sandbox.dir/include/imgui/imgui_tables.cpp.o.d -o CMakeFiles/Sandbox.dir/include/imgui/imgui_tables.cpp.o -c /home/divakar/Desktop/AccelPhysics/Sandbox/include/imgui/imgui_tables.cpp
 
 Sandbox/CMakeFiles/Sandbox.dir/include/imgui/imgui_tables.cpp.i: cmake_force
@@ -156,7 +170,7 @@ Sandbox/CMakeFiles/Sandbox.dir/include/imgui/imgui_tables.cpp.s: cmake_force
 Sandbox/CMakeFiles/Sandbox.dir/include/imgui/imgui_widgets.cpp.o: Sandbox/CMakeFiles/Sandbox.dir/flags.make
 Sandbox/CMakeFiles/Sandbox.dir/include/imgui/imgui_widgets.cpp.o: /home/divakar/Desktop/AccelPhysics/Sandbox/include/imgui/imgui_widgets.cpp
 Sandbox/CMakeFiles/Sandbox.dir/include/imgui/imgui_widgets.cpp.o: Sandbox/CMakeFiles/Sandbox.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/divakar/Desktop/AccelPhysics/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_7) "Building CXX object Sandbox/CMakeFiles/Sandbox.dir/include/imgui/imgui_widgets.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/divakar/Desktop/AccelPhysics/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_8) "Building CXX object Sandbox/CMakeFiles/Sandbox.dir/include/imgui/imgui_widgets.cpp.o"
 	cd /home/divakar/Desktop/AccelPhysics/build/Sandbox && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT Sandbox/CMakeFiles/Sandbox.dir/include/imgui/imgui_widgets.cpp.o -MF CMakeFiles/Sandbox.dir/include/imgui/imgui_widgets.cpp.o.d -o CMakeFiles/Sandbox.dir/include/imgui/imgui_widgets.cpp.o -c /home/divakar/Desktop/AccelPhysics/Sandbox/include/imgui/imgui_widgets.cpp
 
 Sandbox/CMakeFiles/Sandbox.dir/include/imgui/imgui_widgets.cpp.i: cmake_force
@@ -170,7 +184,7 @@ Sandbox/CMakeFiles/Sandbox.dir/include/imgui/imgui_widgets.cpp.s: cmake_force
 Sandbox/CMakeFiles/Sandbox.dir/include/imgui/backends/imgui_impl_sdl3.cpp.o: Sandbox/CMakeFiles/Sandbox.dir/flags.make
 Sandbox/CMakeFiles/Sandbox.dir/include/imgui/backends/imgui_impl_sdl3.cpp.o: /home/divakar/Desktop/AccelPhysics/Sandbox/include/imgui/backends/imgui_impl_sdl3.cpp
 Sandbox/CMakeFiles/Sandbox.dir/include/imgui/backends/imgui_impl_sdl3.cpp.o: Sandbox/CMakeFiles/Sandbox.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/divakar/Desktop/AccelPhysics/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_8) "Building CXX object Sandbox/CMakeFiles/Sandbox.dir/include/imgui/backends/imgui_impl_sdl3.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/divakar/Desktop/AccelPhysics/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_9) "Building CXX object Sandbox/CMakeFiles/Sandbox.dir/include/imgui/backends/imgui_impl_sdl3.cpp.o"
 	cd /home/divakar/Desktop/AccelPhysics/build/Sandbox && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT Sandbox/CMakeFiles/Sandbox.dir/include/imgui/backends/imgui_impl_sdl3.cpp.o -MF CMakeFiles/Sandbox.dir/include/imgui/backends/imgui_impl_sdl3.cpp.o.d -o CMakeFiles/Sandbox.dir/include/imgui/backends/imgui_impl_sdl3.cpp.o -c /home/divakar/Desktop/AccelPhysics/Sandbox/include/imgui/backends/imgui_impl_sdl3.cpp
 
 Sandbox/CMakeFiles/Sandbox.dir/include/imgui/backends/imgui_impl_sdl3.cpp.i: cmake_force
@@ -184,7 +198,7 @@ Sandbox/CMakeFiles/Sandbox.dir/include/imgui/backends/imgui_impl_sdl3.cpp.s: cma
 Sandbox/CMakeFiles/Sandbox.dir/include/imgui/backends/imgui_impl_sdlrenderer3.cpp.o: Sandbox/CMakeFiles/Sandbox.dir/flags.make
 Sandbox/CMakeFiles/Sandbox.dir/include/imgui/backends/imgui_impl_sdlrenderer3.cpp.o: /home/divakar/Desktop/AccelPhysics/Sandbox/include/imgui/backends/imgui_impl_sdlrenderer3.cpp
 Sandbox/CMakeFiles/Sandbox.dir/include/imgui/backends/imgui_impl_sdlrenderer3.cpp.o: Sandbox/CMakeFiles/Sandbox.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/divakar/Desktop/AccelPhysics/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_9) "Building CXX object Sandbox/CMakeFiles/Sandbox.dir/include/imgui/backends/imgui_impl_sdlrenderer3.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/divakar/Desktop/AccelPhysics/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_10) "Building CXX object Sandbox/CMakeFiles/Sandbox.dir/include/imgui/backends/imgui_impl_sdlrenderer3.cpp.o"
 	cd /home/divakar/Desktop/AccelPhysics/build/Sandbox && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT Sandbox/CMakeFiles/Sandbox.dir/include/imgui/backends/imgui_impl_sdlrenderer3.cpp.o -MF CMakeFiles/Sandbox.dir/include/imgui/backends/imgui_impl_sdlrenderer3.cpp.o.d -o CMakeFiles/Sandbox.dir/include/imgui/backends/imgui_impl_sdlrenderer3.cpp.o -c /home/divakar/Desktop/AccelPhysics/Sandbox/include/imgui/backends/imgui_impl_sdlrenderer3.cpp
 
 Sandbox/CMakeFiles/Sandbox.dir/include/imgui/backends/imgui_impl_sdlrenderer3.cpp.i: cmake_force
@@ -200,6 +214,7 @@ Sandbox_OBJECTS = \
 "CMakeFiles/Sandbox.dir/src/main.cpp.o" \
 "CMakeFiles/Sandbox.dir/src/game.cpp.o" \
 "CMakeFiles/Sandbox.dir/src/renderer2D.cpp.o" \
+"CMakeFiles/Sandbox.dir/src/UI.cpp.o" \
 "CMakeFiles/Sandbox.dir/include/imgui/imgui.cpp.o" \
 "CMakeFiles/Sandbox.dir/include/imgui/imgui_draw.cpp.o" \
 "CMakeFiles/Sandbox.dir/include/imgui/imgui_tables.cpp.o" \
@@ -213,6 +228,7 @@ Sandbox_EXTERNAL_OBJECTS =
 Sandbox/Sandbox: Sandbox/CMakeFiles/Sandbox.dir/src/main.cpp.o
 Sandbox/Sandbox: Sandbox/CMakeFiles/Sandbox.dir/src/game.cpp.o
 Sandbox/Sandbox: Sandbox/CMakeFiles/Sandbox.dir/src/renderer2D.cpp.o
+Sandbox/Sandbox: Sandbox/CMakeFiles/Sandbox.dir/src/UI.cpp.o
 Sandbox/Sandbox: Sandbox/CMakeFiles/Sandbox.dir/include/imgui/imgui.cpp.o
 Sandbox/Sandbox: Sandbox/CMakeFiles/Sandbox.dir/include/imgui/imgui_draw.cpp.o
 Sandbox/Sandbox: Sandbox/CMakeFiles/Sandbox.dir/include/imgui/imgui_tables.cpp.o
@@ -224,7 +240,7 @@ Sandbox/Sandbox: AccelEngine/libAccelEngine.a
 Sandbox/Sandbox: /usr/local/lib/libSDL3_image.so.0.2.0
 Sandbox/Sandbox: /usr/local/lib/libSDL3.so.0.3.0
 Sandbox/Sandbox: Sandbox/CMakeFiles/Sandbox.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/divakar/Desktop/AccelPhysics/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_10) "Linking CXX executable Sandbox"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/divakar/Desktop/AccelPhysics/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_11) "Linking CXX executable Sandbox"
 	cd /home/divakar/Desktop/AccelPhysics/build/Sandbox && $(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/Sandbox.dir/link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.

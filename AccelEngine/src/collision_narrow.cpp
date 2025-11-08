@@ -217,7 +217,7 @@ std::pair<real, real> NarrowCollision::projectOnCircle(Vector2 center, real radi
     return {min, max};
 }
 
-std::pair<real, real> NarrowCollision::projectOnAxis(std::vector<Vector2> vertices, Vector2 axis)
+std::pair<real, real> NarrowCollision::projectOnAxis(const std::vector<Vector2> vertices, Vector2 axis)
 {
     real min = std::numeric_limits<real>::max();
     real max = std::numeric_limits<real>::lowest();

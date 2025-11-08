@@ -2,6 +2,7 @@ add_executable(Sandbox
     src/main.cpp
     src/game.cpp
     src/renderer2D.cpp
+    src/UI.cpp
 
     # ImGui core
     include/imgui/imgui.cpp

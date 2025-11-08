@@ -14,6 +14,7 @@ set(CMAKE_DEPENDS_DEPENDENCY_FILES
   "/home/divakar/Desktop/AccelPhysics/Sandbox/include/imgui/imgui_draw.cpp" "Sandbox/CMakeFiles/Sandbox.dir/include/imgui/imgui_draw.cpp.o" "gcc" "Sandbox/CMakeFiles/Sandbox.dir/include/imgui/imgui_draw.cpp.o.d"
   "/home/divakar/Desktop/AccelPhysics/Sandbox/include/imgui/imgui_tables.cpp" "Sandbox/CMakeFiles/Sandbox.dir/include/imgui/imgui_tables.cpp.o" "gcc" "Sandbox/CMakeFiles/Sandbox.dir/include/imgui/imgui_tables.cpp.o.d"
   "/home/divakar/Desktop/AccelPhysics/Sandbox/include/imgui/imgui_widgets.cpp" "Sandbox/CMakeFiles/Sandbox.dir/include/imgui/imgui_widgets.cpp.o" "gcc" "Sandbox/CMakeFiles/Sandbox.dir/include/imgui/imgui_widgets.cpp.o.d"
+  "/home/divakar/Desktop/AccelPhysics/Sandbox/src/UI.cpp" "Sandbox/CMakeFiles/Sandbox.dir/src/UI.cpp.o" "gcc" "Sandbox/CMakeFiles/Sandbox.dir/src/UI.cpp.o.d"
   "/home/divakar/Desktop/AccelPhysics/Sandbox/src/game.cpp" "Sandbox/CMakeFiles/Sandbox.dir/src/game.cpp.o" "gcc" "Sandbox/CMakeFiles/Sandbox.dir/src/game.cpp.o.d"
   "/home/divakar/Desktop/AccelPhysics/Sandbox/src/main.cpp" "Sandbox/CMakeFiles/Sandbox.dir/src/main.cpp.o" "gcc" "Sandbox/CMakeFiles/Sandbox.dir/src/main.cpp.o.d"
   "/home/divakar/Desktop/AccelPhysics/Sandbox/src/renderer2D.cpp" "Sandbox/CMakeFiles/Sandbox.dir/src/renderer2D.cpp.o" "gcc" "Sandbox/CMakeFiles/Sandbox.dir/src/renderer2D.cpp.o.d"
