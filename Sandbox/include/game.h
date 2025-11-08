@@ -32,7 +32,7 @@ public:
     }
 
     void addBody();
-    void showFPS(float dt);
+    void showFPS(float realDt, float fixedDt);
     void imguiAddBodyMenu();
 
     inline Vector2 WorldToScreen(const Vector2 &w, float screenHeight)

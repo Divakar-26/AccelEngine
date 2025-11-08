@@ -133,7 +133,6 @@ void Game::handleEvent()
 
 void Game::update(float dt)
 {
-    showFPS(dt);
 
     world.startFrame();
 
@@ -141,16 +140,18 @@ void Game::update(float dt)
     {
         if (it->inverseMass > 0.0f)
         {
-            it->addForce(Vector2(0, 0));
+            it->addForce(Vector2(0, -980));
         }
     }
 
-    world.step(dt, 6);
+    std::cout << dt << std::endl;
 
-        for (auto *b : bodies)
-        {
-            b->c = {255, 255, 255, 255};
-        }
+    world.step(dt, 10);
+
+    for (auto *b : bodies)
+    {
+        b->c = {255, 255, 255, 255};
+    }
     // if (!contacts.empty())
     // {
     //     std::cout << "Actual collisions: " << contacts.size() << std::endl;
@@ -196,20 +197,15 @@ void Game::render()
         }
     }
 
-    // std::vector<std::pair<RigidBody *, RigidBody *>> potentialPairs;
-    // CoarseCollision::FindPotentialPairs(&world, potentialPairs);
+    std::vector<Contact> contacts = world.getContacts();
 
-    // std::vector<Contact> contacts;
-    // NarrowCollision::FindContacts(&world, potentialPairs, contacts);
-
-    // for (auto it : contacts)
-    // {
-    //     for(auto it2 : it.contactPoints){
-    //         std::cout<<it2.x<<" "<<it2.y<<std::endl;
-    //         Vector2 screenPoint = WorldToScreen(it2, WINDOW_H);
-    // DrawCircle(renderer, screenPoint.x, screenPoint.y, 5);
-    //     }
-    // }
+    for (auto it : contacts)
+    {
+        for (auto it2 : it.contactPoints)
+        {
+            Renderer2D::DrawCircle(it2.x, it2.y, 3, SDL_Color{255,0,0,255});
+        }
+    }
 
     ImGui::Render();
     ImGui_ImplSDLRenderer3_RenderDrawData(ImGui::GetDrawData(), renderer);
@@ -260,15 +256,16 @@ void Game::addBody()
     bodies.push_back(b);
 }
 
-void Game::showFPS(float dt)
+void Game::showFPS(float realDt, float fixedDt)
 {
-    fps = 1.0f / dt;
-    frameTimeMs = dt * 1000.0f;
+    float fps = 1.0f / realDt;
+    float frameMs = realDt * 1000.0f;
+    float fixedMs = fixedDt * 1000.0f;
 
-    char title[128];
+    char title[256];
     snprintf(title, sizeof(title),
-             "AccelEngine | FPS: %.1f | Frame: %.2f ms | Bodies: %zu",
-             fps, frameTimeMs, bodies.size());
+             "AccelEngine | FPS: %.1f | Frame: %.2f ms | Step: %.2f ms | Bodies: %zu",
+             fps, frameMs, fixedMs, bodies.size());
 
     SDL_SetWindowTitle(window, title);
 }
@@ -314,8 +311,8 @@ void Game::addCircle(float x, float y)
 {
     RigidBody *b = new RigidBody();
     b->position = {x, y};
-    b->inverseMass = 1.0f;  
-    b->restitution = 0.8f;
+    b->inverseMass = 1.0f;
+    b->restitution = 0.0f;
 
     b->shapeType = ShapeType::CIRCLE;
     b->circle.radius = 10 + rand() % 50;

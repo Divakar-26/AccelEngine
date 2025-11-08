@@ -5,20 +5,21 @@ int main()
     Game game(800, 600);
     game.Init("hello");
 
-    const float FIXED_DT = 1.0f / 60.0f; // physics tick rate (60 Hz)
+    const float FIXED_DT = 1.0f / 60.0f;
+
     Uint64 lastTime = SDL_GetTicks();
     float accumulator = 0.0f;
 
     while (game.isRunning())
     {
         Uint64 now = SDL_GetTicks();
-        float frameTime = (now - lastTime) / 1000.0f; 
+        float realDt = (now - lastTime) / 1000.0f;
         lastTime = now;
 
-        if (frameTime > 0.25f)
-            frameTime = 0.25f;
+        if (realDt > 0.25f)
+            realDt = 0.25f;
 
-        accumulator += frameTime;
+        accumulator += realDt;
 
         game.handleEvent();
 
@@ -29,6 +30,15 @@ int main()
         }
 
         game.render();
+
+        static float titleTimer = 0.0f;
+        titleTimer += realDt;
+
+        if (titleTimer >= 1.0f)
+        {
+            game.showFPS(realDt, FIXED_DT);
+            titleTimer = 0.0f;
+        }
     }
 
     return 0;

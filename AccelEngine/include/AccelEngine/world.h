@@ -64,6 +64,27 @@ namespace AccelEngine
             firstBody = nullptr;
         }
 
+        std::vector<Contact> getContacts()
+        {
+            std::vector<RigidBody *> bodies;
+            bodies.reserve(64);
+
+            for (auto *reg = firstBody; reg; reg = reg->next)
+                bodies.push_back(reg->body);
+
+            std::vector<std::pair<RigidBody *, RigidBody *>> potentialPairs;
+            std::vector<Contact> contacts;
+
+            potentialPairs.clear();
+            CoarseCollision::FindPotentialPairs(bodies, potentialPairs);
+
+            // narrowphase
+            contacts.clear();
+            NarrowCollision::FindContacts(potentialPairs, contacts);
+
+            return contacts;
+        }
+
         /**
          * Initializes the world for a new simulation frame.
          * Clears accumulators and updates derived data.

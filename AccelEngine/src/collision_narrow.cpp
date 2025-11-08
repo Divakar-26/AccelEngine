@@ -6,7 +6,7 @@
 
 using namespace AccelEngine;
 
-bool NarrowCollision::IntersectRectangles(std::vector<Vector2> verticesA, std::vector<Vector2> verticesB, Contact &contacts)
+bool NarrowCollision::IntersectRectangles(std::vector<Vector2> verticesA, Vector2 centera, std::vector<Vector2> verticesB, Vector2 centerb, Contact &contacts)
 {
     Vector2 normal(0, 0);
     real depth = std::numeric_limits<real>::max();
@@ -63,9 +63,9 @@ bool NarrowCollision::IntersectRectangles(std::vector<Vector2> verticesA, std::v
         }
     }
 
-    Vector2 centerA = (verticesA[0] + verticesA[1] + verticesA[2] + verticesA[3]) * 0.25f;
-    Vector2 centerB = (verticesB[0] + verticesB[1] + verticesB[2] + verticesB[3]) * 0.25f;
-    Vector2 direction = centerB - centerA;
+    // Vector2 centerA = (verticesA[0] + verticesA[1] + verticesA[2] + verticesA[3]) * 0.25f;
+    // Vector2 centerB = (verticesB[0] + verticesB[1] + verticesB[2] + verticesB[3]) * 0.25f;
+    Vector2 direction = centerb - centera;
 
     if (direction.scalarProduct(normal) < 0.0f)
     {
@@ -94,6 +94,10 @@ bool NarrowCollision::IntersectCircles(Vector2 center1, real radius1, Vector2 ce
     Vector2 normal = (center2 - center1).normalized();
     real depth = radii - dist;
 
+    Vector2 contactPoint = center1 + normal * radius1;
+
+    contact.contactPoints[0] = contactPoint;
+    contact.contactCount = 1;
     contact.normal = normal;
     contact.penetration = depth;
 
@@ -163,6 +167,8 @@ bool NarrowCollision::IntersectCircleRectangle(Vector2 center1, real radius, std
         normal = normal * -1.0f;
     }
 
+    FindCircleVsRectangleContact(center1, radius, centerA, vertices, contact);
+
     contact.normal = normal;
     contact.penetration = depth;
 
@@ -190,7 +196,7 @@ int NarrowCollision::FindClosestPointOnRectangle(Vector2 center, std::vector<Vec
 }
 
 std::pair<real, real> NarrowCollision::projectOnCircle(Vector2 center, real radius, std::vector<Vector2> vertices, Vector2 axis)
-{    
+{
     Vector2 direction = axis.normalized();
     Vector2 directionAndRadiud = direction * radius;
 
@@ -232,6 +238,54 @@ std::pair<real, real> NarrowCollision::projectOnAxis(std::vector<Vector2> vertic
     return {min, max};
 }
 
+void NarrowCollision::FindPointSegmentDistance(Vector2 center, Vector2 edge1, Vector2 edge2, real &distanceSquared, Vector2 &conatct)
+{
+    Vector2 ab = edge2 - edge1;
+    Vector2 ap = center - edge1;
+
+    real proj = ab.scalarProduct(ap);
+    real abLenSqr = ab.squareMagnitude();
+    float d = proj / abLenSqr;
+    
+    if(d <= 0.0f){
+        conatct = edge1;
+    }
+    else if(d >= 1.0f){
+        conatct = edge2;
+    }
+    else{
+        conatct = edge1 + ab * d;
+    }
+
+    real r = Vector2::distance(center, conatct);
+    distanceSquared = r * r;
+
+}
+
+void NarrowCollision::FindCircleVsRectangleContact(Vector2 center, real radius, Vector2 rectCenter, std::vector<Vector2> verticesA, Contact &contact)
+{
+    real minDistanceSqr = std::numeric_limits<real>::max();
+    Vector2 actualContact;
+    for (int i = 0; i < verticesA.size(); i++)
+    {
+        Vector2 va = verticesA[i];
+        Vector2 vb = verticesA[(i + 1) % verticesA.size()];
+
+        real distanceSquared;
+        Vector2 contact2(0,0);
+
+        FindPointSegmentDistance(center, va, vb, distanceSquared, contact2);
+
+        if(distanceSquared < minDistanceSqr){
+            minDistanceSqr = distanceSquared;
+            actualContact = contact2;
+        }
+    }
+
+    contact.contactPoints[0] = actualContact;
+    contact.contactCount = 1;
+}
+
 bool NarrowCollision::SATCollision(const RigidBody *A, const RigidBody *B, Contact &contact)
 {
     if (A->shapeType == ShapeType::AABB && B->shapeType == ShapeType::AABB)
@@ -245,7 +299,7 @@ bool NarrowCollision::SATCollision(const RigidBody *A, const RigidBody *B, Conta
         std::vector<Vector2> vecA(verticesA, verticesA + 4);
         std::vector<Vector2> vecB(verticesB, verticesB + 4);
 
-        if (!IntersectRectangles(vecA, vecB, contact))
+        if (!IntersectRectangles(vecA, A->position, vecB, B->position, contact))
         {
             return false;
         }
@@ -289,12 +343,12 @@ bool NarrowCollision::SATCollision(const RigidBody *A, const RigidBody *B, Conta
 }
 
 void NarrowCollision::FindContacts(
-    const std::vector<std::pair<RigidBody*, RigidBody*>>& potentialPairs,
-    std::vector<Contact>& contacts)
+    const std::vector<std::pair<RigidBody *, RigidBody *>> &potentialPairs,
+    std::vector<Contact> &contacts)
 {
     contacts.clear();
 
-    for (auto& pair : potentialPairs)
+    for (auto &pair : potentialPairs)
     {
         Contact c;
         if (SATCollision(pair.first, pair.second, c))
