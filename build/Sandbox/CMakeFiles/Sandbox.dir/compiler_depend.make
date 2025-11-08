@@ -1438,7 +1438,10 @@ Sandbox/CMakeFiles/Sandbox.dir/src/game.cpp.o: /home/divakar/Desktop/AccelPhysic
   /home/divakar/Desktop/AccelPhysics/AccelEngine/include/AccelEngine/collision_coarse.h \
   /usr/include/c++/12/utility \
   /usr/include/c++/12/bits/stl_relops.h \
-  /home/divakar/Desktop/AccelPhysics/AccelEngine/include/AccelEngine/narrow_collision.h
+  /home/divakar/Desktop/AccelPhysics/AccelEngine/include/AccelEngine/collision_narrow.h \
+  /home/divakar/Desktop/AccelPhysics/AccelEngine/include/AccelEngine/collision_resolve.h \
+  /home/divakar/Desktop/AccelPhysics/Sandbox/include/renderer2D.h \
+  /usr/local/include/SDL3_image/SDL_image.h
 
 Sandbox/CMakeFiles/Sandbox.dir/src/main.cpp.o: /home/divakar/Desktop/AccelPhysics/Sandbox/src/main.cpp \
   /usr/include/stdc-predef.h \
@@ -1653,6 +1656,108 @@ Sandbox/CMakeFiles/Sandbox.dir/src/main.cpp.o: /home/divakar/Desktop/AccelPhysic
   /usr/include/x86_64-linux-gnu/bits/types/struct_tm.h \
   /usr/include/x86_64-linux-gnu/bits/types/struct_itimerspec.h
 
+Sandbox/CMakeFiles/Sandbox.dir/src/renderer2D.cpp.o: /home/divakar/Desktop/AccelPhysics/Sandbox/src/renderer2D.cpp \
+  /usr/include/stdc-predef.h \
+  /home/divakar/Desktop/AccelPhysics/Sandbox/include/renderer2D.h \
+  /usr/local/include/SDL3/SDL.h \
+  /usr/local/include/SDL3/SDL_stdinc.h \
+  /usr/local/include/SDL3/SDL_platform_defines.h \
+  /usr/lib/gcc/x86_64-linux-gnu/12/include/stdarg.h \
+  /usr/lib/gcc/x86_64-linux-gnu/12/include/stdint.h \
+  /usr/include/stdint.h \
+  /usr/include/x86_64-linux-gnu/bits/libc-header-start.h \
+  /usr/include/features.h \
+  /usr/include/features-time64.h \
+  /usr/include/x86_64-linux-gnu/bits/wordsize.h \
+  /usr/include/x86_64-linux-gnu/bits/timesize.h \
+  /usr/include/x86_64-linux-gnu/sys/cdefs.h \
+  /usr/include/x86_64-linux-gnu/bits/long-double.h \
+  /usr/include/x86_64-linux-gnu/gnu/stubs.h \
+  /usr/include/x86_64-linux-gnu/gnu/stubs-64.h \
+  /usr/include/x86_64-linux-gnu/bits/types.h \
+  /usr/include/x86_64-linux-gnu/bits/typesizes.h \
+  /usr/include/x86_64-linux-gnu/bits/time64.h \
+  /usr/include/x86_64-linux-gnu/bits/wchar.h \
+  /usr/include/x86_64-linux-gnu/bits/stdint-intn.h \
+  /usr/include/x86_64-linux-gnu/bits/stdint-uintn.h \
+  /usr/include/string.h \
+  /usr/lib/gcc/x86_64-linux-gnu/12/include/stddef.h \
+  /usr/include/x86_64-linux-gnu/bits/types/locale_t.h \
+  /usr/include/x86_64-linux-gnu/bits/types/__locale_t.h \
+  /usr/include/strings.h \
+  /usr/include/wchar.h \
+  /usr/include/x86_64-linux-gnu/bits/floatn.h \
+  /usr/include/x86_64-linux-gnu/bits/floatn-common.h \
+  /usr/include/x86_64-linux-gnu/bits/types/wint_t.h \
+  /usr/include/x86_64-linux-gnu/bits/types/mbstate_t.h \
+  /usr/include/x86_64-linux-gnu/bits/types/__mbstate_t.h \
+  /usr/include/x86_64-linux-gnu/bits/types/__FILE.h \
+  /usr/include/x86_64-linux-gnu/bits/types/FILE.h \
+  /usr/local/include/SDL3/SDL_begin_code.h \
+  /usr/local/include/SDL3/SDL_close_code.h \
+  /usr/local/include/SDL3/SDL_assert.h \
+  /usr/local/include/SDL3/SDL_asyncio.h \
+  /usr/local/include/SDL3/SDL_atomic.h \
+  /usr/local/include/SDL3/SDL_audio.h \
+  /usr/local/include/SDL3/SDL_endian.h \
+  /usr/include/endian.h \
+  /usr/include/x86_64-linux-gnu/bits/endian.h \
+  /usr/include/x86_64-linux-gnu/bits/endianness.h \
+  /usr/include/x86_64-linux-gnu/bits/byteswap.h \
+  /usr/include/x86_64-linux-gnu/bits/uintn-identity.h \
+  /usr/local/include/SDL3/SDL_error.h \
+  /usr/local/include/SDL3/SDL_mutex.h \
+  /usr/local/include/SDL3/SDL_thread.h \
+  /usr/local/include/SDL3/SDL_properties.h \
+  /usr/local/include/SDL3/SDL_iostream.h \
+  /usr/local/include/SDL3/SDL_bits.h \
+  /usr/local/include/SDL3/SDL_blendmode.h \
+  /usr/local/include/SDL3/SDL_camera.h \
+  /usr/local/include/SDL3/SDL_pixels.h \
+  /usr/local/include/SDL3/SDL_surface.h \
+  /usr/local/include/SDL3/SDL_rect.h \
+  /usr/local/include/SDL3/SDL_clipboard.h \
+  /usr/local/include/SDL3/SDL_cpuinfo.h \
+  /usr/local/include/SDL3/SDL_dialog.h \
+  /usr/local/include/SDL3/SDL_video.h \
+  /usr/local/include/SDL3/SDL_events.h \
+  /usr/local/include/SDL3/SDL_gamepad.h \
+  /usr/local/include/SDL3/SDL_guid.h \
+  /usr/local/include/SDL3/SDL_joystick.h \
+  /usr/local/include/SDL3/SDL_power.h \
+  /usr/local/include/SDL3/SDL_sensor.h \
+  /usr/local/include/SDL3/SDL_keyboard.h \
+  /usr/local/include/SDL3/SDL_keycode.h \
+  /usr/local/include/SDL3/SDL_scancode.h \
+  /usr/local/include/SDL3/SDL_mouse.h \
+  /usr/local/include/SDL3/SDL_pen.h \
+  /usr/local/include/SDL3/SDL_touch.h \
+  /usr/local/include/SDL3/SDL_filesystem.h \
+  /usr/local/include/SDL3/SDL_gpu.h \
+  /usr/local/include/SDL3/SDL_haptic.h \
+  /usr/local/include/SDL3/SDL_hidapi.h \
+  /usr/local/include/SDL3/SDL_hints.h \
+  /usr/local/include/SDL3/SDL_init.h \
+  /usr/local/include/SDL3/SDL_loadso.h \
+  /usr/local/include/SDL3/SDL_locale.h \
+  /usr/local/include/SDL3/SDL_log.h \
+  /usr/local/include/SDL3/SDL_messagebox.h \
+  /usr/local/include/SDL3/SDL_metal.h \
+  /usr/local/include/SDL3/SDL_misc.h \
+  /usr/local/include/SDL3/SDL_platform.h \
+  /usr/local/include/SDL3/SDL_process.h \
+  /usr/local/include/SDL3/SDL_render.h \
+  /usr/local/include/SDL3/SDL_storage.h \
+  /usr/local/include/SDL3/SDL_system.h \
+  /usr/local/include/SDL3/SDL_time.h \
+  /usr/local/include/SDL3/SDL_timer.h \
+  /usr/local/include/SDL3/SDL_tray.h \
+  /usr/local/include/SDL3/SDL_version.h \
+  /usr/local/include/SDL3/SDL_oldnames.h \
+  /usr/local/include/SDL3_image/SDL_image.h
+
+
+/home/divakar/Desktop/AccelPhysics/Sandbox/src/renderer2D.cpp:
 
 /usr/include/c++/12/bits/stl_relops.h:
 
@@ -1876,8 +1981,6 @@ Sandbox/CMakeFiles/Sandbox.dir/src/main.cpp.o: /home/divakar/Desktop/AccelPhysic
 
 /usr/lib/gcc/x86_64-linux-gnu/12/include/avx512vnniintrin.h:
 
-/home/divakar/Desktop/AccelPhysics/AccelEngine/include/AccelEngine/narrow_collision.h:
-
 /usr/lib/gcc/x86_64-linux-gnu/12/include/avx512vbmi2vlintrin.h:
 
 /usr/lib/gcc/x86_64-linux-gnu/12/include/avx512vpopcntdqintrin.h:
@@ -1909,6 +2012,8 @@ Sandbox/CMakeFiles/Sandbox.dir/src/main.cpp.o: /home/divakar/Desktop/AccelPhysic
 /usr/lib/gcc/x86_64-linux-gnu/12/include/xsavecintrin.h:
 
 /usr/include/x86_64-linux-gnu/c++/12/bits/os_defines.h:
+
+/home/divakar/Desktop/AccelPhysics/AccelEngine/include/AccelEngine/collision_resolve.h:
 
 /home/divakar/Desktop/AccelPhysics/Sandbox/include/imgui/imgui.cpp:
 
@@ -1955,6 +2060,8 @@ Sandbox/CMakeFiles/Sandbox.dir/src/main.cpp.o: /home/divakar/Desktop/AccelPhysic
 /usr/local/include/SDL3/SDL_locale.h:
 
 /usr/local/include/SDL3/SDL_hints.h:
+
+/usr/local/include/SDL3_image/SDL_image.h:
 
 /usr/local/include/SDL3/SDL_haptic.h:
 
@@ -2250,6 +2357,8 @@ Sandbox/CMakeFiles/Sandbox.dir/src/main.cpp.o: /home/divakar/Desktop/AccelPhysic
 
 /usr/include/x86_64-linux-gnu/bits/long-double.h:
 
+/home/divakar/Desktop/AccelPhysics/Sandbox/include/renderer2D.h:
+
 /usr/include/x86_64-linux-gnu/bits/ss_flags.h:
 
 /usr/include/x86_64-linux-gnu/bits/types/sig_atomic_t.h:
@@ -2465,6 +2574,8 @@ Sandbox/CMakeFiles/Sandbox.dir/src/main.cpp.o: /home/divakar/Desktop/AccelPhysic
 /usr/include/c++/12/bits/functexcept.h:
 
 /usr/lib/gcc/x86_64-linux-gnu/12/include/mwaitxintrin.h:
+
+/home/divakar/Desktop/AccelPhysics/AccelEngine/include/AccelEngine/collision_narrow.h:
 
 /usr/lib/gcc/x86_64-linux-gnu/12/include/pconfigintrin.h:
 

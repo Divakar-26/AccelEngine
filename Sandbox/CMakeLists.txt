@@ -1,6 +1,7 @@
 add_executable(Sandbox 
     src/main.cpp
     src/game.cpp
+    src/renderer2D.cpp
 
     # ImGui core
     include/imgui/imgui.cpp
@@ -16,12 +17,14 @@ add_executable(Sandbox
 
 # Find SDL3 package
 find_package(SDL3 REQUIRED CONFIG)
+find_package(SDL3_image REQUIRED CONFIG)
 
 # Link with AccelEngine and SDL3
 target_link_libraries(Sandbox
     PRIVATE
         AccelEngine
         SDL3::SDL3
+        SDL3_image::SDL3_image
 )
 
 # Include engine headers

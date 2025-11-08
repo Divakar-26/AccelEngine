@@ -322,6 +322,30 @@ src/main.cpp.s:
 	cd /home/divakar/Desktop/AccelPhysics/build && $(MAKE) $(MAKESILENT) -f Sandbox/CMakeFiles/Sandbox.dir/build.make Sandbox/CMakeFiles/Sandbox.dir/src/main.cpp.s
 .PHONY : src/main.cpp.s
 
+src/renderer2D.o: src/renderer2D.cpp.o
+.PHONY : src/renderer2D.o
+
+# target to build an object file
+src/renderer2D.cpp.o:
+	cd /home/divakar/Desktop/AccelPhysics/build && $(MAKE) $(MAKESILENT) -f Sandbox/CMakeFiles/Sandbox.dir/build.make Sandbox/CMakeFiles/Sandbox.dir/src/renderer2D.cpp.o
+.PHONY : src/renderer2D.cpp.o
+
+src/renderer2D.i: src/renderer2D.cpp.i
+.PHONY : src/renderer2D.i
+
+# target to preprocess a source file
+src/renderer2D.cpp.i:
+	cd /home/divakar/Desktop/AccelPhysics/build && $(MAKE) $(MAKESILENT) -f Sandbox/CMakeFiles/Sandbox.dir/build.make Sandbox/CMakeFiles/Sandbox.dir/src/renderer2D.cpp.i
+.PHONY : src/renderer2D.cpp.i
+
+src/renderer2D.s: src/renderer2D.cpp.s
+.PHONY : src/renderer2D.s
+
+# target to generate assembly for a file
+src/renderer2D.cpp.s:
+	cd /home/divakar/Desktop/AccelPhysics/build && $(MAKE) $(MAKESILENT) -f Sandbox/CMakeFiles/Sandbox.dir/build.make Sandbox/CMakeFiles/Sandbox.dir/src/renderer2D.cpp.s
+.PHONY : src/renderer2D.cpp.s
+
 # Help Target
 help:
 	@echo "The following are some of the valid targets for this Makefile:"
@@ -355,6 +379,9 @@ help:
 	@echo "... src/main.o"
 	@echo "... src/main.i"
 	@echo "... src/main.s"
+	@echo "... src/renderer2D.o"
+	@echo "... src/renderer2D.i"
+	@echo "... src/renderer2D.s"
 .PHONY : help
 
 

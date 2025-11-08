@@ -16,6 +16,17 @@ static inline bool AABBOverlap(const Vector2 &minA, const Vector2 &maxA,
 
 inline void computeAABB(const RigidBody *body, Vector2 &outMin, Vector2 &outMax)
 {
+    if (body->shapeType == ShapeType::CIRCLE)
+    {
+        float r = body->circle.radius;
+
+        outMin = Vector2(body->position.x - r, body->position.y - r);
+        outMax = Vector2(body->position.x + r, body->position.y + r);
+
+        return;
+    }
+
+    // shapeType == AABB (or OBB using transformMatrix)
     const Vector2 &half = body->aabb.halfSize;
 
     Vector2 corners[4] = {
@@ -42,6 +53,7 @@ inline void computeAABB(const RigidBody *body, Vector2 &outMin, Vector2 &outMax)
             outMax.y = worldCorner.y;
     }
 }
+
 
 void CoarseCollision::FindPotentialPairs(World *world, std::vector<std::pair<RigidBody *, RigidBody *>> &pairs)
 {

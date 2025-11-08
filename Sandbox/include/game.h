@@ -35,6 +35,15 @@ public:
     void showFPS(float dt);
     void imguiAddBodyMenu();
 
+    inline Vector2 WorldToScreen(const Vector2 &w, float screenHeight)
+    {
+        return Vector2(w.x, screenHeight - w.y);
+    }
+    inline Vector2 ScreenToWorld(const Vector2 &s, float screenHeight)
+    {
+        return Vector2(s.x, screenHeight - s.y);
+    }
+
 private:
     int WINDOW_W, WINDOW_H;
     SDL_Window *window = nullptr;

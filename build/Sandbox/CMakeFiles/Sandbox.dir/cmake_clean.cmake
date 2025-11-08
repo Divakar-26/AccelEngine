@@ -15,6 +15,8 @@ file(REMOVE_RECURSE
   "CMakeFiles/Sandbox.dir/src/game.cpp.o.d"
   "CMakeFiles/Sandbox.dir/src/main.cpp.o"
   "CMakeFiles/Sandbox.dir/src/main.cpp.o.d"
+  "CMakeFiles/Sandbox.dir/src/renderer2D.cpp.o"
+  "CMakeFiles/Sandbox.dir/src/renderer2D.cpp.o.d"
   "Sandbox"
   "Sandbox.pdb"
 )

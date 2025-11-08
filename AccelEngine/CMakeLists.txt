@@ -4,7 +4,7 @@ add_library(AccelEngine STATIC
     src/ParticleContact.cpp
     src/ParticleWorld.cpp
     src/collision_coarse.cpp
-    src/narrow_collision.cpp
+    src/collision_narrow.cpp
     src/collision_resolve.cpp
 )
 

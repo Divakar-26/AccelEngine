@@ -1,8 +1,9 @@
 #include "game.h"
 #include <iostream>
 #include <AccelEngine/collision_coarse.h>
-#include <AccelEngine/narrow_collision.h>
+#include <AccelEngine/collision_narrow.h>
 #include <AccelEngine/collision_resolve.h>
+#include "renderer2D.h"
 
 using namespace AccelEngine;
 
@@ -37,6 +38,8 @@ bool Game::Init(const char *title)
         SDL_Log("ImGui SDL3 renderer init failed!");
         return false;
     }
+
+    Renderer2D::init(renderer, WINDOW_W, WINDOW_H);
 
     // ----------------------------------------
     // FIXED: Position body in visible area (middle-top)
@@ -119,6 +122,14 @@ void Game::handleEvent()
 
 void Game::update(float dt)
 {
+    static int first = 0;
+    if(!first){
+        for(int i = 0; i < 1000; i++){
+            addBody();
+        }
+        first++;
+    }
+
     showFPS(dt);
 
     world.startFrame();
@@ -134,13 +145,11 @@ void Game::update(float dt)
     {
         std::cout << "Actual collisions: " << contacts.size() << std::endl;
 
-        // Reset all bodies to default color first
         for (auto *b : bodies)
         {
-            b->c = {255, 255, 255, 255}; // Default white
+            b->c = {255, 255, 255, 255};
         }
 
-        // Color only the colliding bodies
         for (auto &contact : contacts)
         {
             contact.a->c = {0, 255, 0, 255};
@@ -153,7 +162,7 @@ void Game::update(float dt)
     {
         for (auto *b : bodies)
         {
-            b->c = {255, 255, 255, 255}; // Default white
+            b->c = {255, 255, 255, 255};
         }
     }
 }
@@ -162,29 +171,26 @@ void Game::render()
 {
     imguiAddBodyMenu();
 
-    // --- Render scene ---
     SDL_SetRenderDrawColor(renderer, 25, 25, 40, 255);
     SDL_RenderClear(renderer);
 
-    // First render all bodies
     for (auto *b : bodies)
     {
-        SDL_FRect dst = {
-            b->position.x - b->aabb.halfSize.x,
-            b->position.y - b->aabb.halfSize.y,
-            b->aabb.halfSize.x * 2,
-            b->aabb.halfSize.y * 2};
+        // Vector2 screenPos = WorldToScreen(b->position, WINDOW_H);
+        SDL_Color c = {b->c.r, b->c.g, b->c.b, b->c.a};
 
-        SDL_FPoint center = {b->aabb.halfSize.x, b->aabb.halfSize.y};
-        SDL_SetTextureColorMod(boxTex, b->c.r, b->c.g, b->c.b);
-        SDL_SetTextureAlphaMod(boxTex, b->c.a);
-
-        float degrees = b->orientation * (180.0f / M_PI);
-        SDL_RenderTextureRotated(renderer, boxTex, nullptr, &dst, degrees, &center, SDL_FLIP_NONE);
+        if (b->shapeType == ShapeType::AABB)
+        {
+            Renderer2D::DrawRectangle(b->position.x, b->position.y, b->aabb.halfSize.x * 2, b->aabb.halfSize.y * 2, b->orientation, c);
+        }
+        else if (b->shapeType == ShapeType::CIRCLE)
+        {
+            Renderer2D::DrawCircle(b->position.x, b->position.y, b->circle.radius, c);
+        }
     }
 
-    std::vector<std::pair<RigidBody *, RigidBody *>> potentialPairs;
-    CoarseCollision::FindPotentialPairs(&world, potentialPairs);
+    // std::vector<std::pair<RigidBody *, RigidBody *>> potentialPairs;
+    // CoarseCollision::FindPotentialPairs(&world, potentialPairs);
 
     // std::vector<Contact> contacts;
     // NarrowCollision::FindContacts(&world, potentialPairs, contacts);
@@ -193,11 +199,11 @@ void Game::render()
     // {
     //     for(auto it2 : it.contactPoints){
     //         std::cout<<it2.x<<" "<<it2.y<<std::endl;
-    //         DrawCircle(renderer, it2.x, it2.y, 5);
+    //         Vector2 screenPoint = WorldToScreen(it2, WINDOW_H);
+    // DrawCircle(renderer, screenPoint.x, screenPoint.y, 5);
     //     }
     // }
 
-    // --- Draw ImGui ---
     ImGui::Render();
     ImGui_ImplSDLRenderer3_RenderDrawData(ImGui::GetDrawData(), renderer);
 
@@ -220,16 +226,16 @@ void Game::addBody()
     float y = margin + static_cast<float>(std::rand()) / RAND_MAX * (WINDOW_H * 0.4f);
 
     b->position = Vector2(x, y);
-    b->shapeType = ShapeType::AABB;
-    b->aabb.halfSize = Vector2(30.0f, 30.0f);
+    b->shapeType = ShapeType::CIRCLE;
+    b->circle.radius = 30.0f;
 
     b->inverseMass = 1.0f;
     // Calculate proper inertia for a rectangle: I = (1/12) * m * (w² + h²)
-    float width = b->aabb.halfSize.x * 2;
-    float height = b->aabb.halfSize.y * 2;
-    float mass = 1.0f / b->inverseMass;
-    float inertia = (1.0f / 12.0f) * mass * (width * width + height * height);
-    b->inverseInertia = 1.0f / inertia;
+    // float width = b->aabb.halfSize.x * 2;
+    // float height = b->aabb.halfSize.y * 2;
+    // float mass = 1.0f / b->inverseMass;
+    // float inertia = (1.0f / 12.0f) * mass * (width * width + height * height);
+    // b->inverseInertia = 1.0f / inertia;
 
     b->velocity = Vector2(0, 0);
     b->angularDamping = 0.99f;
@@ -252,21 +258,6 @@ void Game::showFPS(float dt)
              fps, frameTimeMs, bodies.size());
 
     SDL_SetWindowTitle(window, title);
-}
-
-void DrawCircle(SDL_Renderer *renderer, float x, float y, int r)
-{
-    SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);
-    for (int i = -r; i <= r; i++)
-    {
-        for (int j = -r; j <= r; j++)
-        {
-            if (i * i + j * j <= r * r)
-            {
-                SDL_RenderPoint(renderer, i + x, j + y);
-            }
-        }
-    }
 }
 
 void Game::imguiAddBodyMenu()
