@@ -64,8 +64,8 @@ namespace AccelEngine
                       rotation(0),
                       forceAccum(0, 0),
                       torqueAccum(0),
-                      linearDamping(0.99f),
-                      angularDamping(0.99f)
+                      linearDamping(1.0f),
+                      angularDamping(1.0f)
 
         {
             transformMatrix.setIdentity();
@@ -135,6 +135,8 @@ namespace AccelEngine
             // Integrate position & orientation
             position += velocity * duration;
             orientation += rotation * duration;
+
+            calculateDerivativeData();
         }
 
         Vector2 getPosition() const

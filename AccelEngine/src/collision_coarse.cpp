@@ -55,24 +55,22 @@ inline void computeAABB(const RigidBody *body, Vector2 &outMin, Vector2 &outMax)
 }
 
 
-void CoarseCollision::FindPotentialPairs(
-    const std::vector<RigidBody*>& bodies,
-    std::vector<std::pair<RigidBody*, RigidBody*>>& pairs)
+void CoarseCollision::FindPotentialPairs(std::vector<RigidBody*> bodies, std::vector<std::pair<RigidBody *, RigidBody *>> &pairs)
 {
+    // clear pairs from previous frame
     pairs.clear();
-
     Vector2 minA, maxA, minB, maxB;
 
     for (size_t i = 0; i < bodies.size(); ++i)
     {
         computeAABB(bodies[i], minA, maxA);
-
         for (size_t j = i + 1; j < bodies.size(); ++j)
         {
             computeAABB(bodies[j], minB, maxB);
-
             if (AABBOverlap(minA, maxA, minB, maxB))
+            {
                 pairs.emplace_back(bodies[i], bodies[j]);
+            }
         }
     }
 }

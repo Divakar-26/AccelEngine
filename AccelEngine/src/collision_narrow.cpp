@@ -414,7 +414,7 @@ bool NarrowCollision::SATCollision(const RigidBody *A, const RigidBody *B, Conta
 
     contact.a = const_cast<RigidBody *>(A);
     contact.b = const_cast<RigidBody *>(B);
-    contact.contactCount = 0;
+    // contact.contactCount = 0;
 
     return true;
 }

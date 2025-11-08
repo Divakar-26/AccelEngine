@@ -197,11 +197,23 @@ void Game::addCircle(float x, float y)
     RigidBody *b = new RigidBody();
     b->position = {x, y};
     b->inverseMass = 1.0f;
-    b->restitution = 0.0f;
+    b->restitution = 0.3f; // Add some restitution
 
     b->shapeType = ShapeType::CIRCLE;
     b->circle.radius = 10 + rand() % 50;
 
+    // FIX 1: Correct circle inertia formula
+    // I = (1/2) * m * r² for solid circle
+    real mass = 1.0f / b->inverseMass;
+    real inertia = 0.5f * mass * b->circle.radius * b->circle.radius;
+    
+    // FIX 2: Avoid division by zero
+    if (inertia > 1e-6f) {
+        b->inverseInertia = 1.0f / inertia;
+    } else {
+        b->inverseInertia = 0.0f;
+    }
+    
     b->velocity = {0, 0};
     b->calculateDerivativeData();
 
@@ -214,10 +226,27 @@ void Game::addAABB(float x, float y)
     RigidBody *b = new RigidBody();
     b->position = {x, y};
     b->inverseMass = 1.0f;
+    b->restitution = 0.3f; // Add restitution
 
     b->shapeType = ShapeType::AABB;
-    b->aabb.halfSize = {20 + rand() % 50, 20 + rand() % 50}; // random sizes
+    b->aabb.halfSize = {20 + rand() % 50, 20 + rand() % 50};
 
+    // FIX 3: Correct AABB inertia formula with proper order
+    // I = (1/12) * m * (w² + h²) for rectangle
+    real mass = 1.0f / b->inverseMass;
+    real width = b->aabb.halfSize.x * 2.0f;
+    real height = b->aabb.halfSize.y * 2.0f;
+    real inertia = (1.0f / 12.0f) * mass * (width * width + height * height);
+    
+    // FIX 4: Avoid division by zero
+    if (inertia > 1e-6f) {
+        b->inverseInertia = 1.0f / inertia;
+    } else {
+        b->inverseInertia = 0.0f;
+    }
+    b->angularDamping = 0.98;
+    
+    
     b->velocity = {0, 0};
     b->calculateDerivativeData();
 

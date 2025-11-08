@@ -75,14 +75,13 @@ namespace AccelEngine
 
                 potentialPairs.clear();
                 contacts.clear();
-
+                
                 CoarseCollision::FindPotentialPairs(bodies, potentialPairs);
                 NarrowCollision::FindContacts(potentialPairs, contacts);
-
+                
                 for (auto &c : contacts)
                     CollisionResolve::Solve(c, subdt);
-                
-                }
+            }
             contactsThisFrame = contacts;
         }
     };
