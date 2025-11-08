@@ -144,11 +144,21 @@ namespace AccelEngine
             float dy = a.y - b.y;
             return sqrtf(dx * dx + dy * dy);
         }
+        static bool nearlyEqual(real a, real b, real epsilon = (real)1e-5)
+        {
+            return std::fabs(a - b) <= epsilon;
+        }
 
         // Clear to zero
         void clear()
         {
             x = y = 0;
+        }
+
+        static bool nearlyEqual(const Vector2 &a, const Vector2 &b, float epsilon = 1e-5f)
+        {
+            return std::fabs(a.x - b.x) <= epsilon &&
+                   std::fabs(a.y - b.y) <= epsilon;
         }
 
         // Components

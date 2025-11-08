@@ -38,6 +38,7 @@ namespace AccelEngine
 
         //contacts
         static void FindCircleVsRectangleContact(Vector2 center, real radius, Vector2 rectCenter, std::vector<Vector2> verticesA, Contact & contact);
+        static void FindRectVsRectContact(std::vector<Vector2> verticesA, std::vector<Vector2> verticesB, Contact &contacts);
 
     };
 };

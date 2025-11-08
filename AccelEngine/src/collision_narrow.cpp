@@ -74,6 +74,8 @@ bool NarrowCollision::IntersectRectangles(std::vector<Vector2> verticesA, Vector
 
     depth /= normal.magnitude();
 
+    FindRectVsRectContact(verticesA, verticesB, contacts);
+
     contacts.normal = normal;
     contacts.penetration = depth;
 
@@ -246,20 +248,94 @@ void NarrowCollision::FindPointSegmentDistance(Vector2 center, Vector2 edge1, Ve
     real proj = ab.scalarProduct(ap);
     real abLenSqr = ab.squareMagnitude();
     float d = proj / abLenSqr;
-    
-    if(d <= 0.0f){
+
+    if (d <= 0.0f)
+    {
         conatct = edge1;
     }
-    else if(d >= 1.0f){
+    else if (d >= 1.0f)
+    {
         conatct = edge2;
     }
-    else{
+    else
+    {
         conatct = edge1 + ab * d;
     }
 
     real r = Vector2::distance(center, conatct);
     distanceSquared = r * r;
+}
 
+void NarrowCollision::FindRectVsRectContact(std::vector<Vector2> verticesA, std::vector<Vector2> verticesB, Contact &contacts)
+{
+    int contactCount = 0;
+    Vector2 contact1(0, 0);
+    Vector2 contact2(0, 0);
+    real minDistSq = std::numeric_limits<real>::max();
+
+    for (int i = 0; i < verticesA.size(); i++)
+    {
+        Vector2 p = verticesA[i];
+        for (int j = 0; j < verticesB.size(); j++)
+        {
+            Vector2 va = verticesB[j];
+            Vector2 vb = verticesB[(j + 1) % verticesB.size()];
+
+            real distSqrd;
+            Vector2 cp;
+
+            FindPointSegmentDistance(p, va, vb, distSqrd, cp);
+
+            if (Vector2::nearlyEqual(distSqrd, minDistSq))
+            {
+                if (!Vector2::nearlyEqual(cp, contact1))
+                {
+                    contact2 = cp;
+                    contactCount = 2;
+                }
+            }
+            else if (distSqrd < minDistSq)
+            {
+                minDistSq = distSqrd;
+                contactCount = 1;
+                contact1 = cp;
+            }
+        }
+    }
+
+    for (int i = 0; i < verticesB.size(); i++)
+    {
+        Vector2 p = verticesB[i];
+        for (int j = 0; j < verticesA.size(); j++)
+        {
+            Vector2 va = verticesA[j];
+            Vector2 vb = verticesA[(j + 1) % verticesA.size()];
+
+            real distSqrd;
+            Vector2 cp;
+
+            FindPointSegmentDistance(p, va, vb, distSqrd, cp);
+
+            if (Vector2::nearlyEqual(distSqrd, minDistSq))
+            {
+                if (!Vector2::nearlyEqual(cp, contact1))
+                {
+                    contact2 = cp;
+                    contactCount = 2;
+                }
+            }
+            else if (distSqrd < minDistSq)
+            {
+                minDistSq = distSqrd;
+                contactCount = 1;
+                contact1 = cp;
+            }
+        }
+    }
+
+    contacts.contactPoints[0] = contact1;
+    contacts.contactPoints[1] = contact2;
+    contacts.contactCount = contactCount;
 }
 
 void NarrowCollision::FindCircleVsRectangleContact(Vector2 center, real radius, Vector2 rectCenter, std::vector<Vector2> verticesA, Contact &contact)
@@ -272,11 +348,12 @@ void NarrowCollision::FindCircleVsRectangleContact(Vector2 center, real radius, 
         Vector2 vb = verticesA[(i + 1) % verticesA.size()];
 
         real distanceSquared;
-        Vector2 contact2(0,0);
+        Vector2 contact2(0, 0);
 
         FindPointSegmentDistance(center, va, vb, distanceSquared, contact2);
 
-        if(distanceSquared < minDistanceSqr){
+        if (distanceSquared < minDistanceSqr)
+        {
             minDistanceSqr = distanceSquared;
             actualContact = contact2;
         }
