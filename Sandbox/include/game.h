@@ -44,6 +44,9 @@ public:
         return Vector2(s.x, screenHeight - s.y);
     }
 
+    void addCircle(float x, float y);
+    void addAABB(float x, float y);
+
 private:
     int WINDOW_W, WINDOW_H;
     SDL_Window *window = nullptr;

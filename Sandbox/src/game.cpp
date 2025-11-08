@@ -54,10 +54,10 @@ bool Game::Init(const char *title)
     body.linearDamping = 0.98f;
     body.inverseInertia = 1.0f / 30.0f;
 
-    ground.position = Vector2(WINDOW_W / 2.0f, WINDOW_H / 2); // Center at bottom
+    ground.position = Vector2(927, -247); // Center at bottom
     ground.inverseMass = 0.0f;                                // Use 0 for truly static objects
     ground.shapeType = ShapeType::AABB;
-    ground.aabb.halfSize = Vector2(400.0f, 50.0f);
+    ground.aabb.halfSize = Vector2(800.0f, 50.0f);
 
     world.addBody(&ground);
     world.addBody(&body);
@@ -95,16 +95,16 @@ void Game::handleEvent()
             switch (e.key.key)
             {
             case SDLK_D:
-                body.velocity = Vector2(10, 0);
+                body.velocity = Vector2(100, 0);
                 break;
             case SDLK_A:
-                body.velocity = Vector2(-10, 0);
+                body.velocity = Vector2(-100, 0);
                 break;
             case SDLK_S:
-                body.velocity = Vector2(0, 10);
+                body.velocity = Vector2(0, -100);
                 break;
             case SDLK_W:
-                body.velocity = Vector2(0, -10);
+                body.velocity = Vector2(0, 100);
                 break;
             case SDLK_LCTRL:
                 addBody();
@@ -113,26 +113,32 @@ void Game::handleEvent()
                 break;
             }
         }
-        else if (e.type == SDL_EVENT_KEY_UP)
+        if (e.type == SDL_EVENT_MOUSE_BUTTON_DOWN)
         {
-            body.velocity = Vector2(0, 0);
+            float mx = e.button.x;
+            float my = WINDOW_H - e.button.y;
+
+            if (e.button.button == SDL_BUTTON_LEFT)
+            {
+                addCircle(mx, my);
+            }
+            else if (e.button.button == SDL_BUTTON_RIGHT)
+            {
+                addAABB(mx, my);
+            }
         }
     }
 }
 
 void Game::update(float dt)
 {
-    static int first = 0;
-    if(!first){
-        for(int i = 0; i < 1000; i++){
-            addBody();
-        }
-        first++;
-    }
-
     showFPS(dt);
 
-    world.startFrame();
+    for(auto & it : bodies){
+        if(it->inverseMass > 0.0f){
+            it->addForce(Vector2(0, -500));
+        }
+    }
     world.runPhysics(dt);
 
     std::vector<std::pair<RigidBody *, RigidBody *>> potentialPairs;
@@ -226,16 +232,22 @@ void Game::addBody()
     float y = margin + static_cast<float>(std::rand()) / RAND_MAX * (WINDOW_H * 0.4f);
 
     b->position = Vector2(x, y);
-    b->shapeType = ShapeType::CIRCLE;
-    b->circle.radius = 30.0f;
 
     b->inverseMass = 1.0f;
     // Calculate proper inertia for a rectangle: I = (1/12) * m * (w² + h²)
-    // float width = b->aabb.halfSize.x * 2;
-    // float height = b->aabb.halfSize.y * 2;
-    // float mass = 1.0f / b->inverseMass;
-    // float inertia = (1.0f / 12.0f) * mass * (width * width + height * height);
-    // b->inverseInertia = 1.0f / inertia;
+
+    // {
+    //     float width = b->aabb.halfSize.x * 2;
+    //     float height = b->aabb.halfSize.y * 2;
+    //     float mass = 1.0f / b->inverseMass;
+    //     float inertia = (1.0f / 12.0f) * mass * (width * width + height * height);
+    //     b->inverseInertia = 1.0f / inertia;
+    // }
+    // else
+    {
+        b->shapeType = ShapeType::CIRCLE;
+        b->circle.radius = 10 + rand() % 50;
+    }
 
     b->velocity = Vector2(0, 0);
     b->angularDamping = 0.99f;
@@ -295,4 +307,36 @@ void Game::imguiAddBodyMenu()
     }
 
     ImGui::End();
+}
+
+void Game::addCircle(float x, float y)
+{
+    RigidBody *b = new RigidBody();
+    b->position = {x, y};
+    b->inverseMass = 1.0f;
+
+    b->shapeType = ShapeType::CIRCLE;
+    b->circle.radius = 10 + rand() % 50;
+
+    b->velocity = {0, 0};
+    b->calculateDerivativeData();
+
+    world.addBody(b);
+    bodies.push_back(b);
+}
+
+void Game::addAABB(float x, float y)
+{
+    RigidBody *b = new RigidBody();
+    b->position = {x, y};
+    b->inverseMass = 1.0f;
+
+    b->shapeType = ShapeType::AABB;
+    b->aabb.halfSize = {20 + rand() % 50, 20 + rand() % 50}; // random sizes
+
+    b->velocity = {0, 0};
+    b->calculateDerivativeData();
+
+    world.addBody(b);
+    bodies.push_back(b);
 }

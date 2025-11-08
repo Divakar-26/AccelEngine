@@ -129,6 +129,8 @@ namespace AccelEngine
 
             velocity *= std::pow(linearDamping, duration);
             rotation *= std::pow(angularDamping, duration);
+
+            
             // Integrate position & orientation
             position += velocity * duration;
             orientation += rotation * duration;

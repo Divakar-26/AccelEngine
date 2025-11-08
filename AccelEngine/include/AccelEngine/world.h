@@ -70,7 +70,7 @@ namespace AccelEngine
             BodyRegistration *reg = firstBody;
             while (reg)
             {
-                reg->body->clearAccumulators();
+                // reg->body->clearAccumulators();
                 reg->body->calculateDerivativeData();
                 reg = reg->next;
             }

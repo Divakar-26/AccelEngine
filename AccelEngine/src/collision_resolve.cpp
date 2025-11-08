@@ -41,11 +41,9 @@ void CollisionResolve::SolveVelocity(Contact& contact, float restitution, float 
     Vector2 relativeVelocity = B->velocity - A->velocity;
     float velocityAlongNormal = relativeVelocity.scalarProduct(contact.normal);
     
-    // Don't resolve if objects are separating
     if (velocityAlongNormal > 0.0f)
         return;
     
-    // Calculate impulse scalar
     float totalInverseMass = A->getInverseMass() + B->getInverseMass();
     if (totalInverseMass <= 0.0f)
         return;
@@ -76,5 +74,5 @@ void CollisionResolve::Solve(Contact& contact, float dt)
     SolvePosition(contact);
     
     // Then solve velocity (bounce response)
-    // SolveVelocity(contact);
+    SolveVelocity(contact);
 }
