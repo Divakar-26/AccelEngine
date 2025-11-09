@@ -6,7 +6,7 @@
 
 using namespace AccelEngine;
 
-bool NarrowCollision::IntersectRectangles(std::vector<Vector2> verticesA, Vector2 centera, std::vector<Vector2> verticesB, Vector2 centerb, Contact &contacts)
+bool NarrowCollision::IntersectRectangles(const std::vector<Vector2> & verticesA, Vector2 centera, const std::vector<Vector2> & verticesB, Vector2 centerb, Contact &contacts)
 {
     Vector2 normal(0, 0);
     real depth = std::numeric_limits<real>::max();
@@ -177,7 +177,7 @@ bool NarrowCollision::IntersectCircleRectangle(Vector2 center1, real radius, std
     return true;
 }
 
-int NarrowCollision::FindClosestPointOnRectangle(Vector2 center, std::vector<Vector2> vertices)
+int NarrowCollision::FindClosestPointOnRectangle(Vector2 center, const std::vector<Vector2> & vertices)
 {
     int result = -1;
     real minDisatance = std::numeric_limits<real>::max();
@@ -197,7 +197,7 @@ int NarrowCollision::FindClosestPointOnRectangle(Vector2 center, std::vector<Vec
     return result;
 }
 
-std::pair<real, real> NarrowCollision::projectOnCircle(Vector2 center, real radius, std::vector<Vector2> vertices, Vector2 axis)
+std::pair<real, real> NarrowCollision::projectOnCircle(Vector2 center, real radius, const std::vector<Vector2> & vertices, Vector2 axis)
 {
     Vector2 direction = axis.normalized();
     Vector2 directionAndRadiud = direction * radius;
@@ -217,7 +217,7 @@ std::pair<real, real> NarrowCollision::projectOnCircle(Vector2 center, real radi
     return {min, max};
 }
 
-std::pair<real, real> NarrowCollision::projectOnAxis(const std::vector<Vector2> vertices, Vector2 axis)
+std::pair<real, real> NarrowCollision::projectOnAxis(const std::vector<Vector2> & vertices, Vector2 axis)
 {
     real min = std::numeric_limits<real>::max();
     real max = std::numeric_limits<real>::lowest();
@@ -266,7 +266,7 @@ void NarrowCollision::FindPointSegmentDistance(Vector2 center, Vector2 edge1, Ve
     distanceSquared = r * r;
 }
 
-void NarrowCollision::FindRectVsRectContact(std::vector<Vector2> verticesA, std::vector<Vector2> verticesB, Contact &contacts)
+void NarrowCollision::FindRectVsRectContact(const std::vector<Vector2> & verticesA, const std::vector<Vector2> & verticesB, Contact &contacts)
 {
     int contactCount = 0;
     Vector2 contact1(0, 0);
@@ -338,7 +338,7 @@ void NarrowCollision::FindRectVsRectContact(std::vector<Vector2> verticesA, std:
     contacts.contactCount = contactCount;
 }
 
-void NarrowCollision::FindCircleVsRectangleContact(Vector2 center, real radius, Vector2 rectCenter, std::vector<Vector2> verticesA, Contact &contact)
+void NarrowCollision::FindCircleVsRectangleContact(Vector2 center, real radius, Vector2 rectCenter, const std::vector<Vector2> & verticesA, Contact &contact)
 {
     real minDistanceSqr = std::numeric_limits<real>::max();
     Vector2 actualContact;

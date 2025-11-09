@@ -35,18 +35,23 @@ bool UI::init(SDL_Window *window, SDL_Renderer *renderer)
 
 bool UI::handleEvent(SDL_Event &e)
 {
+    // First pass event to ImGui's backend
     ImGui_ImplSDL3_ProcessEvent(&e);
 
     ImGuiIO &io = ImGui::GetIO();
+
     if (io.WantCaptureMouse)
-    {
         return true;
-    }
+
+    if (io.WantCaptureKeyboard)
+        return true;
+
+    return false;
 }
+
 
 void UI::DrawFrame()
 {
-
 
     ImGui::Render();
     ImGui_ImplSDLRenderer3_RenderDrawData(ImGui::GetDrawData(), renderer);

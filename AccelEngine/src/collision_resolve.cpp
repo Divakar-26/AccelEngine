@@ -200,11 +200,155 @@ void CollisionResolve::SolveVelocityWithRoatation(Contact &contact)
     }
 }
 
+void CollisionResolve::SolveVelocityWithRoatationAndFriction(Contact &contact)
+{
+    RigidBody *A = contact.a;
+    RigidBody *B = contact.b;
+    Vector2 normal = contact.normal;
+    Vector2 contact1 = contact.contactPoints[0];
+    Vector2 contact2 = contact.contactPoints[1];
+    int contactCount = contact.contactCount;
+
+    Vector2 contactList[2];
+    contactList[0] = contact1;
+    contactList[1] = contact2;
+
+    Vector2 impulseList[2];
+    Vector2 raList[2];
+    Vector2 rbList[2];
+
+    real jList[2] = {0.0f, 0.0f};
+
+    Vector2 frictionImpulseList[2] = {Vector2(0, 0), Vector2(0, 0)};
+
+    real sf = (A->staticFriction + B->staticFriction) * 0.5f;
+    real df = (A->dynamicFriction + B->dynamicFriction) * 0.5f;
+
+    real restituion = std::min(A->restitution, B->restitution);
+
+    for (int i = 0; i < contactCount; i++)
+    {
+        Vector2 ra = contactList[i] - A->position;
+        Vector2 rb = contactList[i] - B->position;
+
+        raList[i] = ra;
+        rbList[i] = rb;
+
+        Vector2 raPerp(-ra.y, ra.x);
+        Vector2 rbPerp(-rb.y, rb.x);
+
+        Vector2 angularLinearVelocityA = raPerp * A->rotation;
+        Vector2 angularLinearVelocityB = rbPerp * B->rotation;
+
+        Vector2 relativeVelocity = (B->velocity + angularLinearVelocityB) - (A->velocity + angularLinearVelocityA);
+
+        real contactVelocityMag = relativeVelocity.scalarProduct(normal);
+
+        if (contactVelocityMag > 0.0f)
+        {
+            continue;
+        }
+
+        real raPerpDotN = raPerp.scalarProduct(normal);
+        real rbPerpDotN = rbPerp.scalarProduct(normal);
+
+        real denom = A->inverseMass + B->inverseMass +
+                     (raPerpDotN * raPerpDotN) * A->inverseInertia +
+                     (rbPerpDotN * rbPerpDotN) * B->inverseInertia;
+
+        real j = -(1.0f + restituion) * contactVelocityMag;
+        j /= denom;
+        j /= (real)contactCount;
+
+        jList[i] = j;
+
+        Vector2 impulse = normal * j;
+        impulseList[i] = impulse;
+    }
+
+    for (int i = 0; i < contactCount; i++)
+    {
+        Vector2 impulse = impulseList[i];
+
+        Vector2 ra = raList[i];
+        Vector2 rb = rbList[i];
+
+        A->velocity += (impulse * -1) * A->inverseMass;
+        A->rotation += (ra.cross(impulse) * -1) * A->inverseInertia;
+        B->velocity += impulse * B->inverseMass;
+        B->rotation += (rb.cross(impulse)) * B->inverseInertia;
+    }
+
+    for (int i = 0; i < contactCount; i++)
+    {
+        Vector2 ra = contactList[i] - A->position;
+        Vector2 rb = contactList[i] - B->position;
+
+        raList[i] = ra;
+        rbList[i] = rb;
+
+        Vector2 raPerp(-ra.y, ra.x);
+        Vector2 rbPerp(-rb.y, rb.x);
+
+        Vector2 angularLinearVelocityA = raPerp * A->rotation;
+        Vector2 angularLinearVelocityB = rbPerp * B->rotation;
+
+        Vector2 relativeVelocity = (B->velocity + angularLinearVelocityB) - (A->velocity + angularLinearVelocityA);
+
+        Vector2 tangent = relativeVelocity - normal * relativeVelocity.scalarProduct(normal) ;
+        if (Vector2::nearlyEqual(tangent, Vector2(0.0f, 0.0f)))
+        {
+            continue;
+        }
+        else
+        {
+            tangent.normalize();
+        }
+
+        real raPerpDotT = raPerp.scalarProduct(tangent);
+        real rbPerpDotT = rbPerp.scalarProduct(tangent);
+
+        real denom = A->inverseMass + B->inverseMass +
+                     (raPerpDotT * raPerpDotT) * A->inverseInertia +
+                     (rbPerpDotT * rbPerpDotT) * B->inverseInertia;
+
+        real jt = -1 * relativeVelocity.scalarProduct(tangent);
+        ;
+        jt /= denom;
+        jt /= (real)contactCount;
+
+        real j = jList[i];
+        Vector2 frictionImpulse;
+        if (Vector2::abs(jt) <= j * sf)
+        {
+            frictionImpulse = tangent * jt;
+        }
+        else{
+            frictionImpulse = tangent * -j * df;
+        }
+
+        frictionImpulseList[i] = frictionImpulse;
+    }
+
+    for (int i = 0; i < contactCount; i++)
+    {
+        Vector2 frictionImpulse = frictionImpulseList[i];
+
+        Vector2 ra = raList[i];
+        Vector2 rb = rbList[i];
+
+        A->velocity += (frictionImpulse * -1) * A->inverseMass;
+        A->rotation += (ra.cross(frictionImpulse) * -1) * A->inverseInertia;
+        B->velocity += frictionImpulse * B->inverseMass;
+        B->rotation += (rb.cross(frictionImpulse)) * B->inverseInertia;
+    }
+}
+
 void CollisionResolve::Solve(Contact &contact, float dt)
 {
     // Solve position first (separate objects)
     // SolveVelocityWithRoatation(contact);
     SolvePosition(contact);
-    SolveVelocityWithRoatation(contact);
+    SolveVelocityWithRoatationAndFriction(contact);
     // Then solve velocity (bounce response)
 }

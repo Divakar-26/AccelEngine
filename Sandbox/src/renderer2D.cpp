@@ -38,23 +38,23 @@ void Renderer2D::DrawRectangle(float x, float y, float w, float h, float orienta
 {
     float degrees = -orientation * (180.0f / 3.14159f);
 
-    float sx = x - w/2;
-    float sy = WINDOW_H - y - h/2;
+    float sx = x - w / 2;
+    float sy = WINDOW_H - y - h / 2;
 
     float inset = OUTLINE_THICKNESS;
 
     // ----- Outer rect pivot -----
-    SDL_FPoint outerCenter = { w/2, h/2 };
+    SDL_FPoint outerCenter = {w / 2, h / 2};
 
     // ----- Inner rect pivot -----
     float innerW = w - inset * 2;
     float innerH = h - inset * 2;
-    SDL_FPoint innerCenter = { innerW / 2, innerH / 2 };
+    SDL_FPoint innerCenter = {innerW / 2, innerH / 2};
 
     // --------------------
     // 1. WHITE OUTER RECT
     // --------------------
-    SDL_FRect outerRect = { sx, sy, w, h };
+    SDL_FRect outerRect = {sx, sy, w, h};
 
     SDL_SetTextureColorMod(rectangle, 255, 255, 255);
     SDL_RenderTextureRotated(renderer, rectangle, nullptr, &outerRect,
@@ -63,16 +63,14 @@ void Renderer2D::DrawRectangle(float x, float y, float w, float h, float orienta
     // --------------------
     // 2. COLORED INNER RECT
     // --------------------
-    SDL_FRect innerRect = { sx + inset, sy + inset, innerW, innerH };
+    SDL_FRect innerRect = {sx + inset, sy + inset, innerW, innerH};
 
     SDL_SetTextureColorMod(rectangle, fill.r, fill.g, fill.b);
     SDL_RenderTextureRotated(renderer, rectangle, nullptr, &innerRect,
                              degrees, &innerCenter, SDL_FLIP_NONE);
 }
 
-
-
-void Renderer2D::DrawCircle(float x, float y, float radius, SDL_Color outline)
+void Renderer2D::DrawCircle(float x, float y, float radius, float orientation, SDL_Color outline)
 {
     // ---- 1. White outline ----
     SDL_FRect outlineDst = {
@@ -83,6 +81,7 @@ void Renderer2D::DrawCircle(float x, float y, float radius, SDL_Color outline)
 
     SDL_FPoint center = {radius, radius};
 
+    float degrees = -orientation * (180.0f / 3.14159f);
     SDL_SetTextureColorMod(circle, 255, 255, 255);
     SDL_SetTextureAlphaMod(circle, 255);
     SDL_RenderTextureRotated(renderer, circle, nullptr, &outlineDst, 0, &center, SDL_FLIP_NONE);
@@ -97,5 +96,5 @@ void Renderer2D::DrawCircle(float x, float y, float radius, SDL_Color outline)
     SDL_SetTextureColorMod(circle, outline.r, outline.g, outline.b);
     SDL_SetTextureAlphaMod(circle, outline.a);
 
-    SDL_RenderTextureRotated(renderer, circle, nullptr, &dst, 0, &center, SDL_FLIP_NONE);
+    SDL_RenderTextureRotated(renderer, circle, nullptr, &dst, degrees, &center, SDL_FLIP_NONE);
 }

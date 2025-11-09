@@ -161,6 +161,18 @@ namespace AccelEngine
                    std::fabs(a.y - b.y) <= epsilon;
         }
 
+        static real abs(real v)
+        {
+            return v < 0 ? -v : v;
+        }
+
+        Vector2 abs() const
+        {
+            return Vector2(
+                x < 0 ? -x : x,
+                y < 0 ? -y : y);
+        }
+
         // Components
         real x, y;
     };

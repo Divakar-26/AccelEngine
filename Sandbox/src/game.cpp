@@ -67,10 +67,8 @@ bool Game::Init(const char *title)
     ground.restitution = 0.8f;
     ground.c = {200, 200, 0, 255};
 
-
-
-    addAABB(66, -247 - 100, 1600, 100, 90.0f);
-    addAABB(1782, -247 - 100, 1600, 100, 90.0f);
+    addAABB(66, 493, 1600, 100, 90.0f);
+    addAABB(1782, 493, 1600, 100, 90.0f);
 
     // adding bodies to world and bodies
     world.addBody(&ground);
@@ -89,15 +87,15 @@ void Game::handleEvent()
 
     while (SDL_PollEvent(&e))
     {
-        if (ui.handleEvent(e))
-        {
-            continue;
-        }
-
+        // if (ui.handleEvent(e))
+        // {
+        //     continue;
+        // }
         if (e.type == SDL_EVENT_QUIT)
         {
             running = false;
         }
+
         if (e.type == SDL_EVENT_KEY_DOWN)
         {
             switch (e.key.key)
@@ -113,9 +111,6 @@ void Game::handleEvent()
                 break;
             case SDLK_W:
                 body.velocity = Vector2(0, 100);
-                break;
-            case SDLK_LCTRL:
-                ui.addBody(world, bodies);
                 break;
             default:
                 break;
@@ -179,7 +174,7 @@ void Game::render()
         }
         else if (b->shapeType == ShapeType::CIRCLE)
         {
-            Renderer2D::DrawCircle(b->position.x, b->position.y, b->circle.radius, c);
+            Renderer2D::DrawCircle(b->position.x, b->position.y, b->circle.radius, b->orientation, c);
         }
     }
 

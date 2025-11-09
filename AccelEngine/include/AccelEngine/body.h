@@ -39,6 +39,10 @@ namespace AccelEngine
         real inverseMass;
         real inverseInertia;
 
+        // ----- Frictions -----
+        real staticFriction;
+        real dynamicFriction;
+
         // ---- Velocities ----
         Vector2 velocity;
         real rotation;
@@ -56,6 +60,9 @@ namespace AccelEngine
         Circle circle;
         AABB aabb;
 
+        Vector2 worldAABBMin;
+        Vector2 worldAABBMax;
+
         RigidBody() : inverseMass(0.0f),
                       inverseInertia(0.0f),
                       position(0, 0),
@@ -65,7 +72,9 @@ namespace AccelEngine
                       forceAccum(0, 0),
                       torqueAccum(0),
                       linearDamping(1.0f),
-                      angularDamping(1.0f)
+                      angularDamping(1.0f),
+                      staticFriction(0.6),
+                      dynamicFriction(0.4)
 
         {
             transformMatrix.setIdentity();
@@ -75,6 +84,7 @@ namespace AccelEngine
         void calculateDerivativeData()
         {
             updateTransformMatrix(transformMatrix, position, orientation);
+            updateAABB();
         }
 
         void addForce(const Vector2 &force)
@@ -170,6 +180,37 @@ namespace AccelEngine
             for (int i = 0; i < 4; ++i)
             {
                 outVertices[i] = body->transformMatrix * localCorners[i] + body->position;
+            }
+        }
+
+        void updateAABB()
+        {
+            if (shapeType == ShapeType::CIRCLE)
+            {
+                float r = circle.radius;
+                worldAABBMin = {position.x - r, position.y - r};
+                worldAABBMax = {position.x + r, position.y + r};
+                return;
+            }
+
+            // AABB for rotated box
+            Vector2 corners[4] = {
+                {-aabb.halfSize.x, -aabb.halfSize.y},
+                {aabb.halfSize.x, -aabb.halfSize.y},
+                {aabb.halfSize.x, aabb.halfSize.y},
+                {-aabb.halfSize.x, aabb.halfSize.y}};
+
+            worldAABBMin = {+1e9f, +1e9f};
+            worldAABBMax = {-1e9f, -1e9f};
+
+            for (int i = 0; i < 4; i++)
+            {
+                Vector2 p = transformMatrix * corners[i] + position;
+
+                worldAABBMin.x = std::min(worldAABBMin.x, p.x);
+                worldAABBMin.y = std::min(worldAABBMin.y, p.y);
+                worldAABBMax.x = std::max(worldAABBMax.x, p.x);
+                worldAABBMax.y = std::max(worldAABBMax.y, p.y);
             }
         }
 

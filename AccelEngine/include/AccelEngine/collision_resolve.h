@@ -12,6 +12,7 @@ namespace AccelEngine
 
         static void SolveVelocity(Contact& contact, float friction = 0.4f);
         static void SolveVelocityWithRoatation(Contact & contact);
+        static void SolveVelocityWithRoatationAndFriction(Contact & contact);
         // Complete resolution (position + velocity)
         static void Solve(Contact& contact, float dt);
     };
