@@ -148,8 +148,6 @@ void CollisionResolve::SolveVelocityWithRoatation(Contact &contact)
 
     real restituion = std::min(A->restitution, B->restitution);
 
-    std::cout<<"Number of Contacts : "<<contactCount<<std::endl;
-
     for (int i = 0; i < contactCount; i++)
     {
         Vector2 ra = contactList[i] - A->position;

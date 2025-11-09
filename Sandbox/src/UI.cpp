@@ -46,6 +46,8 @@ bool UI::handleEvent(SDL_Event &e)
 
 void UI::DrawFrame()
 {
+
+
     ImGui::Render();
     ImGui_ImplSDLRenderer3_RenderDrawData(ImGui::GetDrawData(), renderer);
 }

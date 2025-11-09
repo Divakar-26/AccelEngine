@@ -1,5 +1,5 @@
 #include "game.h"
-
+#include <iostream>
 int main()
 {
     Game game(800, 600);
@@ -30,6 +30,15 @@ int main()
         }
 
         game.render();
+
+        static float perfTimer = 0.0f;
+        perfTimer += realDt;
+
+        if (perfTimer >= 0.5f) // print every half second
+        {
+            std::cout << "Step time: " << realDt * 1000.0f << " ms" << std::endl;
+            perfTimer = 0.0f;
+        }
 
         static float titleTimer = 0.0f;
         titleTimer += realDt;

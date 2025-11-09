@@ -39,6 +39,8 @@ public:
 
     void addCircle(float x, float y);
     void addAABB(float x, float y);
+    void addAABB(float x, float y, float w, float h, float orientation);
+
 
 private:
     int WINDOW_W, WINDOW_H;
