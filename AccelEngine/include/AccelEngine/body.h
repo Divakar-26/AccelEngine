@@ -164,6 +164,13 @@ namespace AccelEngine
             return velocity;
         }
 
+        real getWidth() const{
+            return aabb.halfSize.x * 2;
+        }
+        real getHeigt() const{
+            return aabb.halfSize.y * 2;
+        }
+
         static void getTransformedVertices(const RigidBody *body, Vector2 outVertices[4])
         {
             if (body->shapeType != ShapeType::AABB)

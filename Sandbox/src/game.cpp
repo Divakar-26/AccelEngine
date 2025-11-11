@@ -3,6 +3,7 @@
 #include <AccelEngine/collision_coarse.h>
 #include <AccelEngine/collision_narrow.h>
 #include <AccelEngine/collision_resolve.h>
+#include <AccelEngine/ForceRegistry.h>
 #include "renderer2D.h"
 
 static float physicsTimeMs = 0.0f;
@@ -11,7 +12,17 @@ static float physicsHistory[600] = {0};
 static float renderHistory[600] = {0};
 static int historyIndex = 0;
 
+Vector2 debugMouseWorld;
+bool showDebugCoords = true;
+
+RigidBody *grabbed = nullptr;
+Vector2 grabOffset;
+bool mouseDown = false;
+
 using namespace AccelEngine;
+
+ForceRegistry registry;
+Gravity *g;
 
 SDL_Texture *boxTex;
 
@@ -37,48 +48,142 @@ bool Game::Init(const char *title)
     window = SDL_CreateWindow(title, WINDOW_W, WINDOW_H, SDL_WINDOW_RESIZABLE);
     renderer = SDL_CreateRenderer(window, NULL);
 
-    // init UI
     if (!ui.init(window, renderer))
     {
-        std::cout << "Somethine wrong with IMGUI ----- Cannot Initialised" << std::endl;
+        std::cout << "Something wrong with IMGUI" << std::endl;
         return false;
     }
 
     Renderer2D::init(renderer, WINDOW_W, WINDOW_H);
 
-    // body
-    body.position = Vector2(WINDOW_W / 2.0f, 100.0f);
-    body.inverseMass = 1.0f;
-    body.orientation = 0;
-    body.velocity = Vector2(0, 0);
-    body.angularDamping = 1.0f;
-    body.rotation = 0.0f;
-    body.shapeType = ShapeType::AABB;
-    body.aabb.halfSize = Vector2(30.0f, 30.0f);
-    body.linearDamping = 1.0f;
-    body.inverseInertia = 1.0f / 30.0f;
-    body.c = {200, 0, 0, 255};
+    camera.x = 0;
+    camera.y = 0;
+    camera.zoom = 1.0f;
 
-    // ground
-    ground.position = Vector2(927, -247);
-    ground.inverseMass = 0.0f;
-    ground.shapeType = ShapeType::AABB;
-    ground.aabb.halfSize = Vector2(800.0f, 50.0f);
-    ground.restitution = 0.8f;
-    ground.c = {200, 200, 0, 255};
+    // ---------------------------------------------------------
+    // GRAVITY
+    // ---------------------------------------------------------
+    g = new Gravity(Vector2(0, -980));
 
-    addAABB(66, 493, 1600, 100, 90.0f);
-    addAABB(1782, 493, 1600, 100, 90.0f);
+    // ---------------------------------------------------------
+    // MODULAR BRIDGE SETTINGS
+    // ---------------------------------------------------------
+    int howMany = 2;
 
-    // adding bodies to world and bodies
-    world.addBody(&ground);
-    world.addBody(&body);
-    bodies.push_back(&body);
-    bodies.push_back(&ground);
+    int plankCount          = 5 * howMany;
+    float plankW            = 100.0f / howMany;
+    float plankH            = 50.0f / howMany;
+    float gap               = 50.0f / howMany;
+    float offset            = 10.0f / howMany;
+    float springK           = 100.0f;
+    float springDamping     = 500.0f;
+
+    int pivotOffsetFromEdges = 300;
+
+    // ---------------------------------------------------------
+    // CREATE SUPPORTS
+    // ---------------------------------------------------------
+    RigidBody *pivot = getBody(
+        pivotOffsetFromEdges,
+        WINDOW_H / 4,
+        500, 50,
+        0.0f,
+        0.0f,
+        {0, 255, 0, 255}
+    );
+
+    RigidBody *pivot2 = getBody(
+        WINDOW_W - pivotOffsetFromEdges,
+        WINDOW_H / 4,
+        500, 50,
+        0.0f,
+        0.0f,
+        {0, 255, 0, 255}
+    );
+
+    world.addBody(pivot);
+    world.addBody(pivot2);
+    bodies.push_back(pivot);
+    bodies.push_back(pivot2);
+
+    // ---------------------------------------------------------
+    // CREATE BRIDGE
+    // ---------------------------------------------------------
+    std::vector<RigidBody *> bridge;
+
+    float halfPivotW  = pivot->getWidth()  * 0.5f;
+    float halfPivot2W = pivot2->getWidth() * 0.5f;
+    float halfPlankW  = plankW * 0.5f;
+
+    float startX = pivot->position.x + halfPivotW + gap + halfPlankW;
+    float step   = plankW + gap;
+    float y      = pivot->position.y;
+
+    for (int i = 0; i < plankCount; i++)
+    {
+        float x = startX + i * step;
+
+        RigidBody *p = getBody(
+            x,
+            y,
+            plankW,
+            plankH,
+            1.0f,
+            0.0f,
+            {255, 0, 0, 255}
+        );
+
+        // connect left side
+        if (i == 0)
+        {
+            // pivot → first plank
+            Spring *s = new Spring(
+                Vector2(-halfPlankW + offset, 0),
+                pivot,
+                Vector2(halfPivotW - offset, 0),
+                springK,
+                gap
+            );
+            s->damping = springDamping;
+            registry.add(p, s);
+        }
+        else
+        {
+            // plank[i-1] → plank[i]
+            Spring *s = new Spring(
+                Vector2(-halfPlankW + offset, 0),
+                bridge[i - 1],
+                Vector2(halfPlankW - offset, 0),
+                springK,
+                gap
+            );
+            s->damping = springDamping;
+            registry.add(p, s);
+        }
+
+        // connect last to pivot2
+        if (i == plankCount - 1)
+        {
+            Spring *s = new Spring(
+                Vector2(halfPlankW - offset, 0),
+                pivot2,
+                Vector2(-halfPivot2W + offset, 0),
+                springK,
+                gap
+            );
+            s->damping = springDamping;
+            registry.add(p, s);
+        }
+
+        world.addBody(p);
+        bodies.push_back(p);
+        bridge.push_back(p);
+    }
 
     running = true;
     return true;
 }
+
 
 void Game::handleEvent()
 {
@@ -87,80 +192,105 @@ void Game::handleEvent()
 
     while (SDL_PollEvent(&e))
     {
-        // if (ui.handleEvent(e))
-        // {
-        //     continue;
-        // }
+        if (ui.handleEvent(e))
+        {
+            continue;
+        }
         if (e.type == SDL_EVENT_QUIT)
         {
             running = false;
         }
-
         if (e.type == SDL_EVENT_KEY_DOWN)
         {
-            switch (e.key.key)
-            {
-            case SDLK_D:
-                body.velocity = Vector2(100, 0);
-                break;
-            case SDLK_A:
-                body.velocity = Vector2(-100, 0);
-                break;
-            case SDLK_S:
-                body.velocity = Vector2(0, -100);
-                break;
-            case SDLK_W:
-                body.velocity = Vector2(0, 100);
-                break;
-            default:
-                break;
-            }
+            cameraControls(e);
         }
         if (e.type == SDL_EVENT_MOUSE_BUTTON_DOWN)
         {
-            float mx = e.button.x;
-            float my = WINDOW_H - e.button.y;
+            SDL_FPoint w = Renderer2D::screenToWorld(e.button.x, e.button.y);
+            float mx = w.x;
+            float my = w.y;
+            mouseDown = true;
 
             if (e.button.button == SDL_BUTTON_LEFT)
             {
-                addCircle(mx, my);
+                gradBodies(mx, my);
             }
             else if (e.button.button == SDL_BUTTON_RIGHT)
             {
                 addAABB(mx, my);
             }
+            else if (e.button.button == SDL_BUTTON_MIDDLE)
+            {
+                addCircle(mx, my);
+            }
+        }
+
+        if (e.type == SDL_EVENT_MOUSE_BUTTON_UP)
+        {
+            if (e.button.button == SDL_BUTTON_LEFT)
+            {
+                grabbed = nullptr;
+                mouseDown = false;
+            }
+        }
+
+        if (e.type == SDL_EVENT_MOUSE_MOTION && grabbed)
+        {
+            SDL_FPoint w = Renderer2D::screenToWorld(e.motion.x, e.motion.y);
+            float mx = w.x;
+            float my = w.y;
+
+            Vector2 target = Vector2(mx, my) + grabOffset;
+
+            grabbed->position = target;
+            grabbed->velocity = Vector2(0, 0);
+            grabbed->rotation = 0;
         }
     }
 }
 
 void Game::update(float dt)
 {
-
-    world.startFrame();
-
-    for (auto &it : bodies)
-    {
-        if (it->inverseMass > 0.0f)
-        {
-            it->addForce(Vector2(0, -980));
-        }
-    }
+    const int substeps = 20;
+    const real h = dt / (real)substeps;
 
     Uint64 startPhysics = SDL_GetPerformanceCounter();
-    world.step(dt, 20);
-    Uint64 endPhysics = SDL_GetPerformanceCounter();
 
+    if (grabbed && mouseDown)
+    {
+        float sx, sy;
+        SDL_GetMouseState(&sx, &sy);
+
+        SDL_FPoint w = Renderer2D::screenToWorld(sx, sy);
+        Vector2 target = Vector2(w.x, w.y) + grabOffset;
+
+        grabbed->position = target;
+        grabbed->velocity = Vector2(0, 0);
+        grabbed->rotation = 0;
+    }
+
+    for (int i = 0; i < substeps; ++i)
+    {
+        world.startFrame();
+        registry.updateForces(h);
+        world.step(h, 1);
+    }
+
+    // std::cout<<bodies.size()<<std::endl;
+
+    Uint64 endPhysics = SDL_GetPerformanceCounter();
     physicsTimeMs = (float)(endPhysics - startPhysics) * 1000.0f / SDL_GetPerformanceFrequency();
 }
 
 void Game::render()
 {
+    Renderer2D::setCamera(camera);
     static int sampleCounter = 0;
 
     Uint64 startRender = SDL_GetPerformanceCounter();
     ui.DrawAddBody(world, bodies);
 
-    SDL_SetRenderDrawColor(renderer, 25, 25, 40, 255);
+    SDL_SetRenderDrawColor(renderer, 100, 100, 100, 255);
     SDL_RenderClear(renderer);
 
     for (auto *b : bodies)
@@ -184,9 +314,11 @@ void Game::render()
     // {
     //     for (auto it2 : it.contactPoints)
     //     {
-    //         Renderer2D::DrawCircle(it2.x, it2.y, 3, SDL_Color{255, 0, 0, 255});
+    //         Renderer2D::DrawCircle(it2.x, it2.y, 3,  0.0,  SDL_Color{255, 0, 0, 255});
     //     }
     // }
+
+    Renderer2D::drawSprings(registry);
 
     float minVal, maxVal;
     FindMinMax(physicsHistory, 200, minVal, maxVal);
@@ -214,6 +346,21 @@ void Game::render()
     ImGui::PlotLines("##rend", renderHistory, 100, 0, nullptr, 0, 20, ImVec2(300, 80));
 
     ImGui::End();
+
+    if (showDebugCoords)
+    {
+        ImGui::Begin("Mouse World", nullptr, ImGuiWindowFlags_AlwaysAutoResize);
+
+        ImGui::Text("World X: %.2f", debugMouseWorld.x);
+        ImGui::Text("World Y: %.2f", debugMouseWorld.y);
+
+        ImGui::Separator();
+        if (ImGui::Button("Hide"))
+            showDebugCoords = false;
+
+        ImGui::End();
+    }
+
     ui.DrawFrame();
 
     Uint64 endRender = SDL_GetPerformanceCounter();
@@ -300,6 +447,7 @@ void Game::addCircle(float x, float y)
 
     world.addBody(b);
     bodies.push_back(b);
+    registry.add(b, g);
 }
 
 void Game::addAABB(float x, float y)
@@ -336,6 +484,7 @@ void Game::addAABB(float x, float y)
 
     world.addBody(b);
     bodies.push_back(b);
+    registry.add(b, g);
 }
 
 void Game::addAABB(float x, float y, float w, float h, float orientation)
@@ -343,7 +492,32 @@ void Game::addAABB(float x, float y, float w, float h, float orientation)
     RigidBody *b = new RigidBody();
     b->position = {x, y};
     b->inverseMass = 0.0f;
-    b->restitution = 0.3f; // Add restitution
+    b->restitution = 0.3f;
+
+    b->shapeType = ShapeType::AABB;
+    b->aabb.halfSize = {w / 2, h / 2};
+    b->orientation = orientation * (3.14159265f / 180.0f);
+
+    b->inverseInertia = 0.0f;
+    b->angularDamping = 0.98;
+
+    b->velocity = {0, 0};
+    b->calculateDerivativeData();
+    b->c = RandomColor();
+
+    world.addBody(b);
+    bodies.push_back(b);
+
+    std::cout << "Hello" << std::endl;
+    // registry.add(b, g);
+}
+
+RigidBody *Game::getBody(float x, float y, float w, float h, float mass1, float orientation, SDL_Color c)
+{
+    RigidBody *b = new RigidBody();
+    b->position = {x, y};
+    b->inverseMass = mass1;
+    b->restitution = 0.3f;
 
     b->shapeType = ShapeType::AABB;
     b->aabb.halfSize = {w / 2, h / 2};
@@ -368,8 +542,115 @@ void Game::addAABB(float x, float y, float w, float h, float orientation)
 
     b->velocity = {0, 0};
     b->calculateDerivativeData();
-    b->c = RandomColor();
+    b->c = {(float)c.r, (float)c.g, (float)c.b, (float)c.a};
 
-    world.addBody(b);
-    bodies.push_back(b);
+    return b;
+}
+
+Vector2 Game::WorldToScreen(const Vector2 &w, float screenHeight)
+{
+    return Vector2(w.x, screenHeight - w.y);
+}
+Vector2 Game::ScreenToWorld(const Vector2 &s, float screenHeight)
+{
+    return Vector2(s.x, screenHeight - s.y);
+}
+Vector2 Game::getMouseWorld()
+{
+    float sx, sy;
+    SDL_GetMouseState(&sx, &sy);
+
+    SDL_FPoint w = Renderer2D::screenToWorld(sx, sy);
+
+    return Vector2(w.x, w.y);
+}
+
+void Game::gradBodies(float mx, float my)
+{
+    for (auto *b : bodies)
+    {
+        if (b->inverseMass == 0.0f)
+            continue; // static bodies not draggable
+
+        if (b->shapeType == ShapeType::AABB)
+        {
+            if (mx >= b->position.x - b->aabb.halfSize.x &&
+                mx <= b->position.x + b->aabb.halfSize.x &&
+                my >= b->position.y - b->aabb.halfSize.y &&
+                my <= b->position.y + b->aabb.halfSize.y)
+            {
+                grabbed = b;
+                grabOffset = b->position - Vector2(mx, my);
+                break;
+            }
+        }
+        else if (b->shapeType == ShapeType::CIRCLE)
+        {
+            Vector2 d = b->position - Vector2(mx, my);
+            if (d.magnitude() <= b->circle.radius)
+            {
+                grabbed = b;
+                grabOffset = d;
+                break;
+            }
+        }
+    }
+}
+
+void Game::cameraControls(SDL_Event &e)
+{
+    switch (e.key.key)
+    {
+    case SDLK_LEFT:
+        camera.x -= 50;
+        break;
+    case SDLK_RIGHT:
+        camera.x += 50;
+        break;
+    case SDLK_UP:
+        camera.y += 50;
+        break;
+    case SDLK_DOWN:
+        camera.y -= 50;
+        break;
+    case SDLK_LCTRL:
+    {
+        debugMouseWorld = getMouseWorld();
+        showDebugCoords = true;
+    }
+    break;
+    case SDLK_Q:
+    {
+        float msx, msy;
+        SDL_GetMouseState(&msx, &msy);
+
+        SDL_FPoint before = Renderer2D::screenToWorld(msx, msy);
+
+        camera.zoom *= 1.1f;
+        SDL_FPoint after = Renderer2D::screenToWorld(msx, msy);
+
+        camera.x += before.x - after.x;
+        camera.y += before.y - after.y;
+    }
+    break;
+
+    case SDLK_E:
+    {
+        float msx, msy;
+        SDL_GetMouseState(&msx, &msy);
+
+        SDL_FPoint before = Renderer2D::screenToWorld(msx, msy);
+
+        camera.zoom /= 1.1f;
+
+        SDL_FPoint after = Renderer2D::screenToWorld(msx, msy);
+
+        camera.x += before.x - after.x;
+        camera.y += before.y - after.y;
+    }
+    break;
+
+    default:
+        break;
+    }
 }

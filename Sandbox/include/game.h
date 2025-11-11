@@ -5,9 +5,8 @@
 #include <AccelEngine/core.h>
 #include <AccelEngine/body.h>
 #include <AccelEngine/world.h>
+#include <renderer2D.h>
 #include "UI.h"
-
-
 
 using namespace AccelEngine;
 
@@ -18,6 +17,7 @@ public:
 
     bool Init(const char *title);
     void handleEvent();
+    void cameraControls(SDL_Event &e);
     void update(float dt);
     void render();
 
@@ -25,22 +25,18 @@ public:
     {
         return running;
     }
-
     void showFPS(float realDt, float fixedDt);
+    Vector2 WorldToScreen(const Vector2 &w, float screenHeight);
+    Vector2 ScreenToWorld(const Vector2 &s, float screenHeight);
+    Vector2     getMouseWorld();
 
-    inline Vector2 WorldToScreen(const Vector2 &w, float screenHeight)
-    {
-        return Vector2(w.x, screenHeight - w.y);
-    }
-    inline Vector2 ScreenToWorld(const Vector2 &s, float screenHeight)
-    {
-        return Vector2(s.x, screenHeight - s.y);
-    }
+        void gradBodies(float mx, float my);
 
     void addCircle(float x, float y);
     void addAABB(float x, float y);
     void addAABB(float x, float y, float w, float h, float orientation);
 
+    RigidBody *getBody(float x, float y, float w, float h, float mass, float orientation, SDL_Color c);
 
 private:
     int WINDOW_W, WINDOW_H;
@@ -59,4 +55,6 @@ private:
 
     float fps = 0.0f;
     float frameTimeMs = 0.0f;
+
+    Camera camera;
 };

@@ -26,8 +26,7 @@ namespace AccelEngine
         virtual void updateForce(RigidBody *body, real duration) override
         {
             if (body->inverseMass <= 0.0f)
-                std::cout<<"HElLo"<<std::endl;
-                return; // infinite mass → no gravity
+                return;
 
             // F = m * g
             body->addForce(gravity * (1.0f / body->inverseMass));
@@ -37,52 +36,123 @@ namespace AccelEngine
     class Spring : public ForceGenerator
     {
     public:
-        // Connection point on this body (local coordinates)
-        Vector2 connectionPoint;
+        real damping;
 
-        // Connection point on the other body (local coordinates)
-        Vector2 otherConnectionPoint;
+        Vector2 localA; // local connection point on body A
+        Vector2 localB; // local connection point on body B
 
-        // Pointer to the other body
         RigidBody *other;
 
-        // Spring properties
+        real k;          // spring constant
+        real restLength; // rest distance
+
+        Spring(const Vector2 &localA,
+               RigidBody *otherBody,
+               const Vector2 &localB,
+               real springK,
+               real restLength)
+            : localA(localA),
+              localB(localB),
+              other(otherBody),
+              k(springK),
+              restLength(restLength),
+              damping(0.0f)
+        {
+        }
+
+        virtual void updateForce(RigidBody *bodyA, real duration) override
+        {
+            RigidBody *bodyB = other;
+
+            // If body has infinite mass no force needed
+            bool A_static = (bodyA->inverseMass <= 0.0f);
+            bool B_static = (bodyB->inverseMass <= 0.0f);
+
+            // Both static → nothing to do
+            if (A_static && B_static)
+                return;
+
+            // World points
+            Vector2 pA = bodyA->getPointInWorldSpace(localA);
+            Vector2 pB = bodyB->getPointInWorldSpace(localB);
+
+            // Spring vector
+            Vector2 stretch = pA - pB;
+            real len = stretch.magnitude();
+            if (len < 1e-6f)
+                return;
+
+            Vector2 dir = stretch / len;
+
+            // Hooke's law
+            real displacement = len - restLength;
+            real Fs = -k * displacement;
+
+            // Relative velocity (in direction of spring)
+            Vector2 relVel = (bodyA->velocity - bodyB->velocity);
+            real dampingForce = -damping * relVel.scalarProduct(dir);
+
+            real totalForceScalar = Fs + dampingForce;
+            Vector2 F = dir * totalForceScalar;
+
+            // ---------- Apply force to both bodies ----------
+
+            if (!A_static)
+                bodyA->addForceAtPoint(F, pA);
+
+            if (!B_static)
+                bodyB->addForceAtPoint(F * -1, pB);
+        }
+    };
+
+    class AnchoredSpring : public ForceGenerator
+    {
+    public:
+        Vector2 anchor;     // fixed point in world
+        Vector2 localPoint; // local point on body
         real springConstant;
         real restLength;
+        real damping;
 
-        Spring(const Vector2 &localConnectionPoint,
-               RigidBody *otherBody,
-               const Vector2 &otherConnectionPoint,
-               real springConstant,
-               real restLength)
-            : connectionPoint(localConnectionPoint),
-              otherConnectionPoint(otherConnectionPoint),
-              other(otherBody),
-              springConstant(springConstant),
-              restLength(restLength)
+        AnchoredSpring(const Vector2 &anchorPoint,
+                       const Vector2 &localPointOnBody,
+                       real k, real rest, real damping)
+            : anchor(anchorPoint),
+              localPoint(localPointOnBody),
+              springConstant(k),
+              restLength(rest),
+              damping(damping)
         {
         }
 
         virtual void updateForce(RigidBody *body, real duration) override
         {
-            // Convert both connection points to world space
-            Vector2 lws = body->getPointInWorldSpace(connectionPoint);
-            Vector2 ows = other->getPointInWorldSpace(otherConnectionPoint);
+            if (body->inverseMass <= 0.0f)
+                return;
 
-            // Calculate the vector of the spring
-            Vector2 force = lws - ows;
+            // world-space point on body
+            Vector2 bodyWS = body->getPointInWorldSpace(localPoint);
 
-            // Calculate the magnitude
-            real magnitude = force.magnitude();
-            magnitude = std::abs(magnitude - restLength);
-            magnitude *= springConstant;
+            // spring vector
+            Vector2 stretch = bodyWS - anchor;
+            real length = stretch.magnitude();
+            if (length < 1e-6f)
+                return;
 
-            // Normalize and invert
-            force.normalize();
-            force *= -magnitude;
+            Vector2 dir = stretch / length;
 
-            // Apply the force at the local connection point
-            body->addForceAtPoint(force, lws);
+            // Hooke's law
+            real displacement = length - restLength;
+            real Fs = -springConstant * displacement;
+
+            // damping
+            Vector2 vel = body->velocity;
+            real Fd = -damping * vel.scalarProduct(dir);
+
+            Vector2 totalForce = dir * (Fs + Fd);
+
+            // Apply force at body attachment point
+            body->addForceAtPoint(totalForce, bodyWS);
         }
     };
 
@@ -266,6 +336,7 @@ namespace AccelEngine
             temp.updateForce(body, duration);
         }
     };
+
     class Buoyancy : public ForceGenerator
     {
         Vector2 centerOfBuoyancy; // local-space center

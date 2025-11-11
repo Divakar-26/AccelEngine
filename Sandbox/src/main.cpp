@@ -2,7 +2,7 @@
 #include <iostream>
 int main()
 {
-    Game game(800, 600);
+    Game game(1920, 1000);
     game.Init("hello");
 
     const float FIXED_DT = 1.0f / 60.0f;

@@ -1,10 +1,14 @@
 #include "renderer2D.h"
+#include <AccelEngine/world.h>
+
+using namespace AccelEngine;
 
 SDL_Renderer *Renderer2D::renderer = nullptr;
 SDL_Texture *Renderer2D::rectangle = nullptr;
 SDL_Texture *Renderer2D::circle = nullptr;
 int Renderer2D::WINDOW_W = 0;
 int Renderer2D::WINDOW_H = 0;
+Camera Renderer2D::camera;
 
 static const float OUTLINE_THICKNESS = 2.0f;
 
@@ -12,6 +16,7 @@ void Renderer2D::init(SDL_Renderer *r, int w, int h)
 {
     renderer = r;
 
+    // asset loading
     rectangle = GetTexture("../Sandbox/assets/rectangle.png");
     circle = GetTexture("../Sandbox/assets/circle.png");
 
@@ -34,67 +39,139 @@ SDL_Texture *Renderer2D::GetTexture(const char *path)
     return t;
 }
 
+void Renderer2D::setCamera(const Camera &c)
+{
+    camera = c;
+}
+
+SDL_FPoint Renderer2D::worldToScreen(float x, float y)
+{
+    float sx = (x - camera.x) * camera.zoom;
+    float sy = (y - camera.y) * camera.zoom;
+
+    sy = WINDOW_H - sy;
+
+    SDL_FPoint p = {sx, sy};
+    return p;
+}
+
+SDL_FPoint Renderer2D::screenToWorld(float sx, float sy)
+{
+    float wy = WINDOW_H - sy;
+
+    wy = wy / camera.zoom + camera.y;
+    float wx = sx / camera.zoom + camera.x;
+
+    SDL_FPoint p = {wx, wy};
+    return p;
+}
+
+
 void Renderer2D::DrawRectangle(float x, float y, float w, float h, float orientation, SDL_Color fill)
 {
     float degrees = -orientation * (180.0f / 3.14159f);
 
-    float sx = x - w / 2;
-    float sy = WINDOW_H - y - h / 2;
+    SDL_FPoint center = worldToScreen(x, y);
+
+    float scaledW = w * camera.zoom;
+    float scaledH = h * camera.zoom;
+
+    float sx = center.x - scaledW / 2;
+    float sy = center.y - scaledH / 2;
 
     float inset = OUTLINE_THICKNESS;
 
-    // ----- Outer rect pivot -----
-    SDL_FPoint outerCenter = {w / 2, h / 2};
+    float innerW = scaledW - inset * 2;
+    float innerH = scaledH - inset * 2;
 
-    // ----- Inner rect pivot -----
-    float innerW = w - inset * 2;
-    float innerH = h - inset * 2;
-    SDL_FPoint innerCenter = {innerW / 2, innerH / 2};
+    // Rotation pivot (pivot is always half rect size)
+    SDL_FPoint outerPivot = {scaledW / 2, scaledH / 2};
+    SDL_FPoint innerPivot = {innerW / 2, innerH / 2};
 
-    // --------------------
-    // 1. WHITE OUTER RECT
-    // --------------------
-    SDL_FRect outerRect = {sx, sy, w, h};
-
+    // Outer rect
+    SDL_FRect outerRect = {sx, sy, scaledW, scaledH};
     SDL_SetTextureColorMod(rectangle, 255, 255, 255);
     SDL_RenderTextureRotated(renderer, rectangle, nullptr, &outerRect,
-                             degrees, &outerCenter, SDL_FLIP_NONE);
+                             degrees, &outerPivot, SDL_FLIP_NONE);
 
-    // --------------------
-    // 2. COLORED INNER RECT
-    // --------------------
+    // Inner rect (filled body)
     SDL_FRect innerRect = {sx + inset, sy + inset, innerW, innerH};
-
     SDL_SetTextureColorMod(rectangle, fill.r, fill.g, fill.b);
     SDL_RenderTextureRotated(renderer, rectangle, nullptr, &innerRect,
-                             degrees, &innerCenter, SDL_FLIP_NONE);
+                             degrees, &innerPivot, SDL_FLIP_NONE);
 }
+
 
 void Renderer2D::DrawCircle(float x, float y, float radius, float orientation, SDL_Color outline)
 {
-    // ---- 1. White outline ----
-    SDL_FRect outlineDst = {
-        x - radius - OUTLINE_THICKNESS,
-        WINDOW_H - y - radius - OUTLINE_THICKNESS,
-        (radius * 2) + OUTLINE_THICKNESS * 2,
-        (radius * 2) + OUTLINE_THICKNESS * 2};
+    SDL_FPoint center = worldToScreen(x, y);
+    float scaledRadius = radius * camera.zoom;
 
-    SDL_FPoint center = {radius, radius};
+    SDL_FPoint pivot = {scaledRadius, scaledRadius};
 
     float degrees = -orientation * (180.0f / 3.14159f);
-    SDL_SetTextureColorMod(circle, 255, 255, 255);
-    SDL_SetTextureAlphaMod(circle, 255);
-    SDL_RenderTextureRotated(renderer, circle, nullptr, &outlineDst, 0, &center, SDL_FLIP_NONE);
 
-    // ---- 2. Draw body color ----
+    // Outer white outline
+    SDL_FRect outlineDst = {
+        center.x - scaledRadius - OUTLINE_THICKNESS,
+        center.y - scaledRadius - OUTLINE_THICKNESS,
+        (scaledRadius * 2) + OUTLINE_THICKNESS * 2,
+        (scaledRadius * 2) + OUTLINE_THICKNESS * 2};
+
+    SDL_SetTextureColorMod(circle, 255, 255, 255);
+    SDL_RenderTextureRotated(renderer, circle, nullptr, &outlineDst, 0, &pivot, SDL_FLIP_NONE);
+
+    // Inner colored circle
     SDL_FRect dst = {
-        x - radius,
-        WINDOW_H - y - radius,
-        radius * 2,
-        radius * 2};
+        center.x - scaledRadius,
+        center.y - scaledRadius,
+        scaledRadius * 2,
+        scaledRadius * 2};
 
     SDL_SetTextureColorMod(circle, outline.r, outline.g, outline.b);
-    SDL_SetTextureAlphaMod(circle, outline.a);
+    SDL_RenderTextureRotated(renderer, circle, nullptr, &dst, degrees, &pivot, SDL_FLIP_NONE);
+}
 
-    SDL_RenderTextureRotated(renderer, circle, nullptr, &dst, degrees, &center, SDL_FLIP_NONE);
+
+void Renderer2D::drawSprings(ForceRegistry &registry)
+{
+    const auto &springs = registry.getSprings();
+
+    for (Spring *s : springs)
+    {
+        RigidBody *a = nullptr;
+        RigidBody *b = s->other;
+
+        // Find body 'a'
+        for (auto &reg : registry.registrations)
+        {
+            if (reg.fg == s)
+            {
+                a = reg.body;
+                break;
+            }
+        }
+
+        if (!a || !b)
+            continue;
+
+        // World positions of endpoints
+        Vector2 p1 = a->getPointInWorldSpace(s->localA);
+        Vector2 p2 = b->getPointInWorldSpace(s->localB);
+
+        // Convert to screen coordinates
+        SDL_FPoint sp1 = worldToScreen(p1.x, p1.y);
+        SDL_FPoint sp2 = worldToScreen(p2.x, p2.y);
+
+        // Draw spring line
+        SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+        SDL_RenderLine(renderer, sp1.x, sp1.y, sp2.x, sp2.y);
+
+        // Draw endpoints
+        SDL_FRect c1 = {sp1.x - 4, sp1.y - 4, 8, 8};
+        SDL_FRect c2 = {sp2.x - 4, sp2.y - 4, 8, 8};
+
+        SDL_RenderFillRect(renderer, &c1);
+        SDL_RenderFillRect(renderer, &c2);
+    }
 }
