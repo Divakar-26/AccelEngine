@@ -66,27 +66,14 @@ bool Game::Init(const char *title)
     g = new Gravity(Vector2(0, -980));
 
     // ---------------------------------------------------------
-    // MODULAR BRIDGE SETTINGS
+    // STATIC SUPPORTS (kept as in your original)
     // ---------------------------------------------------------
-    int howMany = 2;
-
-    int plankCount          = 5 * howMany;
-    float plankW            = 100.0f / howMany;
-    float plankH            = 50.0f / howMany;
-    float gap               = 50.0f / howMany;
-    float offset            = 10.0f / howMany;
-    float springK           = 100.0f;
-    float springDamping     = 500.0f;
-
     int pivotOffsetFromEdges = 300;
 
-    // ---------------------------------------------------------
-    // CREATE SUPPORTS
-    // ---------------------------------------------------------
     RigidBody *pivot = getBody(
-        pivotOffsetFromEdges,
+        WINDOW_W / 2,
         WINDOW_H / 4,
-        500, 50,
+        2000, 50,
         0.0f,
         0.0f,
         {0, 255, 0, 255}
@@ -102,87 +89,158 @@ bool Game::Init(const char *title)
     );
 
     world.addBody(pivot);
-    world.addBody(pivot2);
+    // world.addBody(pivot2);
     bodies.push_back(pivot);
-    bodies.push_back(pivot2);
+    // bodies.push_back(pivot2);
 
     // ---------------------------------------------------------
-    // CREATE BRIDGE
+    // SIMPLE TEST JOINT (same as original)
     // ---------------------------------------------------------
-    std::vector<RigidBody *> bridge;
+    RigidBody *body1 = getBody(
+        pivotOffsetFromEdges,
+        WINDOW_H / 2,
+        50, 50,
+        1.0f,
+        0.0f,
+        {0,255,0,255}
+    );
 
-    float halfPivotW  = pivot->getWidth()  * 0.5f;
-    float halfPivot2W = pivot2->getWidth() * 0.5f;
-    float halfPlankW  = plankW * 0.5f;
+    RigidBody *body2 = getBody(
+        pivotOffsetFromEdges + 300,
+        WINDOW_H / 2,
+        50, 50,
+        1.0f,
+        0.0f,
+        {0,255,255,255}
+    );
 
-    float startX = pivot->position.x + halfPivotW + gap + halfPlankW;
-    float step   = plankW + gap;
-    float y      = pivot->position.y;
+    DistanceJoint *j = new DistanceJoint(body1, body2, Vector2(0,0), Vector2(0,0));
 
-    for (int i = 0; i < plankCount; i++)
+    // world.addBody(body1);
+    // world.addBody(body2);
+    // bodies.push_back(body1);
+    // bodies.push_back(body2);
+
+    // registry.add(body1, g);
+    // registry.add(body2, g);
+
+    // world.addJoint(j);
+
+    // ---------------------------------------------------------
+    // SOFT BODY CLOTH USING ALL SPRINGS (H + V + Diagonals)
+    // ---------------------------------------------------------
+    int rows = 15;
+    int cols = 25;
+    float spacing = 25.0f;
+
+    std::vector<std::vector<RigidBody*>> cloth(rows, std::vector<RigidBody*>(cols));
+
+    float startX = 200;
+    float startY = 900;
+
+    float springK = 7000.0f;    // stiffness
+    float springD = 25.0f;      // damping
+
+    // diagonal rest length
+    float diagSpacing = sqrtf(spacing * spacing * 2.0f);
+
+    // --------- Create cloth particles ----------
+    for(int r = 0; r < rows; r++)
     {
-        float x = startX + i * step;
-
-        RigidBody *p = getBody(
-            x,
-            y,
-            plankW,
-            plankH,
-            1.0f,
-            0.0f,
-            {255, 0, 0, 255}
-        );
-
-        // connect left side
-        if (i == 0)
+        for(int c = 0; c < cols; c++)
         {
-            // pivot → first plank
-            Spring *s = new Spring(
-                Vector2(-halfPlankW + offset, 0),
-                pivot,
-                Vector2(halfPivotW - offset, 0),
-                springK,
-                gap
-            );
-            s->damping = springDamping;
-            registry.add(p, s);
-        }
-        else
-        {
-            // plank[i-1] → plank[i]
-            Spring *s = new Spring(
-                Vector2(-halfPlankW + offset, 0),
-                bridge[i - 1],
-                Vector2(halfPlankW - offset, 0),
-                springK,
-                gap
-            );
-            s->damping = springDamping;
-            registry.add(p, s);
-        }
+            RigidBody* b = new RigidBody();
 
-        // connect last to pivot2
-        if (i == plankCount - 1)
-        {
-            Spring *s = new Spring(
-                Vector2(halfPlankW - offset, 0),
-                pivot2,
-                Vector2(-halfPivot2W + offset, 0),
-                springK,
-                gap
-            );
-            s->damping = springDamping;
-            registry.add(p, s);
-        }
+            b->shapeType = ShapeType::CIRCLE;
+            b->circle.radius = 8;
 
-        world.addBody(p);
-        bodies.push_back(p);
-        bridge.push_back(p);
+            b->position = { startX + c * spacing, startY - r * spacing };
+            b->inverseMass = 1.0f;   // Fully dynamic, no pinned nodes
+            b->restitution = 0.0f;
+
+            real mass = 1.0f / b->inverseMass;
+            real inertia = 0.5f * mass * b->circle.radius * b->circle.radius;
+            b->inverseInertia = 1.0f / inertia;
+
+            b->calculateDerivativeData();
+            b->c = RandomColor();
+
+            world.addBody(b);
+            bodies.push_back(b);
+            registry.add(b, g);
+
+            cloth[r][c] = b;
+        }
+    }
+
+    // --------- Horizontal springs ----------
+    for(int r = 0; r < rows; r++)
+    {
+        for(int c = 0; c < cols - 1; c++)
+        {
+            Spring* s = new Spring(
+                Vector2(0,0),
+                cloth[r][c+1],
+                Vector2(0,0),
+                springK,
+                spacing
+            );
+            s->damping = springD;
+            registry.add(cloth[r][c], s);
+        }
+    }
+
+    // --------- Vertical springs ----------
+    for(int r = 0; r < rows - 1; r++)
+    {
+        for(int c = 0; c < cols; c++)
+        {
+            Spring* s = new Spring(
+                Vector2(0,0),
+                cloth[r+1][c],
+                Vector2(0,0),
+                springK,
+                spacing
+            );
+            s->damping = springD;
+            registry.add(cloth[r][c], s);
+        }
+    }
+
+    // --------- Diagonal springs (like a net) ----------
+    for(int r = 0; r < rows - 1; r++)
+    {
+        for(int c = 0; c < cols - 1; c++)
+        {
+            // down-right diagonal
+            Spring* s1 = new Spring(
+                Vector2(0,0),
+                cloth[r+1][c+1],
+                Vector2(0,0),
+                springK,
+                diagSpacing
+            );
+            s1->damping = springD;
+            registry.add(cloth[r][c], s1);
+
+            // down-left diagonal
+            Spring* s2 = new Spring(
+                Vector2(0,0),
+                cloth[r+1][c],
+                Vector2(0,0),
+                springK,
+                diagSpacing
+            );
+            s2->damping = springD;
+            registry.add(cloth[r][c+1], s2);
+        }
     }
 
     running = true;
     return true;
 }
+
+
 
 
 void Game::handleEvent()
@@ -319,6 +377,7 @@ void Game::render()
     // }
 
     Renderer2D::drawSprings(registry);
+    Renderer2D::drawJoints(world.getJoints());
 
     float minVal, maxVal;
     FindMinMax(physicsHistory, 200, minVal, maxVal);
@@ -454,7 +513,7 @@ void Game::addAABB(float x, float y)
 {
     RigidBody *b = new RigidBody();
     b->position = {x, y};
-    b->inverseMass = 1.0f;
+    b->inverseMass = 0.01f;
     b->restitution = 0.3f; // Add restitution
 
     b->shapeType = ShapeType::AABB;

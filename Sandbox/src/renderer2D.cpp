@@ -66,7 +66,6 @@ SDL_FPoint Renderer2D::screenToWorld(float sx, float sy)
     return p;
 }
 
-
 void Renderer2D::DrawRectangle(float x, float y, float w, float h, float orientation, SDL_Color fill)
 {
     float degrees = -orientation * (180.0f / 3.14159f);
@@ -101,7 +100,6 @@ void Renderer2D::DrawRectangle(float x, float y, float w, float h, float orienta
                              degrees, &innerPivot, SDL_FLIP_NONE);
 }
 
-
 void Renderer2D::DrawCircle(float x, float y, float radius, float orientation, SDL_Color outline)
 {
     SDL_FPoint center = worldToScreen(x, y);
@@ -131,7 +129,6 @@ void Renderer2D::DrawCircle(float x, float y, float radius, float orientation, S
     SDL_SetTextureColorMod(circle, outline.r, outline.g, outline.b);
     SDL_RenderTextureRotated(renderer, circle, nullptr, &dst, degrees, &pivot, SDL_FLIP_NONE);
 }
-
 
 void Renderer2D::drawSprings(ForceRegistry &registry)
 {
@@ -174,4 +171,58 @@ void Renderer2D::drawSprings(ForceRegistry &registry)
         SDL_RenderFillRect(renderer, &c1);
         SDL_RenderFillRect(renderer, &c2);
     }
+}
+
+void Renderer2D::drawJoints(const std::vector<Joint *> &joints)
+{
+    SDL_Color jointColor = {255, 255, 0, 255};
+
+    for (auto *j : joints)
+    {
+        DistanceJoint *dj = dynamic_cast<DistanceJoint *>(j);
+        if (!dj)
+            continue;
+
+        Vector2 p1 = dj->A->getPointInWorldSpace(dj->localA);
+        Vector2 p2 = dj->B->getPointInWorldSpace(dj->localB);
+
+        DrawJoint(p1, p2, jointColor);
+    }
+}
+
+void Renderer2D::DrawJoint(const Vector2 &p1, const Vector2 &p2, SDL_Color color)
+{
+    SDL_FPoint sp1 = worldToScreen(p1.x, p1.y);
+    SDL_FPoint sp2 = worldToScreen(p2.x, p2.y);
+
+    // distance in world
+    float dx = p2.x - p1.x;
+    float dy = p2.y - p1.y;
+
+    float length = sqrtf(dx * dx + dy * dy);
+    float angle = atan2f(dy, dx);
+
+    // convert to screen-space center
+    SDL_FPoint center = {
+        (sp1.x + sp2.x) * 0.5f,
+        (sp1.y + sp2.y) * 0.5f};
+
+    // convert length to screen space
+    float w = length * camera.zoom;
+    float h = 6.0f * camera.zoom; // joint thickness
+
+    // convert to top-left:
+    float sx = center.x - w / 2;
+    float sy = center.y - h / 2;
+
+    SDL_FRect rect = {sx, sy, w, h};
+
+    float degrees = -angle * (180.0f / 3.14159f);
+
+    SDL_SetTextureColorMod(rectangle, color.r, color.g, color.b);
+
+    SDL_FPoint pivot = {w / 2, h / 2};
+
+    SDL_RenderTextureRotated(renderer, rectangle, nullptr, &rect,
+                             degrees, &pivot, SDL_FLIP_NONE);
 }
