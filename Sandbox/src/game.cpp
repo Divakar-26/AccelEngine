@@ -68,7 +68,7 @@ bool Game::Init(const char *title)
     // ---------------------------------------------------------
     // GRAVITY
     // ---------------------------------------------------------
-    g = new Gravity(Vector2(0, -500));
+    g = new Gravity(Vector2(0, -980));
 
     // ---------------------------------------------------------
     // STATIC SUPPORTS (kept as in your original)
@@ -81,37 +81,165 @@ bool Game::Init(const char *title)
         2000, 50,
         0.0f,
         0.0f,
-        {0, 255, 0, 255});
-    RigidBody *wall1 = getBody(
-        -100,
-        2222,
-        4000, 50,
-        0.0f,
-        90.0f,
-        {0, 255, 0, 255});
-    RigidBody *wall2 = getBody(
-        WINDOW_W + 100,
-        2222,
-        4000, 50,
-        0.0f,
-        90.0f,
-        {0, 255, 0, 255});
+        {0, 255, 0, 255}
+    );
 
     RigidBody *pivot2 = getBody(
         WINDOW_W - pivotOffsetFromEdges,
-        1278,
+        WINDOW_H / 4,
         500, 50,
         0.0f,
         0.0f,
-        {0, 255, 0, 255});
+        {0, 255, 0, 255}
+    );
 
     world.addBody(pivot);
-    world.addBody(wall1);
-    world.addBody(wall2);
-
+    // world.addBody(pivot2);
     bodies.push_back(pivot);
-    bodies.push_back(wall1);
-    bodies.push_back(wall2);
+    // bodies.push_back(pivot2);
+
+    // ---------------------------------------------------------
+    // SIMPLE TEST JOINT (same as original)
+    // ---------------------------------------------------------
+    RigidBody *body1 = getBody(
+        pivotOffsetFromEdges,
+        WINDOW_H / 2,
+        50, 50,
+        1.0f,
+        0.0f,
+        {0,255,0,255}
+    );
+
+    RigidBody *body2 = getBody(
+        pivotOffsetFromEdges + 300,
+        WINDOW_H / 2,
+        50, 50,
+        1.0f,
+        0.0f,
+        {0,255,255,255}
+    );
+
+    DistanceJoint *j = new DistanceJoint(body1, body2, Vector2(0,0), Vector2(0,0));
+
+    // world.addBody(body1);
+    // world.addBody(body2);
+    // bodies.push_back(body1);
+    // bodies.push_back(body2);
+
+    // registry.add(body1, g);
+    // registry.add(body2, g);
+
+    // world.addJoint(j);
+
+    // ---------------------------------------------------------
+    // SOFT BODY CLOTH USING ALL SPRINGS (H + V + Diagonals)
+    // ---------------------------------------------------------
+    int rows = 15;
+    int cols = 25;
+    float spacing = 25.0f;
+
+    std::vector<std::vector<RigidBody*>> cloth(rows, std::vector<RigidBody*>(cols));
+
+    float startX = 200;
+    float startY = 900;
+
+    float springK = 7000.0f;    // stiffness
+    float springD = 25.0f;      // damping
+
+    // diagonal rest length
+    float diagSpacing = sqrtf(spacing * spacing * 2.0f);
+
+    // --------- Create cloth particles ----------
+    for(int r = 0; r < rows; r++)
+    {
+        for(int c = 0; c < cols; c++)
+        {
+            RigidBody* b = new RigidBody();
+
+            b->shapeType = ShapeType::CIRCLE;
+            b->circle.radius = 8;
+
+            b->position = { startX + c * spacing, startY - r * spacing };
+            b->inverseMass = 1.0f;   // Fully dynamic, no pinned nodes
+            b->restitution = 0.0f;
+
+            real mass = 1.0f / b->inverseMass;
+            real inertia = 0.5f * mass * b->circle.radius * b->circle.radius;
+            b->inverseInertia = 1.0f / inertia;
+
+            b->calculateDerivativeData();
+            b->c = RandomColor();
+
+            world.addBody(b);
+            bodies.push_back(b);
+            registry.add(b, g);
+
+            cloth[r][c] = b;
+        }
+    }
+
+    // --------- Horizontal springs ----------
+    for(int r = 0; r < rows; r++)
+    {
+        for(int c = 0; c < cols - 1; c++)
+        {
+            Spring* s = new Spring(
+                Vector2(0,0),
+                cloth[r][c+1],
+                Vector2(0,0),
+                springK,
+                spacing
+            );
+            s->damping = springD;
+            registry.add(cloth[r][c], s);
+        }
+    }
+
+    // --------- Vertical springs ----------
+    for(int r = 0; r < rows - 1; r++)
+    {
+        for(int c = 0; c < cols; c++)
+        {
+            Spring* s = new Spring(
+                Vector2(0,0),
+                cloth[r+1][c],
+                Vector2(0,0),
+                springK,
+                spacing
+            );
+            s->damping = springD;
+            registry.add(cloth[r][c], s);
+        }
+    }
+
+    // --------- Diagonal springs (like a net) ----------
+    for(int r = 0; r < rows - 1; r++)
+    {
+        for(int c = 0; c < cols - 1; c++)
+        {
+            // down-right diagonal
+            Spring* s1 = new Spring(
+                Vector2(0,0),
+                cloth[r+1][c+1],
+                Vector2(0,0),
+                springK,
+                diagSpacing
+            );
+            s1->damping = springD;
+            registry.add(cloth[r][c], s1);
+
+            // down-left diagonal
+            Spring* s2 = new Spring(
+                Vector2(0,0),
+                cloth[r+1][c],
+                Vector2(0,0),
+                springK,
+                diagSpacing
+            );
+            s2->damping = springD;
+            registry.add(cloth[r][c+1], s2);
+        }
+    }
 
     running = true;
     return true;
@@ -428,7 +556,7 @@ void Game::addAABB(float x, float y)
 {
     RigidBody *b = new RigidBody();
     b->position = {x, y};
-    b->inverseMass = 1.0f;
+    b->inverseMass = 0.25f;
     b->restitution = 0.3f; // Add restitution
 
     b->shapeType = ShapeType::AABB;
@@ -623,7 +751,7 @@ void Game::cameraControls(SDL_Event &e)
         camera.y += before.y - after.y;
     }
     break;
-
+    
     default:
         break;
     }
