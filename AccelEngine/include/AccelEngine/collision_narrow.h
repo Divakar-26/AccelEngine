@@ -15,6 +15,7 @@ namespace AccelEngine
         Vector2 contactPoints[2];
         int contactCount;
     };
+    
 
     class NarrowCollision
     {

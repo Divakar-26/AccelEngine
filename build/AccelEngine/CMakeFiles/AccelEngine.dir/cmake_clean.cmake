@@ -1,4 +1,6 @@
 file(REMOVE_RECURSE
+  "CMakeFiles/AccelEngine.dir/src/BVH.cpp.o"
+  "CMakeFiles/AccelEngine.dir/src/BVH.cpp.o.d"
   "CMakeFiles/AccelEngine.dir/src/ParticleContact.cpp.o"
   "CMakeFiles/AccelEngine.dir/src/ParticleContact.cpp.o.d"
   "CMakeFiles/AccelEngine.dir/src/ParticleWorld.cpp.o"

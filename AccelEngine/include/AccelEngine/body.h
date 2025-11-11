@@ -63,6 +63,9 @@ namespace AccelEngine
         Vector2 worldAABBMin;
         Vector2 worldAABBMax;
 
+        bool enableCollision;
+        real boundingRadius = 0.0f;
+
         RigidBody() : inverseMass(0.0f),
                       inverseInertia(0.0f),
                       position(0, 0),
@@ -74,7 +77,8 @@ namespace AccelEngine
                       linearDamping(1.0f),
                       angularDamping(1.0f),
                       staticFriction(0.6),
-                      dynamicFriction(0.4)
+                      dynamicFriction(0.4),
+                      enableCollision(true)
 
         {
             transformMatrix.setIdentity();
@@ -85,6 +89,18 @@ namespace AccelEngine
         {
             updateTransformMatrix(transformMatrix, position, orientation);
             updateAABB();
+
+            if (shapeType == ShapeType::CIRCLE)
+            {
+                boundingRadius = circle.radius;
+            }
+            else
+            { 
+                // tightest sphere that contains the rotated rectangle
+                const real hx = aabb.halfSize.x;
+                const real hy = aabb.halfSize.y;
+                boundingRadius = std::sqrt(hx * hx + hy * hy);
+            }
         }
 
         void addForce(const Vector2 &force)
@@ -149,47 +165,6 @@ namespace AccelEngine
             calculateDerivativeData();
         }
 
-        Vector2 getPosition() const
-        {
-            return position;
-        }
-
-        real getInverseMass()
-        {
-            return inverseMass;
-        }
-
-        Vector2 getVelocity() const
-        {
-            return velocity;
-        }
-
-        real getWidth() const{
-            return aabb.halfSize.x * 2;
-        }
-        real getHeigt() const{
-            return aabb.halfSize.y * 2;
-        }
-
-        static void getTransformedVertices(const RigidBody *body, Vector2 outVertices[4])
-        {
-            if (body->shapeType != ShapeType::AABB)
-                return;
-
-            const Vector2 &half = body->aabb.halfSize;
-
-            Vector2 localCorners[4] = {
-                Vector2(-half.x, -half.y),
-                Vector2(half.x, -half.y),
-                Vector2(half.x, half.y),
-                Vector2(-half.x, half.y)};
-
-            for (int i = 0; i < 4; ++i)
-            {
-                outVertices[i] = body->transformMatrix * localCorners[i] + body->position;
-            }
-        }
-
         void updateAABB()
         {
             if (shapeType == ShapeType::CIRCLE)
@@ -218,6 +193,52 @@ namespace AccelEngine
                 worldAABBMin.y = std::min(worldAABBMin.y, p.y);
                 worldAABBMax.x = std::max(worldAABBMax.x, p.x);
                 worldAABBMax.y = std::max(worldAABBMax.y, p.y);
+            }
+        }
+
+        // GETTERS
+        Vector2 getPosition() const
+        {
+            return position;
+        }
+
+        real getInverseMass()
+        {
+            return inverseMass;
+        }
+
+        Vector2 getVelocity() const
+        {
+            return velocity;
+        }
+
+        real getWidth() const
+        {
+            return aabb.halfSize.x * 2;
+        }
+        real getHeigt() const
+        {
+            return aabb.halfSize.y * 2;
+        }
+
+        inline real getBoundingRadius() const { return boundingRadius; }
+
+        static void getTransformedVertices(const RigidBody *body, Vector2 outVertices[4])
+        {
+            if (body->shapeType != ShapeType::AABB)
+                return;
+
+            const Vector2 &half = body->aabb.halfSize;
+
+            Vector2 localCorners[4] = {
+                Vector2(-half.x, -half.y),
+                Vector2(half.x, -half.y),
+                Vector2(half.x, half.y),
+                Vector2(-half.x, half.y)};
+
+            for (int i = 0; i < 4; ++i)
+            {
+                outVertices[i] = body->transformMatrix * localCorners[i] + body->position;
             }
         }
 

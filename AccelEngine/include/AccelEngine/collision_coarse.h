@@ -6,9 +6,10 @@
 
 namespace AccelEngine
 {
+
     class CoarseCollision
     {
-        public:
-        static void FindPotentialPairs(const std::vector<RigidBody*> & bodies, std::vector<std::pair<RigidBody *, RigidBody *>> &pairs);
+    public:
+        static void FindPotentialPairs(const std::vector<RigidBody *> &bodies, std::vector<std::pair<RigidBody *, RigidBody *>> &pairs);
     };
 } // namespace AccelEngine

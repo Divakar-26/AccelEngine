@@ -226,3 +226,18 @@ void Renderer2D::DrawJoint(const Vector2 &p1, const Vector2 &p2, SDL_Color color
     SDL_RenderTextureRotated(renderer, rectangle, nullptr, &rect,
                              degrees, &pivot, SDL_FLIP_NONE);
 }
+
+void Renderer2D::DrawAABBOutline(float minX, float minY, float maxX, float maxY, SDL_Color color)
+{
+    SDL_FPoint p1 = worldToScreen(minX, minY);
+    SDL_FPoint p2 = worldToScreen(maxX, minY);
+    SDL_FPoint p3 = worldToScreen(maxX, maxY);
+    SDL_FPoint p4 = worldToScreen(minX, maxY);
+
+    SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, color.a);
+
+    SDL_RenderLine(renderer, p1.x, p1.y, p2.x, p2.y);
+    SDL_RenderLine(renderer, p2.x, p2.y, p3.x, p3.y);
+    SDL_RenderLine(renderer, p3.x, p3.y, p4.x, p4.y);
+    SDL_RenderLine(renderer, p4.x, p4.y, p1.x, p1.y);
+}

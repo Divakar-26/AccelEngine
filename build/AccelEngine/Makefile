@@ -130,6 +130,30 @@ AccelEngine/fast:
 	cd /home/divakar/Desktop/AccelPhysics/build && $(MAKE) $(MAKESILENT) -f AccelEngine/CMakeFiles/AccelEngine.dir/build.make AccelEngine/CMakeFiles/AccelEngine.dir/build
 .PHONY : AccelEngine/fast
 
+src/BVH.o: src/BVH.cpp.o
+.PHONY : src/BVH.o
+
+# target to build an object file
+src/BVH.cpp.o:
+	cd /home/divakar/Desktop/AccelPhysics/build && $(MAKE) $(MAKESILENT) -f AccelEngine/CMakeFiles/AccelEngine.dir/build.make AccelEngine/CMakeFiles/AccelEngine.dir/src/BVH.cpp.o
+.PHONY : src/BVH.cpp.o
+
+src/BVH.i: src/BVH.cpp.i
+.PHONY : src/BVH.i
+
+# target to preprocess a source file
+src/BVH.cpp.i:
+	cd /home/divakar/Desktop/AccelPhysics/build && $(MAKE) $(MAKESILENT) -f AccelEngine/CMakeFiles/AccelEngine.dir/build.make AccelEngine/CMakeFiles/AccelEngine.dir/src/BVH.cpp.i
+.PHONY : src/BVH.cpp.i
+
+src/BVH.s: src/BVH.cpp.s
+.PHONY : src/BVH.s
+
+# target to generate assembly for a file
+src/BVH.cpp.s:
+	cd /home/divakar/Desktop/AccelPhysics/build && $(MAKE) $(MAKESILENT) -f AccelEngine/CMakeFiles/AccelEngine.dir/build.make AccelEngine/CMakeFiles/AccelEngine.dir/src/BVH.cpp.s
+.PHONY : src/BVH.cpp.s
+
 src/ParticleContact.o: src/ParticleContact.cpp.o
 .PHONY : src/ParticleContact.o
 
@@ -307,6 +331,9 @@ help:
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
 	@echo "... AccelEngine"
+	@echo "... src/BVH.o"
+	@echo "... src/BVH.i"
+	@echo "... src/BVH.s"
 	@echo "... src/ParticleContact.o"
 	@echo "... src/ParticleContact.i"
 	@echo "... src/ParticleContact.s"

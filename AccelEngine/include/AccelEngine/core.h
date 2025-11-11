@@ -172,6 +172,15 @@ namespace AccelEngine
                 x < 0 ? -x : x,
                 y < 0 ? -y : y);
         }
+        real operator[](int index) const
+        {
+            return (index == 0) ? x : y;
+        }
+
+        real &operator[](int index)
+        {
+            return (index == 0) ? x : y;
+        }
 
         // Components
         real x, y;

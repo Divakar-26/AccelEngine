@@ -20,7 +20,8 @@ public:
     static void init(SDL_Renderer *renderer, int w, int h);
     static void DrawRectangle(float x, float y, float w, float h, float orientation, SDL_Color outline);
     static void DrawCircle(float x, float y, float radius, float orientation, SDL_Color outline);
-
+    static void DrawAABBOutline(float minX, float minY, float maxX, float maxY, SDL_Color color);
+    
     static void drawSprings(ForceRegistry &registry);
     static SDL_Texture *GetTexture(const char *path);
     static SDL_Texture *rectangle;

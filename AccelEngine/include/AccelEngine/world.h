@@ -5,6 +5,7 @@
 #include <AccelEngine/collision_narrow.h>
 #include <AccelEngine/collision_resolve.h>
 #include <AccelEngine/joint.h>
+#include <AccelEngine/BVH.h>
 
 namespace AccelEngine
 {
@@ -16,9 +17,10 @@ namespace AccelEngine
         std::vector<std::pair<RigidBody *, RigidBody *>> potentialPairs;
         std::vector<Contact> contacts;
         std::vector<Contact> contactsThisFrame;
-        std::vector<Joint*> joints;
+        std::vector<Joint *> joints;
 
     public:
+        BVHTree broadPhase;
         World() {}
 
         ~World()
@@ -36,7 +38,8 @@ namespace AccelEngine
             joints.push_back(j);
         }
 
-        std::vector<Joint*> & getJoints(){
+        std::vector<Joint *> &getJoints()
+        {
             return joints;
         }
 
@@ -87,18 +90,23 @@ namespace AccelEngine
                 potentialPairs.clear();
                 contacts.clear();
 
-                CoarseCollision::FindPotentialPairs(bodies, potentialPairs);
+                // CoarseCollision::FindPotentialPairs(bodies, potentialPairs);
+
+                broadPhase.build(bodies);
+                broadPhase.findPairs(potentialPairs);
+
                 NarrowCollision::FindContacts(potentialPairs, contacts);
 
-                for(auto * j : joints)
+                for (auto *j : joints)
                     j->preSolve(subdt);
-
 
                 for (auto &c : contacts)
                     CollisionResolve::Solve(c, subdt);
 
-                for(int it = 0; it < 100; it ++){
-                    for(auto * j : joints){
+                for (int it = 0; it < 100; it++)
+                {
+                    for (auto *j : joints)
+                    {
                         j->solve(subdt);
                     }
                 }
