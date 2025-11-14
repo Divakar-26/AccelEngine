@@ -3,6 +3,8 @@ add_executable(Sandbox
     src/game.cpp
     src/renderer2D.cpp
     src/UI.cpp
+    src/InputManager.cpp
+    src/InputActions.cpp
 
     # ImGui core
     include/imgui/imgui.cpp
@@ -32,5 +34,6 @@ target_link_libraries(Sandbox
 target_include_directories(Sandbox PRIVATE
     ${CMAKE_SOURCE_DIR}/AccelEngine/include
     ${CMAKE_SOURCE_DIR}/Sandbox/include
+    ${CMAKE_SOURCE_DIR}/Sandbox/include/demo
     ${CMAKE_SOURCE_DIR}/Sandbox/include/imgui
 )

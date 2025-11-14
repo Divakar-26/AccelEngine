@@ -89,7 +89,7 @@ void Renderer2D::DrawRectangle(float x, float y, float w, float h, float orienta
 
     // Outer rect
     SDL_FRect outerRect = {sx, sy, scaledW, scaledH};
-    SDL_SetTextureColorMod(rectangle, 255, 255, 255);
+    SDL_SetTextureColorMod(rectangle, 0, 0, 0);
     SDL_RenderTextureRotated(renderer, rectangle, nullptr, &outerRect,
                              degrees, &outerPivot, SDL_FLIP_NONE);
 
@@ -116,7 +116,7 @@ void Renderer2D::DrawCircle(float x, float y, float radius, float orientation, S
         (scaledRadius * 2) + OUTLINE_THICKNESS * 2,
         (scaledRadius * 2) + OUTLINE_THICKNESS * 2};
 
-    SDL_SetTextureColorMod(circle, 255, 255, 255);
+    SDL_SetTextureColorMod(circle, 0, 0, 0);
     SDL_RenderTextureRotated(renderer, circle, nullptr, &outlineDst, 0, &pivot, SDL_FLIP_NONE);
 
     // Inner colored circle

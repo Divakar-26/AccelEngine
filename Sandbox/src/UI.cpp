@@ -63,36 +63,152 @@ void UI::DrawAddBody(World &world, std::vector<RigidBody *> &bodies)
     ImGui_ImplSDL3_NewFrame();
     ImGui::NewFrame();
 
-    // --- Scene Editor UI ---
-    ImGui::Begin("Scene Editor");
+    ImGui::Begin("Scene Editor", nullptr, ImGuiWindowFlags_AlwaysAutoResize);
+
+    // ============================================================
+    // TOP: Creation + Global Controls
+    // ============================================================
+
+    ImGui::Text("Create Body");
+
+    static int newShape = 0;
+    ImGui::RadioButton("AABB", &newShape, 0);
+    ImGui::SameLine();
+    ImGui::RadioButton("Circle", &newShape, 1);
+
+    static float spawnW = 50;
+    static float spawnH = 50;
+    static float spawnR = 25;
+
+    if (newShape == 0)
+    {
+        ImGui::DragFloat("Width", &spawnW, 1.f, 5.f, 500.f);
+        ImGui::DragFloat("Height", &spawnH, 1.f, 5.f, 500.f);
+    }
+    else
+    {
+        ImGui::DragFloat("Radius", &spawnR, 1.f, 5.f, 500.f);
+    }
+
+    static bool spawnCollisionEnabled = true;
+    ImGui::Checkbox("Enable Collision for New Bodies",&spawnCollisionEnabled);
 
     if (ImGui::Button("Add Body"))
-        addBody(world, bodies);
+    {
+        RigidBody* b = new RigidBody();
+
+        b->position = {500, 500};
+        b->velocity = {0, 0};
+
+        if (newShape == 0)
+        {
+            b->shapeType = ShapeType::AABB;
+            b->aabb.halfSize = {spawnW / 2, spawnH / 2};
+
+            float mass = 1.f;
+            b->inverseMass = 1.f / mass;
+
+            float inertia = (1.f/12.f) * mass * (spawnW*spawnW + spawnH*spawnH);
+            b->inverseInertia = 1.f / inertia;
+        }
+        else
+        {
+            b->shapeType = ShapeType::CIRCLE;
+            b->circle.radius = spawnR;
+
+            float mass = 1.f;
+            b->inverseMass = 1.f / mass;
+
+            float inertia = 0.5f * mass * spawnR * spawnR;
+            b->inverseInertia = 1.f / inertia;
+        }
+
+        b->enableCollision = spawnCollisionEnabled;
+        b->calculateDerivativeData();
+        world.addBody(b);
+        bodies.push_back(b);
+    }
+
+    ImGui::Separator();
+
+    // ============================================================
+    // SELECTED BODY INSPECTOR
+    // ============================================================
 
     static int selectedIndex = -1;
-    ImGui::Separator();
-    ImGui::Text("Bodies:");
 
-    for (int i = 0; i < bodies.size(); ++i)
+    ImGui::Text("Inspector");
+    if (selectedIndex >= 0 && selectedIndex < bodies.size())
     {
-        char label[32];
+        RigidBody* b = bodies[selectedIndex];
+
+        ImGui::BeginChild("InspectorSection", ImVec2(0, 250), true);
+
+        ImGui::Text("Body %d", selectedIndex);
+
+        ImGui::Checkbox("Enable Collision", &b->enableCollision);
+
+        ImGui::DragFloat2("Position", (float*)&b->position, 0.5f);
+
+        float degrees = b->orientation * 180.0f / 3.14159265f;
+        ImGui::DragFloat("Rotation (deg)", &degrees, 0.2f, -180.f, 180.f, "%.2f");
+        b->orientation = degrees * 3.14159265f / 180.f;
+
+        ImGui::DragFloat2("Velocity", (float*)&b->velocity, 0.2f);
+        ImGui::DragFloat("Angular Vel", &b->rotation, 0.1f);
+        ImGui::DragFloat("Angular Damping", &b->angularDamping, 0.01f, 0.f, 1.f);
+
+        float mass = 1.f / b->inverseMass;
+        if (ImGui::DragFloat("Mass", &mass, 0.1f, 0.01f, 10000.f))
+            b->inverseMass = 1.f / mass;
+
+        float inertia = b->inverseInertia > 0 ? 1.f / b->inverseInertia : 0.f;
+        if (ImGui::DragFloat("Inertia", &inertia, 0.1f, 0.01f, 100000.f))
+            b->inverseInertia = 1.f / inertia;
+
+        ImGui::DragFloat("Restitution", &b->restitution, 0.01f, 0.f, 1.f);
+
+        if (b->shapeType == ShapeType::AABB)
+        {
+            ImGui::Text("AABB");
+            ImGui::DragFloat2("Half Size", (float*)&b->aabb.halfSize, 1.f);
+        }
+        else
+        {
+            ImGui::Text("Circle");
+            ImGui::DragFloat("Radius", &b->circle.radius, 1.f, 1.f, 500.f);
+        }
+
+        ImGui::ColorEdit4("Color", (float*)&b->c);
+
+        ImGui::EndChild();
+    }
+
+    ImGui::Separator();
+
+    // ============================================================
+    // BODY LIST AT BOTTOM
+    // ============================================================
+
+    ImGui::Text("Bodies");
+
+    ImGui::BeginChild("BodiesList", ImVec2(0, 200), true);
+
+    for (int i = 0; i < bodies.size(); i++)
+    {
+        char label[64];
         snprintf(label, sizeof(label), "Body %d", i);
+
         if (ImGui::Selectable(label, selectedIndex == i))
             selectedIndex = i;
     }
 
-    if (selectedIndex >= 0 && selectedIndex < bodies.size())
-    {
-        RigidBody *selected = bodies[selectedIndex];
-        ImGui::Separator();
-        ImGui::Text("Transform");
-        ImGui::DragFloat2("Position", (float *)&selected->position, 1.0f);
-        ImGui::SliderAngle("Orientation", (float *)&selected->orientation, -180.0f, 180.0f);
-        ImGui::DragFloat2("Velocity", (float *)&selected->velocity, 0.5f);
-    }
+    ImGui::EndChild();
 
     ImGui::End();
 }
+
+
 
 void UI::addBody(World &world, std::vector<RigidBody *> &bodies)
 {

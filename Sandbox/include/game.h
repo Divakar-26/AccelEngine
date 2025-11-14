@@ -7,8 +7,13 @@
 #include <AccelEngine/world.h>
 #include <renderer2D.h>
 #include "UI.h"
+#include "InputManager.h"
+#include "InputActions.h"
 
 using namespace AccelEngine;
+
+class InputManager;
+class InputActions;
 
 class Game
 {
@@ -17,7 +22,7 @@ public:
 
     bool Init(const char *title);
     void handleEvent();
-    void cameraControls(SDL_Event &e);
+    void cameraControls(const SDL_KeyboardEvent &  e);
     void update(float dt);
     void render();
 
@@ -28,15 +33,21 @@ public:
     void showFPS(float realDt, float fixedDt);
     Vector2 WorldToScreen(const Vector2 &w, float screenHeight);
     Vector2 ScreenToWorld(const Vector2 &s, float screenHeight);
-    Vector2     getMouseWorld();
+    Vector2 getMouseWorld();
 
-        void gradBodies(float mx, float my);
-
+    void gradBodies(float mx, float my);
     void addCircle(float x, float y);
     void addAABB(float x, float y);
     void addAABB(float x, float y, float w, float h, float orientation);
 
     RigidBody *getBody(float x, float y, float w, float h, float mass, float orientation, SDL_Color c);
+
+    bool spawnBoxHeld = false;
+    bool spawnCircleHeld = false;
+    bool mouseDown = false;
+
+    RigidBody *grabbed = nullptr;
+    Vector2 grabOffset;
 
 private:
     int WINDOW_W, WINDOW_H;
@@ -57,4 +68,7 @@ private:
     float frameTimeMs = 0.0f;
 
     Camera camera;
+
+    InputManager *inputMgr;
+    InputActions *inputAct;
 };

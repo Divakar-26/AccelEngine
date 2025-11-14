@@ -95,7 +95,7 @@ namespace AccelEngine
                 boundingRadius = circle.radius;
             }
             else
-            { 
+            {
                 // tightest sphere that contains the rotated rectangle
                 const real hx = aabb.halfSize.x;
                 const real hy = aabb.halfSize.y;
@@ -196,6 +196,35 @@ namespace AccelEngine
             }
         }
 
+        void calculateInertia()
+        {
+            float mass = (inverseMass > 0) ? (1.0f / inverseMass) : 0.0f;
+
+            if (shapeType == ShapeType::AABB)
+            {
+                float w = aabb.halfSize.x * 2.0f;
+                float h = aabb.halfSize.y * 2.0f;
+
+                float inertia = (1.0f / 12.0f) * mass * (w * w + h * h);
+
+                if (inertia > 1e-6f)
+                    inverseInertia = 1.0f / inertia;
+                else
+                    inverseInertia = 0.0f;
+            }
+
+            else if (shapeType == ShapeType::CIRCLE)
+            {
+                float r = circle.radius;
+
+                float inertia = 0.5f * mass * r * r;
+
+                if (inertia > 1e-6f)
+                    inverseInertia = 1.0f / inertia;
+                else
+                    inverseInertia = 0.0f;
+            }
+        }
         // GETTERS
         Vector2 getPosition() const
         {

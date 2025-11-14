@@ -1,7 +1,5 @@
 {
     "files.associations": {
-        "random": "cpp",
-        "queue": "cpp",
         "array": "cpp",
         "atomic": "cpp",
         "bit": "cpp",
@@ -25,6 +23,7 @@
         "deque": "cpp",
         "string": "cpp",
         "unordered_map": "cpp",
+        "unordered_set": "cpp",
         "vector": "cpp",
         "exception": "cpp",
         "algorithm": "cpp",
@@ -34,6 +33,7 @@
         "memory_resource": "cpp",
         "numeric": "cpp",
         "optional": "cpp",
+        "random": "cpp",
         "ratio": "cpp",
         "string_view": "cpp",
         "system_error": "cpp",
@@ -74,6 +74,6 @@
         "__tuple": "cpp",
         "ios": "cpp",
         "locale": "cpp",
-        "unordered_set": "cpp"
+        "queue": "cpp"
     }
 }

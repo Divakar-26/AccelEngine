@@ -5,6 +5,8 @@
 #include <AccelEngine/collision_resolve.h>
 #include <AccelEngine/ForceRegistry.h>
 #include "renderer2D.h"
+#include "allDemo.h"
+
 
 static float physicsTimeMs = 0.0f;
 static float renderTimeMs = 0.0f;
@@ -14,7 +16,7 @@ static int historyIndex = 0;
 
 bool spawnBoxHeld = false;
 bool spawnCircleHeld = false;
-float spawnCooldown = 0.001f; // spawn every 0.05 sec
+float spawnCooldown = 0.001f;
 float spawnTimer = 0.0f;
 
 Vector2 debugMouseWorld;
@@ -29,7 +31,8 @@ using namespace AccelEngine;
 ForceRegistry registry;
 Gravity *g;
 
-SDL_Texture *boxTex;
+Demo *activeDemo = nullptr;
+std::vector<Demo *> demos;
 
 static Color RandomColor()
 {
@@ -65,181 +68,21 @@ bool Game::Init(const char *title)
     camera.y = 0;
     camera.zoom = 1.0f;
 
-    // ---------------------------------------------------------
-    // GRAVITY
-    // ---------------------------------------------------------
+    inputAct = new InputActions();
+    inputMgr = new InputManager();
+
+    inputAct->init(this);
+    inputMgr->init(inputAct);
+
     g = new Gravity(Vector2(0, -980));
 
-    // ---------------------------------------------------------
-    // STATIC SUPPORTS (kept as in your original)
-    // ---------------------------------------------------------
-    int pivotOffsetFromEdges = 300;
-
-    RigidBody *pivot = getBody(
-        WINDOW_W / 2,
-        WINDOW_H / 4,
-        2000, 50,
-        0.0f,
-        0.0f,
-        {0, 255, 0, 255}
-    );
-
-    RigidBody *pivot2 = getBody(
-        WINDOW_W - pivotOffsetFromEdges,
-        WINDOW_H / 4,
-        500, 50,
-        0.0f,
-        0.0f,
-        {0, 255, 0, 255}
-    );
-
-    world.addBody(pivot);
-    // world.addBody(pivot2);
-    bodies.push_back(pivot);
-    // bodies.push_back(pivot2);
-
-    // ---------------------------------------------------------
-    // SIMPLE TEST JOINT (same as original)
-    // ---------------------------------------------------------
-    RigidBody *body1 = getBody(
-        pivotOffsetFromEdges,
-        WINDOW_H / 2,
-        50, 50,
-        1.0f,
-        0.0f,
-        {0,255,0,255}
-    );
-
-    RigidBody *body2 = getBody(
-        pivotOffsetFromEdges + 300,
-        WINDOW_H / 2,
-        50, 50,
-        1.0f,
-        0.0f,
-        {0,255,255,255}
-    );
-
-    DistanceJoint *j = new DistanceJoint(body1, body2, Vector2(0,0), Vector2(0,0));
-
-    // world.addBody(body1);
-    // world.addBody(body2);
-    // bodies.push_back(body1);
-    // bodies.push_back(body2);
-
-    // registry.add(body1, g);
-    // registry.add(body2, g);
-
-    // world.addJoint(j);
-
-    // ---------------------------------------------------------
-    // SOFT BODY CLOTH USING ALL SPRINGS (H + V + Diagonals)
-    // ---------------------------------------------------------
-    int rows = 15;
-    int cols = 25;
-    float spacing = 25.0f;
-
-    std::vector<std::vector<RigidBody*>> cloth(rows, std::vector<RigidBody*>(cols));
-
-    float startX = 200;
-    float startY = 900;
-
-    float springK = 7000.0f;    // stiffness
-    float springD = 25.0f;      // damping
-
-    // diagonal rest length
-    float diagSpacing = sqrtf(spacing * spacing * 2.0f);
-
-    // --------- Create cloth particles ----------
-    for(int r = 0; r < rows; r++)
-    {
-        for(int c = 0; c < cols; c++)
-        {
-            RigidBody* b = new RigidBody();
-
-            b->shapeType = ShapeType::CIRCLE;
-            b->circle.radius = 8;
-
-            b->position = { startX + c * spacing, startY - r * spacing };
-            b->inverseMass = 1.0f;   // Fully dynamic, no pinned nodes
-            b->restitution = 0.0f;
-
-            real mass = 1.0f / b->inverseMass;
-            real inertia = 0.5f * mass * b->circle.radius * b->circle.radius;
-            b->inverseInertia = 1.0f / inertia;
-
-            b->calculateDerivativeData();
-            b->c = RandomColor();
-
-            world.addBody(b);
-            bodies.push_back(b);
-            registry.add(b, g);
-
-            cloth[r][c] = b;
-        }
-    }
-
-    // --------- Horizontal springs ----------
-    for(int r = 0; r < rows; r++)
-    {
-        for(int c = 0; c < cols - 1; c++)
-        {
-            Spring* s = new Spring(
-                Vector2(0,0),
-                cloth[r][c+1],
-                Vector2(0,0),
-                springK,
-                spacing
-            );
-            s->damping = springD;
-            registry.add(cloth[r][c], s);
-        }
-    }
-
-    // --------- Vertical springs ----------
-    for(int r = 0; r < rows - 1; r++)
-    {
-        for(int c = 0; c < cols; c++)
-        {
-            Spring* s = new Spring(
-                Vector2(0,0),
-                cloth[r+1][c],
-                Vector2(0,0),
-                springK,
-                spacing
-            );
-            s->damping = springD;
-            registry.add(cloth[r][c], s);
-        }
-    }
-
-    // --------- Diagonal springs (like a net) ----------
-    for(int r = 0; r < rows - 1; r++)
-    {
-        for(int c = 0; c < cols - 1; c++)
-        {
-            // down-right diagonal
-            Spring* s1 = new Spring(
-                Vector2(0,0),
-                cloth[r+1][c+1],
-                Vector2(0,0),
-                springK,
-                diagSpacing
-            );
-            s1->damping = springD;
-            registry.add(cloth[r][c], s1);
-
-            // down-left diagonal
-            Spring* s2 = new Spring(
-                Vector2(0,0),
-                cloth[r+1][c],
-                Vector2(0,0),
-                springK,
-                diagSpacing
-            );
-            s2->damping = springD;
-            registry.add(cloth[r][c+1], s2);
-        }
-    }
+    demos.push_back(new LogoDemo());
+    demos.push_back(new BetterCarDemo());
+    demos.push_back(new SoftBodyDemo());
+    demos.push_back(new SeeSawDemo());
+    demos.push_back(new FrictionDemo());
+    activeDemo = demos[2];
+    activeDemo->init(world, bodies, registry, g);
 
     running = true;
     return true;
@@ -248,84 +91,23 @@ bool Game::Init(const char *title)
 void Game::handleEvent()
 {
     SDL_Event e;
-    // handle ui
 
     while (SDL_PollEvent(&e))
     {
+
         if (ui.handleEvent(e))
-        {
             continue;
-        }
+
         if (e.type == SDL_EVENT_QUIT)
-        {
             running = false;
-        }
-        if (e.type == SDL_EVENT_KEY_DOWN)
-        {
-            cameraControls(e);
-            if (e.key.key == SDLK_B)
-                spawnBoxHeld = true;
-            if (e.key.key == SDLK_C)
-                spawnCircleHeld = true;
-        }
-        if (e.type == SDL_EVENT_KEY_UP)
-        {
-            if (e.key.key == SDLK_B)
-                spawnBoxHeld = false;
-            if (e.key.key == SDLK_C)
-                spawnCircleHeld = false;
-        }
-        if (e.type == SDL_EVENT_MOUSE_BUTTON_DOWN)
-        {
-            SDL_FPoint w = Renderer2D::screenToWorld(e.button.x, e.button.y);
-            float mx = w.x;
-            float my = w.y;
-            mouseDown = true;
 
-            if (e.button.button == SDL_BUTTON_LEFT)
-            {
-                gradBodies(mx, my);
-            }
-            else if (e.button.button == SDL_BUTTON_RIGHT)
-            {
-                addAABB(mx, my);
-            }
-            else if (e.button.button == SDL_BUTTON_MIDDLE)
-            {
-                addCircle(mx, my);
-            }
-        }
-
-        if (e.type == SDL_EVENT_MOUSE_BUTTON_UP)
-        {
-            if (e.button.button == SDL_BUTTON_LEFT)
-            {
-                grabbed = nullptr;
-                mouseDown = false;
-            }
-        }
-
-        if (e.type == SDL_EVENT_MOUSE_MOTION && grabbed)
-        {
-            SDL_FPoint w = Renderer2D::screenToWorld(e.motion.x, e.motion.y);
-            float mx = w.x;
-            float my = w.y;
-
-            Vector2 target = Vector2(mx, my) + grabOffset;
-
-            grabbed->position = target;
-            grabbed->velocity = Vector2(0, 0);
-            grabbed->rotation = 0;
-        }
+        inputMgr->process(e);
     }
 }
 
 void Game::update(float dt)
 {
 
-    // -----------------------------------------------------
-    // Continuous spawning while holding B or C
-    // -----------------------------------------------------
     spawnTimer -= dt;
 
     if (spawnTimer <= 0.0f)
@@ -375,7 +157,12 @@ void Game::update(float dt)
         world.step(h, 1);
     }
 
-    // std::cout<<bodies.size()<<std::endl;
+    if (activeDemo)
+    {
+        auto *s = dynamic_cast<SoftBodyDemo *>(activeDemo);
+        if (s)
+            s->update();
+    }
 
     Uint64 endPhysics = SDL_GetPerformanceCounter();
     physicsTimeMs = (float)(endPhysics - startPhysics) * 1000.0f / SDL_GetPerformanceFrequency();
@@ -389,12 +176,11 @@ void Game::render()
     Uint64 startRender = SDL_GetPerformanceCounter();
     ui.DrawAddBody(world, bodies);
 
-    SDL_SetRenderDrawColor(renderer, 100, 100, 100, 255);
+    SDL_SetRenderDrawColor(renderer, 176, 224, 230, 255);
     SDL_RenderClear(renderer);
 
     for (auto *b : bodies)
     {
-        // Vector2 screenPos = WorldToScreen(b->position, WINDOW_H);
         SDL_Color c = {b->c.r, b->c.g, b->c.b, b->c.a};
 
         if (b->shapeType == ShapeType::AABB)
@@ -407,20 +193,43 @@ void Game::render()
         }
     }
 
-    // std::vector<Contact> contacts = world.getContacts();
-
-    // for (auto it : contacts)
-    // {
-    //     for (auto it2 : it.contactPoints)
-    //     {
-    //         Renderer2D::DrawCircle(it2.x, it2.y, 3,  0.0,  SDL_Color{255, 0, 0, 255});
-    //     }
-    // }
-
     Renderer2D::drawSprings(registry);
     Renderer2D::drawJoints(world.getJoints());
 
+    if (activeDemo)
+    {
+        activeDemo->drawImGui();
+    }
+
     // world.broadPhase.draw();
+
+    ImGui::Begin("Demo Selector", nullptr, ImGuiWindowFlags_AlwaysAutoResize);
+
+    static int selectedDemoIndex = 2; 
+
+    ImGui::Text("Select Demo");
+    ImGui::Separator();
+
+    for (int i = 0; i < demos.size(); ++i)
+    {
+        bool isSelected = (selectedDemoIndex == i);
+        if (ImGui::Selectable(demos[i]->getName(), isSelected))
+        {
+            selectedDemoIndex = i;
+
+            world.clear();
+            bodies.clear();
+            registry.clear();
+
+            activeDemo = demos[i];
+            activeDemo->init(world, bodies, registry, g);
+        }
+
+        if (isSelected)
+            ImGui::SetItemDefaultFocus();
+    }
+
+    ImGui::End();
 
     float minVal, maxVal;
     FindMinMax(physicsHistory, 200, minVal, maxVal);
@@ -528,21 +337,7 @@ void Game::addCircle(float x, float y)
     b->shapeType = ShapeType::CIRCLE;
     b->circle.radius = 10 + rand() % 50;
 
-    // FIX 1: Correct circle inertia formula
-    // I = (1/2) * m * r² for solid circle
-    real mass = 1.0f / b->inverseMass;
-    real inertia = 0.5f * mass * b->circle.radius * b->circle.radius;
-
-    // FIX 2: Avoid division by zero
-    if (inertia > 1e-6f)
-    {
-        b->inverseInertia = 1.0f / inertia;
-    }
-    else
-    {
-        b->inverseInertia = 0.0f;
-    }
-
+    b->calculateInertia();
     b->velocity = {0, 0};
     b->calculateDerivativeData();
     b->c = RandomColor();
@@ -562,22 +357,7 @@ void Game::addAABB(float x, float y)
     b->shapeType = ShapeType::AABB;
     b->aabb.halfSize = {20 + rand() % 50, 20 + rand() % 50};
 
-    // FIX 3: Correct AABB inertia formula with proper order
-    // I = (1/12) * m * (w² + h²) for rectangle
-    real mass = 1.0f / b->inverseMass;
-    real width = b->aabb.halfSize.x * 2.0f;
-    real height = b->aabb.halfSize.y * 2.0f;
-    real inertia = (1.0f / 12.0f) * mass * (width * width + height * height);
-
-    // FIX 4: Avoid division by zero
-    if (inertia > 1e-6f)
-    {
-        b->inverseInertia = 1.0f / inertia;
-    }
-    else
-    {
-        b->inverseInertia = 0.0f;
-    }
+    b->calculateInertia();
     b->angularDamping = 0.98;
 
     b->velocity = {0, 0};
@@ -609,9 +389,6 @@ void Game::addAABB(float x, float y, float w, float h, float orientation)
 
     world.addBody(b);
     bodies.push_back(b);
-
-    std::cout << "Hello" << std::endl;
-    // registry.add(b, g);
 }
 
 RigidBody *Game::getBody(float x, float y, float w, float h, float mass1, float orientation, SDL_Color c)
@@ -699,9 +476,9 @@ void Game::gradBodies(float mx, float my)
     }
 }
 
-void Game::cameraControls(SDL_Event &e)
+void Game::cameraControls(const SDL_KeyboardEvent &e)
 {
-    switch (e.key.key)
+    switch (e.key)
     {
     case SDLK_LEFT:
         camera.x -= 50;
@@ -751,7 +528,7 @@ void Game::cameraControls(SDL_Event &e)
         camera.y += before.y - after.y;
     }
     break;
-    
+
     default:
         break;
     }
