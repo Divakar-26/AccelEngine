@@ -5,3 +5,7 @@
 #include "frictionDemo.h"
 #include "bridgeDemo.h"
 #include "dominoDemo.h"
+#include "clothDemo.h"
+#include "engineDemo.h"
+#include "restitutionDemo.h"
+#include "newtonCradle.h"

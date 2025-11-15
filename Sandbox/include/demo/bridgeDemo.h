@@ -105,7 +105,7 @@ private:
             plank->aabb.halfSize = {plankWidth * 0.5f, plankHeight * 0.5f};
             plank->position = {firstPlankCenterX + i * spacing, bridgeY};
             plank->inverseMass = 1.0f;
-            plank->linearDamping = 0.96f;
+            plank->linearDamping = 0.96f;   
             plank->angularDamping = 0.99f;
             plank->inverseInertia = 1.0f / 50.0f;
             plank->c = {180, 120, 80, 255};

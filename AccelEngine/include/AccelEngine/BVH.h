@@ -9,7 +9,7 @@ namespace AccelEngine
         Vector2 minAABB;
         Vector2 maxAABB;
 
-        RigidBody* body;     // leaf if not null
+        RigidBody* body;    
         BVHNode* left;
         BVHNode* right;
 
@@ -31,7 +31,6 @@ namespace AccelEngine
 
         void findPairs(std::vector<std::pair<RigidBody*,RigidBody*>>& outPairs);
 
-        // Visualization
         void draw();
 
     private:

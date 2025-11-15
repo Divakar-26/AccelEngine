@@ -33,6 +33,7 @@ public:
     Vector2 WorldToScreen(const Vector2 &w, float screenHeight);
     Vector2 ScreenToWorld(const Vector2 &s, float screenHeight);
     Vector2 getMouseWorld();
+    void eraseAt(float mx, float my);
 
     void gradBodies(float mx, float my);
     void addCircle(float x, float y);

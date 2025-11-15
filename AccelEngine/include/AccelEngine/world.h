@@ -17,8 +17,8 @@ namespace AccelEngine
         std::vector<std::pair<RigidBody *, RigidBody *>> potentialPairs;
         std::vector<Contact> contacts;
         std::vector<Contact> contactsThisFrame;
-        
-        public:
+
+    public:
         std::vector<Joint *> joints;
         BVHTree broadPhase;
         World() {}
@@ -43,23 +43,19 @@ namespace AccelEngine
             return joints;
         }
 
-        /**
-         * Removes all bodies.
-         */
+
         void clear()
         {
             bodies.clear();
         }
+
 
         const std::vector<Contact> getContacts() const
         {
             return contactsThisFrame;
         }
 
-        /**
-         * Initializes the world for a new simulation frame.
-         * Clears accumulators and updates derived data.
-         */
+
         void startFrame()
         {
 

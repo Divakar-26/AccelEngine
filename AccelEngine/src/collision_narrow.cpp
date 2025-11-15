@@ -13,19 +13,18 @@ bool NarrowCollision::IntersectRectangles(const Vector2 *verticesA, Vector2 cent
     Vector2 bestAxis(0, 0);
     real bestDepth = std::numeric_limits<real>::max();
 
-    // ---- loop over A edges ----
     for (int i = 0; i < verticesSize; i++)
     {
         Vector2 va = verticesA[i];
         Vector2 vb = verticesA[(i + 1) % verticesSize];
 
         Vector2 edge = vb - va;
-        Vector2 axis(-edge.y, edge.x); // ← do NOT normalize
+        Vector2 axis(-edge.y, edge.x); 
         real len = axis.magnitude();
         if (len <= 1e-6f)
-            continue; // degenerate edge guard
+            continue; 
 
-        auto minMaxA = projectOnAxis(verticesA, axis); // axis is unnormalized
+        auto minMaxA = projectOnAxis(verticesA, axis); 
         auto minMaxB = projectOnAxis(verticesB, axis);
 
         if (minMaxA.second < minMaxB.first || minMaxB.second < minMaxA.first)
@@ -33,16 +32,15 @@ bool NarrowCollision::IntersectRectangles(const Vector2 *verticesA, Vector2 cent
 
         real raw = std::min(minMaxB.second - minMaxA.first,
                             minMaxA.second - minMaxB.first);
-        real depth = raw / len; // convert to true penetration
+        real depth = raw / len;
 
         if (depth < bestDepth)
         {
             bestDepth = depth;
-            bestAxis = axis; // keep unnormalized axis
+            bestAxis = axis;
         }
     }
 
-    // ---- loop over B edges ----
     for (int i = 0; i < verticesSize; i++)
     {
         Vector2 va = verticesB[i];
@@ -71,8 +69,8 @@ bool NarrowCollision::IntersectRectangles(const Vector2 *verticesA, Vector2 cent
         }
     }
 
-    Vector2 normal = bestAxis / bestAxis.magnitude(); // normalize once
-    real depth = bestDepth;                           // already scaled
+    Vector2 normal = bestAxis / bestAxis.magnitude(); 
+    real depth = bestDepth;                           
     
     Vector2 direction = centerb - centera;
     if (direction.scalarProduct(normal) < 0.0f)
@@ -163,7 +161,6 @@ bool NarrowCollision::IntersectCircleRectangle(Vector2 center1, real radius, Vec
     }
 
     depth /= normal.magnitude();
-    // normal.normalize();
 
     Vector2 centerA = (vertices[0] + vertices[1] + vertices[2] + vertices[3]) * 0.25f;
     Vector2 direction = centerA - center1;
@@ -216,7 +213,6 @@ std::pair<real, real> NarrowCollision::projectOnCircle(Vector2 center, real radi
 
     if (min > max)
     {
-        // swap the min and max
         std::swap(min, max);
     }
 
@@ -432,7 +428,6 @@ void NarrowCollision::FindContacts(
         Vector2 diff = B->position - A->position;
         float rsum = A->boundingRadius + B->boundingRadius;
 
-        // diff.dot(diff) > rsum*rsum  → cannot collide
         if (diff.scalarProduct(diff) > rsum * rsum)
             continue;
 

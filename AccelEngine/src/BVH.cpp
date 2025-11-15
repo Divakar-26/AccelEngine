@@ -1,7 +1,7 @@
 #include <AccelEngine/BVH.h>
 #include <algorithm>
 #include <cmath>
-#include <../../Sandbox/include/renderer2D.h> // for visualization
+#include <../../Sandbox/include/renderer2D.h> 
 
 using namespace AccelEngine;
 
@@ -44,7 +44,6 @@ void BVHTree::build(const std::vector<RigidBody*>& bodies)
         return;
     }
 
-    // Create a copy for sorting
     std::vector<RigidBody*> temp = bodies;
     root = buildRecursive(temp, 0, temp.size());
 }
@@ -58,14 +57,12 @@ BVHNode* BVHTree::buildRecursive(std::vector<RigidBody*>& bodies, int start, int
 
     if (count == 1)
     {
-        // Single body - leaf node
         node->body = bodies[start];
         node->minAABB = bodies[start]->worldAABBMin;
         node->maxAABB = bodies[start]->worldAABBMax;
         return node;
     }
 
-    // Calculate bounding box for all bodies in this node
     Vector2 mn(1e9f, 1e9f);
     Vector2 mx(-1e9f, -1e9f);
 
@@ -83,12 +80,10 @@ BVHNode* BVHTree::buildRecursive(std::vector<RigidBody*>& bodies, int start, int
     node->minAABB = mn;
     node->maxAABB = mx;
 
-    // Find longest axis for splitting
     float dx = mx.x - mn.x;
     float dy = mx.y - mn.y;
     int axis = (dx > dy) ? 0 : 1;
 
-    // Sort bodies along the longest axis
     std::sort(bodies.begin() + start, bodies.begin() + end,
               [axis](RigidBody* A, RigidBody* B)
     {
@@ -99,7 +94,6 @@ BVHNode* BVHTree::buildRecursive(std::vector<RigidBody*>& bodies, int start, int
 
     int mid = start + count / 2;
 
-    // Recursively build left and right subtrees
     node->left = buildRecursive(bodies, start, mid);
     node->right = buildRecursive(bodies, mid, end);
 
@@ -118,10 +112,8 @@ void BVHTree::queryPairs(BVHNode* node, std::vector<std::pair<RigidBody*, RigidB
 {
     if (!node || !node->left || !node->right) return;
     
-    // Check collision between left and right subtrees
     queryNodeAgainstTree(node->left, node->right, outPairs);
     
-    // Recurse into children
     queryPairs(node->left, outPairs);
     queryPairs(node->right, outPairs);
 }
@@ -131,11 +123,9 @@ void BVHTree::queryNodeAgainstTree(BVHNode* nodeA, BVHNode* nodeB,
 {
     if (!nodeA || !nodeB) return;
     
-    // Check if AABBs overlap
     if (!AABBOverlap(nodeA->minAABB, nodeA->maxAABB, nodeB->minAABB, nodeB->maxAABB))
         return;
     
-    // Both are leaves - report collision
     if (nodeA->body && nodeB->body)
     {
         if (nodeA->body->enableCollision && nodeB->body->enableCollision)
@@ -143,22 +133,18 @@ void BVHTree::queryNodeAgainstTree(BVHNode* nodeA, BVHNode* nodeB,
         return;
     }
     
-    // Recursive cases
     if (nodeA->body)
     {
-        // nodeA is leaf, nodeB is internal - check leaf against both children of nodeB
         queryNodeAgainstTree(nodeA, nodeB->left, outPairs);
         queryNodeAgainstTree(nodeA, nodeB->right, outPairs);
     }
     else if (nodeB->body)
     {
-        // nodeB is leaf, nodeA is internal - check both children of nodeA against leaf
         queryNodeAgainstTree(nodeA->left, nodeB, outPairs);
         queryNodeAgainstTree(nodeA->right, nodeB, outPairs);
     }
     else
     {
-        // Both are internal nodes - check all combinations
         queryNodeAgainstTree(nodeA->left, nodeB->left, outPairs);
         queryNodeAgainstTree(nodeA->left, nodeB->right, outPairs);
         queryNodeAgainstTree(nodeA->right, nodeB->left, outPairs);

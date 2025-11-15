@@ -45,50 +45,41 @@ void ParticleDrag::updateForce(Particle * p, real duration){
 }
 
 void ParticleSpring::updateForce(Particle * p, real duration){
-    //get length of spring
     Vector2 force = p->getPosition();
     force -= other->getPosition();
 
-    //calculate force
     real magnitude = force.magnitude();
     magnitude = magnitude - restLenght;
     magnitude *= springConstant;
 
-    //apply force
     force.normalize();
     force *= -magnitude;
     p->addForce(force);
 }
 
 void ParticleAnchoredSpring::updateForce(Particle * p, real duration){
-    //get length of spring
     Vector2 force = p->getPosition();
     force -= *anchor;
 
-    //calculate force
     real magnitude = force.magnitude();
     magnitude = magnitude - restLenght;
     magnitude *= springConstant;
 
-    //apply force
     force.normalize();
     force *= -magnitude;
     p->addForce(force);
 }
 
 void ParticleBungee::updateForce(Particle * p, real duration){
-    //get length of spring
     Vector2 force = p->getPosition();
     force -= other->getPosition();
 
-    //calculate force
     real magnitude = force.magnitude();
     if(magnitude <= restLenght){
         return;
     }
     magnitude = springConstant * (magnitude - restLenght);
 
-    //apply force
     force.normalize();
     force *= -magnitude;
     p->addForce(force);

@@ -9,6 +9,7 @@
 
 using namespace AccelEngine;
 
+
 class Demo
 {
 public:
@@ -24,6 +25,7 @@ public:
     virtual const char *getName() const = 0;
 
     virtual void drawImGui() {}
+    virtual void update() {}
 
 protected:
 
@@ -63,7 +65,7 @@ protected:
             b->inverseInertia = 0.0f;
         }
 
-        b->c = {(float)color.r, (float)color.g, (float)color.b, (float)color.a};
+        b->c = randomColor();
         b->calculateDerivativeData();
         b->calculateInertia();
         world.addBody(b);
@@ -109,6 +111,8 @@ protected:
         b->c = {(float)color.r, (float)color.g, (float)color.b, (float)color.a};
         b->calculateDerivativeData();
 
+        b->c = randomColor();
+
         world.addBody(b);
         bodies.push_back(b);
         if (gravity && invMass > 0.0f)
@@ -117,12 +121,12 @@ protected:
         return b;
     }
 
-    SDL_Color randomColor()
+    Color randomColor()
     {
         return {
-            (Uint8)(rand() % 200 + 55),
-            (Uint8)(rand() % 200 + 55),
-            (Uint8)(rand() % 200 + 55),
+            (float)(rand() % 200 + 55),
+            (float)(rand() % 200 + 55),
+            (float)(rand() % 200 + 55),
             255
         };
     }

@@ -21,7 +21,7 @@ public:
     {
         world.joints.clear();
         RigidBody *ground = makeAABB(world, bodies, registry, gravity, {600, 40}, {600, 30}, 0.0, 0.0);
-        ground->staticFriction = 1.0f;
+        ground->staticFriction  = 1.0f;
         ground->dynamicFriction = 1.0f;
 
         int numberOfBoxes = 10;
@@ -50,12 +50,12 @@ public:
     {
     }
 
-    void update()
+    void update() override
     {
     }
 
 private:
-    void buildSoftBody()
+    void buildDominos()
     {
     }
 };

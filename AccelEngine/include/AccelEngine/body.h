@@ -65,6 +65,10 @@ namespace AccelEngine
 
         bool enableCollision;
         real boundingRadius = 0.0f;
+        // mimic kinermatic body
+        bool lockPosition = false;
+        bool lockRotation = false;
+        bool ignoreGravity = false;
 
         RigidBody() : inverseMass(0.0f),
                       inverseInertia(0.0f),
@@ -78,7 +82,8 @@ namespace AccelEngine
                       angularDamping(1.0f),
                       staticFriction(0.6),
                       dynamicFriction(0.4),
-                      enableCollision(true)
+                      enableCollision(true),
+                      lockPosition(false)
 
         {
             transformMatrix.setIdentity();
@@ -140,27 +145,65 @@ namespace AccelEngine
 
         void integrate(real duration)
         {
+            // ============================================
+            // 1. POSITION LOCK  (Kinematic translation)
+            // ============================================
+            if (lockPosition)
+            {
+                // no linear motion
+                velocity = Vector2(0, 0);
+                forceAccum.clear();
+                position = position;
+
+                if (!lockRotation)
+                {
+                    real angularAcceleration = torqueAccum * inverseInertia;
+                    rotation += angularAcceleration * duration;
+                    rotation *= std::pow(angularDamping, duration);
+                    orientation += rotation * duration;
+
+                    // wrap to [0, 2*pi]
+                    while (orientation >= 6.28318531f)
+                        orientation -= 6.28318531f;
+                    while (orientation < 0)
+                        orientation += 6.28318531f;
+                }
+                else
+                {
+                    rotation = 0;
+                    torqueAccum = 0;
+                }
+
+                calculateDerivativeData();
+                return;
+            }
+
             if (inverseMass <= 0.0f)
                 return;
 
-            // Linear acceleration
             Vector2 acceleration = forceAccum * inverseMass;
-
-            // Angular acceleration
             real angularAcceleration = torqueAccum * inverseInertia;
 
-            // Integrate linear velocity
             velocity += acceleration * duration;
 
-            // Integrate angular velocity
-            rotation += angularAcceleration * duration;
+            // rotation lock for dynamic bodies
+            if (!lockRotation)
+                rotation += angularAcceleration * duration;
+            else
+            {
+                rotation = 0;
+                torqueAccum = 0;
+            }
 
             velocity *= std::pow(linearDamping, duration);
-            rotation *= std::pow(angularDamping, duration);
 
-            // Integrate position & orientation
+            if (!lockRotation)
+                rotation *= std::pow(angularDamping, duration);
+
             position += velocity * duration;
-            orientation += rotation * duration;
+
+            if (!lockRotation)
+                orientation += rotation * duration;
 
             calculateDerivativeData();
         }

@@ -167,6 +167,8 @@ void UI::DrawAddBody(World &world, std::vector<RigidBody *> &bodies)
             b->inverseInertia = 1.f / inertia;
 
         ImGui::DragFloat("Restitution", &b->restitution, 0.01f, 0.f, 1.f);
+        ImGui::DragFloat("Orientation (raw)", &b->orientation, 0.01f, -10000.f, 10000.f, "%.4f");
+
 
         if (b->shapeType == ShapeType::AABB)
         {

@@ -26,7 +26,6 @@ inline void computeAABB(const RigidBody *body, Vector2 &outMin, Vector2 &outMax)
         return;
     }
 
-    // shapeType == AABB (or OBB using transformMatrix)
     const Vector2 &half = body->aabb.halfSize;
 
     Vector2 corners[4] = {
@@ -56,7 +55,6 @@ inline void computeAABB(const RigidBody *body, Vector2 &outMin, Vector2 &outMax)
 
 void CoarseCollision::FindPotentialPairs(const std::vector<RigidBody *> &bodies, std::vector<std::pair<RigidBody *, RigidBody *>> &pairs)
 {
-    // clear pairs from previous frame
     pairs.clear();
     Vector2 minA, maxA, minB, maxB;
 

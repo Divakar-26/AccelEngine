@@ -8,10 +8,10 @@
 #include <vector>
 #include "UI.h"
 
-class SoftBodyDemo : public Demo
+class ClothDemo : public Demo
 {
 public:
-    const char *getName() const override { return "Soft Body Simulation (with Ground + ImGui)"; }
+    const char *getName() const override { return "Cloth simulation"; }
 
     void init(
         World &world,
@@ -92,11 +92,11 @@ private:
             for (int c = 0; c < cols; ++c)
             {
                 RigidBody *b = new RigidBody();
-
                 b->shapeType = ShapeType::CIRCLE;
                 b->circle.radius = 10.0f;
                 b->position = {startX + c * spacing, startY - r * spacing};
-                b->inverseMass = 1.0f;
+
+                b->inverseMass = 1.0f; // normal
                 b->restitution = 0.2f;
                 b->angularDamping = 0.98f;
 
@@ -104,8 +104,21 @@ private:
                 real inertia = 0.5f * mass * b->circle.radius * b->circle.radius;
                 b->inverseInertia = 1.0f / inertia;
 
+                // -------- CLOTH PINNING HERE --------
+                if (r == 0) // top row fixed
+                {
+                    if (c % 3 == 0) // every 4th fixed
+                    {
+                        b->inverseMass = 0.0f;       // infinite mass
+                        b->inverseInertia = 0.0f;    // no rotation
+                        b->velocity = Vector2(0, 0); // prevent moving
+                    }
+                }
+                // -------------------------------------
+
                 b->calculateDerivativeData();
-                b->c = {(float)180 + rand() % 60, (float)100 + rand() % 70, (float)200 + rand() % 55, (float)255};
+                b->c = {(float)180 + rand() % 60, (float)100 + rand() % 70,
+                        (float)200 + rand() % 55, (float)255};
 
                 worldRef->addBody(b);
                 bodiesRef->push_back(b);

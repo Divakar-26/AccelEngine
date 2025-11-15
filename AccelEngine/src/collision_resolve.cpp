@@ -58,7 +58,6 @@ void CollisionResolve::SolvePositionWithRotation(Contact &contact, float baumgar
 
         float baum = baumgarte * (contact.penetration - slop);
 
-        // Compute angular leverage
         float raCrossN = ra.cross(n);
         float rbCrossN = rb.cross(n);
 
@@ -76,14 +75,12 @@ void CollisionResolve::SolvePositionWithRotation(Contact &contact, float baumgar
 
         Vector2 impulse = n * impulseMag;
 
-        // Apply to A
         if (A->inverseMass > 0.0f)
         {
             A->position -= impulse * A->inverseMass;
             A->orientation -= ra.cross(impulse) * A->inverseInertia;
         }
 
-        // Apply to B
         if (B->inverseMass > 0.0f)
         {
             B->position += impulse * B->inverseMass;
@@ -91,7 +88,6 @@ void CollisionResolve::SolvePositionWithRotation(Contact &contact, float baumgar
         }
     }
 
-    // Update matrices
     A->calculateDerivativeData();
     B->calculateDerivativeData();
 }
