@@ -11,15 +11,15 @@
 class SoftBodyDemo : public Demo
 {
 public:
-    const char* getName() const override { return "Soft Body Simulation (with Ground + ImGui)"; }
+    const char *getName() const override { return "Soft Body Simulation (with Ground + ImGui)"; }
 
     void init(
-        World& world,
-        std::vector<RigidBody*>& bodies,
-        ForceRegistry& registry,
-        ForceGenerator* gravity
-    ) override
+        World &world,
+        std::vector<RigidBody *> &bodies,
+        ForceRegistry &registry,
+        ForceGenerator *gravity) override
     {
+        world.joints.clear();
         worldRef = &world;
         bodiesRef = &bodies;
         registryRef = &registry;
@@ -65,7 +65,7 @@ private:
         // =====================================================
         // GROUND
         // =====================================================
-        RigidBody* ground = new RigidBody();
+        RigidBody *ground = new RigidBody();
         ground->shapeType = ShapeType::AABB;
         ground->aabb.halfSize = {600, 40};
         ground->position = {600, 100};
@@ -81,7 +81,7 @@ private:
         // =====================================================
         // SOFT BODY GRID
         // =====================================================
-        std::vector<std::vector<RigidBody*>> grid(rows, std::vector<RigidBody*>(cols));
+        std::vector<std::vector<RigidBody *>> grid(rows, std::vector<RigidBody *>(cols));
         const float startX = 600.0f - (cols * spacing) / 2.0f;
         const float startY = 700.0f;
 
@@ -91,11 +91,11 @@ private:
         {
             for (int c = 0; c < cols; ++c)
             {
-                RigidBody* b = new RigidBody();
+                RigidBody *b = new RigidBody();
 
                 b->shapeType = ShapeType::CIRCLE;
                 b->circle.radius = 10.0f;
-                b->position = { startX + c * spacing, startY - r * spacing };
+                b->position = {startX + c * spacing, startY - r * spacing};
                 b->inverseMass = 1.0f;
                 b->restitution = 0.2f;
                 b->angularDamping = 0.98f;
@@ -122,7 +122,7 @@ private:
         {
             for (int c = 0; c < cols - 1; ++c)
             {
-                Spring* s = new Spring(Vector2(0,0), grid[r][c+1], Vector2(0,0), springK, spacing);
+                Spring *s = new Spring(Vector2(0, 0), grid[r][c + 1], Vector2(0, 0), springK, spacing);
                 s->damping = springD;
                 registryRef->add(grid[r][c], s);
             }
@@ -132,7 +132,7 @@ private:
         {
             for (int c = 0; c < cols; ++c)
             {
-                Spring* s = new Spring(Vector2(0,0), grid[r+1][c], Vector2(0,0), springK, spacing);
+                Spring *s = new Spring(Vector2(0, 0), grid[r + 1][c], Vector2(0, 0), springK, spacing);
                 s->damping = springD;
                 registryRef->add(grid[r][c], s);
             }
@@ -143,20 +143,20 @@ private:
         {
             for (int c = 0; c < cols - 1; ++c)
             {
-                Spring* s1 = new Spring(Vector2(0,0), grid[r+1][c+1], Vector2(0,0), springK, diagSpacing2);
+                Spring *s1 = new Spring(Vector2(0, 0), grid[r + 1][c + 1], Vector2(0, 0), springK, diagSpacing2);
                 s1->damping = springD;
                 registryRef->add(grid[r][c], s1);
 
-                Spring* s2 = new Spring(Vector2(0,0), grid[r+1][c], Vector2(0,0), springK, diagSpacing2);
+                Spring *s2 = new Spring(Vector2(0, 0), grid[r + 1][c], Vector2(0, 0), springK, diagSpacing2);
                 s2->damping = springD;
-                registryRef->add(grid[r][c+1], s2);
+                registryRef->add(grid[r][c + 1], s2);
             }
         }
     }
 
     void rebuildSoftBody()
     {
-        worldRef->clear();    // depends on your engine’s clear API
+        worldRef->clear(); // depends on your engine’s clear API
         bodiesRef->clear();
         registryRef->clear();
 
@@ -165,10 +165,10 @@ private:
 
 private:
     // references
-    World* worldRef = nullptr;
-    std::vector<RigidBody*>* bodiesRef = nullptr;
-    ForceRegistry* registryRef = nullptr;
-    ForceGenerator* gravityRef = nullptr;
+    World *worldRef = nullptr;
+    std::vector<RigidBody *> *bodiesRef = nullptr;
+    ForceRegistry *registryRef = nullptr;
+    ForceGenerator *gravityRef = nullptr;
 
     // tweakable params
     int rows = 6;

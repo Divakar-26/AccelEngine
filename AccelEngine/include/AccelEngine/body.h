@@ -48,7 +48,7 @@ namespace AccelEngine
         real rotation;
 
         // ---- Acumulating Force ----
-        Vector2 forceAccum;
+        Vector2 forceAccum; // this force is not a single force, in this we add multiple force (vector addition)
         real torqueAccum;
 
         // ---- Damping ----

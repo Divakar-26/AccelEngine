@@ -2,8 +2,10 @@
 #include <AccelEngine/world.h>
 #include <AccelEngine/ForceRegistry.h>
 #include <AccelEngine/ForceGenerator.h>
-#include <cstdlib>  // for rand()
+#include <cstdlib> 
 #include <cmath>
+#include <SDL3/SDL.h>
+
 
 using namespace AccelEngine;
 
@@ -24,9 +26,7 @@ public:
     virtual void drawImGui() {}
 
 protected:
-    // =====================================================
-    // 🟪 Helper: create a rectangular body (AABB)
-    // =====================================================
+
     RigidBody* makeAABB(
         World& world,
         std::vector<RigidBody*>& bodies,
@@ -74,9 +74,7 @@ protected:
         return b;
     }
 
-    // =====================================================
-    // 🟢 Helper: create a circular body
-    // =====================================================
+
     RigidBody* makeCircle(
         World& world,
         std::vector<RigidBody*>& bodies,

@@ -20,20 +20,17 @@ public:
     virtual const char* getName() const{ return "Better Car + Terrain"; }
 
     void init(
+        
         World& world,
+        
         std::vector<RigidBody*>& bodies,
         ForceRegistry& registry,
         ForceGenerator* gravity
     ) override
     {
-        // =====================================================
-        // TERRAIN WITH HILLS AND OBSTACLES
-        // =====================================================
+
         createTerrain(world, bodies);
 
-        // =====================================================
-        // CAR CHASSIS (LOWER CENTER OF MASS)
-        // =====================================================
         chassis = new RigidBody();
         chassis->shapeType = ShapeType::AABB;
         chassis->aabb.halfSize = {60, 15};  // Lower, wider chassis

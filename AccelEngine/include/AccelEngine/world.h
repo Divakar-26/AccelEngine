@@ -17,9 +17,9 @@ namespace AccelEngine
         std::vector<std::pair<RigidBody *, RigidBody *>> potentialPairs;
         std::vector<Contact> contacts;
         std::vector<Contact> contactsThisFrame;
+        
+        public:
         std::vector<Joint *> joints;
-
-    public:
         BVHTree broadPhase;
         World() {}
 

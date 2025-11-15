@@ -101,9 +101,10 @@ class LogoDemo : public Demo
 {
     virtual const char *getName() const { return "Logo"; }
 
-    virtual void init(World &world, std::vector<RigidBody *> &bodies,ForceRegistry& registry,
-        ForceGenerator* gravity)
+    virtual void init(World &world, std::vector<RigidBody *> &bodies, ForceRegistry &registry,
+                      ForceGenerator *gravity)
     {
+        world.joints.clear();
         float cell = 16;
         float thick = 14;
         float spacing = cell;
@@ -133,7 +134,6 @@ class LogoDemo : public Demo
         world.addBody(b);
         bodies.push_back(b);
     }
-
 
     void stampGlyph(World &world, std::vector<RigidBody *> &bodies, char ch, float ox, float oy, float cell, float thickness, SDL_Color col)
     {

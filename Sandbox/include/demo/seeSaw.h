@@ -25,7 +25,7 @@ public:
         ForceRegistry &registry,
         ForceGenerator *gravity) override
     {
-
+        world.joints.clear();
         RigidBody *ground = new RigidBody();
         ground->shapeType = ShapeType::AABB;
         ground->aabb.halfSize = {800, 40};

@@ -77,10 +77,11 @@ bool Game::Init(const char *title)
     g = new Gravity(Vector2(0, -980));
 
     demos.push_back(new LogoDemo());
-    demos.push_back(new BetterCarDemo());
+    demos.push_back(new BridgeDemo());
     demos.push_back(new SoftBodyDemo());
     demos.push_back(new SeeSawDemo());
     demos.push_back(new FrictionDemo());
+    demos.push_back(new DominoDemo());
     activeDemo = demos[2];
     activeDemo->init(world, bodies, registry, g);
 
