@@ -1,6 +1,6 @@
-1. Add a function to calculate moment of intertia and Inverse of it in body.h
+1. Add a function to calculate moment of intertia and Inverse of it in body.h (done)
 2. REMOVE RENDERER FROM BVH
 3. Add ForceRegistry in World
 4. Maybe SOA and SIMD???
-5. LOGO, Bridge, Soft body, Ragdolls for demo
+5. LOGO, Bridge, Soft body, Ragdolls for demo (done)
 6. Maybe some more helper functions like addCircle or addBox in World
