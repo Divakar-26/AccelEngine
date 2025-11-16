@@ -30,14 +30,14 @@ Right now it supports Circle and AABB bodies.
 
 1. Clone the Repo
 
-```
+```sh
     git clone https://github.com/Divakar-26/AccelEngine
     cd AccelEngine
 ```
 
 2. Build with CMake
 
-```
+```sh
     mkdir build
     cd build
     cmake ..
@@ -47,14 +47,14 @@ Right now it supports Circle and AABB bodies.
 ### Build With the Sandbox (demo)
 
 1. Clone the Repo
-```
+```sh
     git clone --recursive https://github.com/Divakar-26/AccelEngine
     cd AccelEngine
 ```
 
 2. Build with CMake and SDL (SDL3 Should be installed System-wide)
 
-```
+```sh
     mkdir build
     cd build
     cmake .. -DACCELENGINE_BUILD_SANDBOX=ON
@@ -64,7 +64,7 @@ Right now it supports Circle and AABB bodies.
 
 3. Run the Demo
 
-```
+```sh
     ./Sandbox/Sandbox
 ```
 
@@ -79,7 +79,7 @@ target_link_libraries(YourProject PRIVATE AccelEngine)
 ```
 
 Then include it:
-```
+```cpp
 #include <AccelEngine/core.h>
 #include <AccelEngine/world.h>
 ```
