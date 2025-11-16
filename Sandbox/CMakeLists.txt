@@ -16,8 +16,6 @@ add_executable(Sandbox
     include/imgui/backends/imgui_impl_sdl3.cpp
     include/imgui/backends/imgui_impl_sdlrenderer3.cpp
 )
-
-
 # Find SDL3 package
 find_package(SDL3 REQUIRED CONFIG)
 find_package(SDL3_image REQUIRED CONFIG)
