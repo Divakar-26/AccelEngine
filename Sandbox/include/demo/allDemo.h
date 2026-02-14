@@ -9,3 +9,4 @@
 #include "engineDemo.h"
 #include "restitutionDemo.h"
 #include "newtonCradle.h"
+#include "stressDemo.h"

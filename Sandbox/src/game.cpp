@@ -88,6 +88,7 @@
         demos.push_back(new EngineDemo());
         demos.push_back(new RestitutionDemo());
         demos.push_back(new NewtonsCradle());
+        demos.push_back(new StressDemo());
         
         activeDemo = demos[0];
         activeDemo->init(world, bodies, registry, g);
@@ -116,6 +117,7 @@
     void Game::update(float dt)
     {
 
+        aProfileData.clear();
         spawnTimer -= dt;
 
         if (spawnTimer <= 0.0f)
@@ -140,7 +142,7 @@
             }
         }
 
-        const int substeps = 20;
+        const int substeps = 50;
         const real h = dt / (real)substeps;
 
         Uint64 startPhysics = SDL_GetPerformanceCounter();
@@ -195,6 +197,9 @@
         for (auto *b : bodies)
         {
             SDL_Color c = {b->c.r, b->c.g, b->c.b, b->c.a};
+            // if(!b->isAwake){
+            //     c = {0,0,0,255};
+            // }
 
             if (b->shapeType == ShapeType::AABB)
             {
@@ -245,29 +250,21 @@
         float minVal, maxVal;
         FindMinMax(physicsHistory, 200, minVal, maxVal);
 
-        ImGui::Begin("Profiler");
 
-        ImGui::Text("Physics: %.3f ms", physicsTimeMs);
-        ImGui::ProgressBar(physicsTimeMs / 16.67f, ImVec2(200, 20));
+        if(ImGui::Begin("Profiler")){
+            for(auto & [name, data] : aProfileData){
+                double avg = data.totalTime / (double)data.callCount;
 
-        ImGui::Spacing();
+                ImGui::Text("%s", name.c_str());
+                ImGui::SameLine(200);
+                ImGui::Text("Total : %.3f ms", data.totalTime);
+                ImGui::Text("Total : %.3f ms", avg);
+                ImGui::Text("Calls : %d", data.callCount);
 
-        ImGui::Text("Render: %.3f ms", renderTimeMs);
-        ImGui::ProgressBar(renderTimeMs / 16.67f, ImVec2(200, 20));
-
-        ImGui::Spacing();
-        ImGui::Separator();
-        ImGui::Spacing();
-
-        ImGui::Text("Physics Time (Last 100 frames)");
-        ImGui::PlotLines("##phys", physicsHistory, 100, historyIndex, nullptr, minVal, maxVal, ImVec2(600, 160));
-
-        ImGui::Spacing();
-
-        ImGui::Text("Render Time (Last 100 frames)");
-        ImGui::PlotLines("##rend", renderHistory, 100, 0, nullptr, 0, 20, ImVec2(300, 80));
-
+            }
+        }
         ImGui::End();
+
 
         if (showDebugCoords)
         {

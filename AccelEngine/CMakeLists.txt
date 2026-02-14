@@ -9,4 +9,6 @@ add_library(AccelEngine STATIC
     src/BVH.cpp
 )
 
+target_compile_options(AccelEngine PRIVATE -O3 -march=native)
+
 target_include_directories(AccelEngine PUBLIC include)

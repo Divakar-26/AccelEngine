@@ -291,7 +291,7 @@ void CollisionResolve::SolveVelocityWithRoatationAndFriction(Contact &contact)
 
         Vector2 relativeVelocity = (B->velocity + angularLinearVelocityB) - (A->velocity + angularLinearVelocityA);
 
-        Vector2 tangent = relativeVelocity - normal * relativeVelocity.scalarProduct(normal) ;
+        Vector2 tangent = relativeVelocity - normal * relativeVelocity.scalarProduct(normal);
         if (Vector2::nearlyEqual(tangent, Vector2(0.0f, 0.0f)))
         {
             continue;
@@ -314,12 +314,14 @@ void CollisionResolve::SolveVelocityWithRoatationAndFriction(Contact &contact)
         jt /= (real)contactCount;
 
         real j = jList[i];
+
         Vector2 frictionImpulse;
         if (Vector2::abs(jt) <= j * sf)
         {
             frictionImpulse = tangent * jt;
         }
-        else{
+        else
+        {
             frictionImpulse = tangent * -j * df;
         }
 
@@ -342,9 +344,9 @@ void CollisionResolve::SolveVelocityWithRoatationAndFriction(Contact &contact)
 
 void CollisionResolve::Solve(Contact &contact, float dt)
 {
-    // Solve position first (separate objects)
-    // SolveVelocityWithRoatation(contact);
+    RigidBody *A = contact.a;
+    RigidBody *B = contact.b;
+
     SolvePosition(contact);
     SolveVelocityWithRoatationAndFriction(contact);
-    // Then solve velocity (bounce response)
 }
