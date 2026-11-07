@@ -27,10 +27,13 @@ namespace AccelEngine
         {
             if (body->inverseMass <= 0.0f)
                 return;
-            if (body->ignoreGravity) return;           // <-- NEW
 
-            // F = m * g
-            body->addForce(gravity * (1.0f / body->inverseMass));
+
+            if (body->ignoreGravity)
+                return;
+
+
+            body->forceAccum += gravity * (1.0f / body->inverseMass);
         }
     };
 
@@ -94,7 +97,6 @@ namespace AccelEngine
             real totalForceScalar = Fs + dampingForce;
             Vector2 F = dir * totalForceScalar;
 
-
             if (!A_static)
                 bodyA->addForceAtPoint(F, pA);
 
@@ -157,24 +159,20 @@ namespace AccelEngine
     class Aero : public ForceGenerator
     {
     protected:
-
         Matrix2 tensor;
 
         Vector2 position;
         const Vector2 *windSpeed;
 
     public:
-
         Aero(const Matrix2 &tensor, const Vector2 &position,
              const Vector2 *windSpeed = nullptr)
             : tensor(tensor), position(position), windSpeed(windSpeed) {}
-
 
         virtual void updateForce(RigidBody *body, real duration) override
         {
             if (body->inverseMass <= 0.0f)
                 return;
-
 
             Vector2 bodyVel = body->velocity;
 
@@ -182,13 +180,12 @@ namespace AccelEngine
             if (windSpeed)
                 relativeVel -= *windSpeed;
 
-
             Matrix2 inverseRot;
             inverseRot.setInverse(body->transformMatrix);
             Vector2 bodySpaceVel = inverseRot * relativeVel;
 
             Vector2 bodyForce = tensor * bodySpaceVel;
-            bodyForce *= -1; 
+            bodyForce *= -1;
 
             Vector2 worldForce = body->transformMatrix * bodyForce;
 
@@ -203,7 +200,6 @@ namespace AccelEngine
         real orientationOffset;
 
     public:
-
         AngledAero(const Matrix2 &tensor, const Vector2 &position,
                    const Vector2 *windSpeed = nullptr)
             : Aero(tensor, position, windSpeed),
@@ -254,13 +250,13 @@ namespace AccelEngine
 
             if (controlSetting <= 0)
             {
-                real k = controlSetting + 1.0f; 
+                real k = controlSetting + 1.0f;
                 for (int i = 0; i < 4; ++i)
                     result.data[i] = minTensor.data[i] * (1.0f - k) + tensor.data[i] * k;
             }
             else
             {
-                real k = controlSetting; 
+                real k = controlSetting;
                 for (int i = 0; i < 4; ++i)
                     result.data[i] = tensor.data[i] * (1.0f - k) + maxTensor.data[i] * k;
             }
@@ -297,11 +293,11 @@ namespace AccelEngine
 
     class Buoyancy : public ForceGenerator
     {
-        Vector2 centerOfBuoyancy; 
-        real maxDepth;            
-        real volume;             
-        real waterHeight;         
-        real liquidDensity;      
+        Vector2 centerOfBuoyancy;
+        real maxDepth;
+        real volume;
+        real waterHeight;
+        real liquidDensity;
 
     public:
         Buoyancy(const Vector2 &cOfB, real maxDepth, real volume,

@@ -1,14 +1,14 @@
-option(ACCELENGINE_BUILD_SANDBOX "Build the Sandbox demo" OFF)
+add_library(AccelEngine STATIC 
+    src/particle.cpp
+    src/pfgen.cpp
+    src/ParticleContact.cpp
+    src/ParticleWorld.cpp
+    src/collision_coarse.cpp
+    src/collision_narrow.cpp
+    src/collision_resolve.cpp
+    src/BVH.cpp
+)
 
-cmake_minimum_required(VERSION 3.20)
-project(AccelEngine)
+target_compile_options(AccelEngine PRIVATE -O3 -march=native)
 
-set(CMAKE_CXX_STANDARD 20)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-
-# Add subprojects
-add_subdirectory(AccelEngine)
-if(ACCELENGINE_BUILD_SANDBOX)
-    add_subdirectory(Sandbox)
-endif()
-
+target_include_directories(AccelEngine PUBLIC include)

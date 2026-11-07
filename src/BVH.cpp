@@ -1,7 +1,6 @@
 #include <AccelEngine/BVH.h>
 #include <algorithm>
 #include <cmath>
-#include <../../Sandbox/include/renderer2D.h> 
 
 using namespace AccelEngine;
 
@@ -150,28 +149,4 @@ void BVHTree::queryNodeAgainstTree(BVHNode* nodeA, BVHNode* nodeB,
         queryNodeAgainstTree(nodeA->right, nodeB->left, outPairs);
         queryNodeAgainstTree(nodeA->right, nodeB->right, outPairs);
     }
-}
-
-// Visualization (same as before)
-static void drawNode(BVHNode* node)
-{
-    if (!node) return;
-
-    SDL_Color col = {255, 255, 0, 255}; // yellow
-
-    Renderer2D::DrawAABBOutline(
-        node->minAABB.x,
-        node->minAABB.y,
-        node->maxAABB.x,
-        node->maxAABB.y,
-        col
-    );
-
-    drawNode(node->left);
-    drawNode(node->right);
-}
-
-void BVHTree::draw()
-{
-    drawNode(root);
 }

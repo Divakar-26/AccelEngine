@@ -1,6 +1,7 @@
 #pragma once
 
 #include <AccelEngine/core.h>
+#include <cstdint>
 
 struct Color
 {
@@ -70,6 +71,11 @@ namespace AccelEngine
         bool lockRotation = false;
         bool ignoreGravity = false;
 
+        uint32_t entityID = 0; // used by engine
+        void* userData = nullptr;
+
+
+
         RigidBody() : inverseMass(0.0f),
                       inverseInertia(0.0f),
                       position(0, 0),
@@ -108,13 +114,18 @@ namespace AccelEngine
             }
         }
 
+        void wakeUp()
+        {
+        }
         void addForce(const Vector2 &force)
         {
+
             forceAccum += force;
         }
 
         void addForceAtPoint(const Vector2 &force, const Vector2 &point)
         {
+
             Vector2 r = point - position;
             forceAccum += force;
             torqueAccum += r.x * force.y - r.y * force.x;
@@ -145,9 +156,8 @@ namespace AccelEngine
 
         void integrate(real duration)
         {
-            // ============================================
-            // 1. POSITION LOCK  (Kinematic translation)
-            // ============================================
+
+
             if (lockPosition)
             {
                 // no linear motion

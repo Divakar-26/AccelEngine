@@ -6,9 +6,16 @@
 #include <AccelEngine/collision_resolve.h>
 #include <AccelEngine/joint.h>
 #include <AccelEngine/BVH.h>
+#include <AccelEngine/profiler.h>
 
 namespace AccelEngine
 {
+
+    struct CollisionEvent
+    {
+        RigidBody *a;
+        RigidBody *b;
+    };
 
     class World
     {
@@ -20,7 +27,9 @@ namespace AccelEngine
 
     public:
         std::vector<Joint *> joints;
+        std::vector<CollisionEvent> collisionEvents;
         BVHTree broadPhase;
+
         World() {}
 
         ~World()
@@ -43,18 +52,20 @@ namespace AccelEngine
             return joints;
         }
 
+        const std::vector<CollisionEvent> &GetCollisionEvents() const
+        {
+            return collisionEvents;
+        }
 
         void clear()
         {
             bodies.clear();
         }
 
-
         const std::vector<Contact> getContacts() const
         {
             return contactsThisFrame;
         }
-
 
         void startFrame()
         {
@@ -78,6 +89,7 @@ namespace AccelEngine
         {
             float subdt = dt / substeps;
 
+            broadPhase.build(bodies);
             for (int i = 0; i < substeps; i++)
             {
                 for (auto *b : bodies)
@@ -86,18 +98,25 @@ namespace AccelEngine
                 potentialPairs.clear();
                 contacts.clear();
 
-                // CoarseCollision::FindPotentialPairs(bodies, potentialPairs);
-
-                broadPhase.build(bodies);
+                PROFILE_SCOPE("Collision");
                 broadPhase.findPairs(potentialPairs);
-
                 NarrowCollision::FindContacts(potentialPairs, contacts);
+
+                collisionEvents.clear();
+
+                for (auto &c : contacts)
+                {
+                    collisionEvents.push_back({c.a, c.b});
+                }
 
                 for (auto *j : joints)
                     j->preSolve(subdt);
 
                 for (auto &c : contacts)
+                {
+                    PROFILE_SCOPE("Solve");
                     CollisionResolve::Solve(c, subdt);
+                }
 
                 for (int it = 0; it < 100; it++)
                 {
