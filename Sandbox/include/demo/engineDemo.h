@@ -36,6 +36,10 @@ public:
         wheel->lockRotation = false;
         wheel->angularDamping = 1.0;
 
+        // driven by update() below, which only adds force while the engine is moving
+        piston->canSleep = false;
+        wheel->canSleep = false;
+
         DistanceJoint *j = new DistanceJoint(piston, wheel, {0, -piston->getHeigt() / 2}, {100, 0});
 
         world.addJoint(j);

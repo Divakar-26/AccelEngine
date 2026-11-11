@@ -25,6 +25,8 @@ public:
     virtual const char *getName() const = 0;
 
     virtual void drawImGui() {}
+    // World-space drawing through Renderer2D (labels, guides). Called after the bodies, inside the GL frame.
+    virtual void drawWorld() {}
     virtual void update() {}
 
 protected:

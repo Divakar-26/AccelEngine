@@ -6,6 +6,7 @@
     #include <AccelEngine/ForceRegistry.h>
     #include "renderer2D.h"
     #include "allDemo.h"
+    #include <Engine/Application/Application.h>
 
     static float physicsTimeMs = 0.0f;
     static float renderTimeMs = 0.0f;
@@ -14,6 +15,11 @@
     static int historyIndex = 0;
 
     bool showBVH = false;
+    bool showSleeping = true; // draw sleeping bodies dimmed
+bool showContacts = false;
+    // Substeps per 1/60 s update (was a hard-coded 50). 6 keeps the joint demos (See-Saw) steady;
+    // 4 is ~1.5x cheaper and fine for pure contact scenes, so lower it in the Physics panel for huge piles.
+    int physicsSubsteps = 6;
 
     bool spawnBoxHeld = false;
     bool spawnCircleHeld = false;
@@ -34,6 +40,7 @@
     Gravity *g;
 
     Demo *activeDemo = nullptr;
+static int startDemoIndex = 0;
     std::vector<Demo *> demos;
 
     static Color RandomColor()
@@ -55,16 +62,15 @@
 
     bool Game::Init(const char *title)
     {
-        window = SDL_CreateWindow(title, WINDOW_W, WINDOW_H, SDL_WINDOW_RESIZABLE);
-        renderer = SDL_CreateRenderer(window, NULL);
+        // the window, GL context and ImGui come from SIMPEngine (SandboxApp in main.cpp)
+        window = SIMPEngine::Application::Get().GetWindow().GetNativeWindow();
+        SDL_SetWindowTitle(window, title);
+        int ww = WINDOW_W, wh = WINDOW_H;
+        SDL_GetWindowSize(window, &ww, &wh);
+        WINDOW_W = ww;
+        WINDOW_H = wh;
 
-        if (!ui.init(window, renderer))
-        {
-            std::cout << "Something wrong with IMGUI" << std::endl;
-            return false;
-        }
-
-        Renderer2D::init(renderer, WINDOW_W, WINDOW_H);
+        Renderer2D::init(WINDOW_W, WINDOW_H);
 
         camera.x = 0;
         camera.y = 0;
@@ -78,7 +84,30 @@
 
         g = new Gravity(Vector2(0, -980));
 
+        // with warm starting and 4-6 substeps, 2 velocity iterations per substep are enough
+        world.settings.velocityIterations = 2;
+
+        demos.push_back(new ShapesDemo());
+        demos.push_back(new CarDemo());
+        demos.push_back(new RagdollDemo());
+        demos.push_back(new FilterDemo());
+        demos.push_back(new PinballDemo());
+        demos.push_back(new CatapultDemo());
+        demos.push_back(new HillClimbDemo());
+        demos.push_back(new BridgeHingeDemo());
+        demos.push_back(new MarbleRunDemo());
+        demos.push_back(new PortalDemo());
+        demos.push_back(new TowerSmashDemo());
         demos.push_back(new LogoDemo());
+        demos.push_back(new DamBreakDemo());
+        demos.push_back(new GaltonDemo());
+        demos.push_back(new WreckingBallDemo());
+        demos.push_back(new GravityWellDemo());
+        demos.push_back(new MixerDemo());
+        demos.push_back(new HourglassDemo());
+        demos.push_back(new ChainReactionDemo());
+        demos.push_back(new SiegeDemo());
+        demos.push_back(new GravityTiltDemo());
         demos.push_back(new BridgeDemo());
         demos.push_back(new SoftBodyDemo());
         demos.push_back(new SeeSawDemo());
@@ -90,34 +119,53 @@
         demos.push_back(new NewtonsCradle());
         demos.push_back(new StressDemo());
         
-        activeDemo = demos[0];
+        // SANDBOX_DEMO=<index or name fragment> starts with that demo (handy for screenshots / automated checks)
+        if (const char *want = getenv("SANDBOX_DEMO"))
+        {
+            for (int i = 0; i < (int)demos.size(); i++)
+                if (std::to_string(i) == want || std::string(demos[i]->getName()).find(want) != std::string::npos)
+                {
+                    startDemoIndex = i;
+                    break;
+                }
+        }
+        activeDemo = demos[startDemoIndex];
         activeDemo->init(world, bodies, registry, g);
 
         running = true;
         return true;
     }
 
-    void Game::handleEvent()
+    void Game::processEvent(const SDL_Event &e)
     {
-        SDL_Event e;
-
-        while (SDL_PollEvent(&e))
+        if (e.type == SDL_EVENT_WINDOW_RESIZED)
         {
-
-            if (ui.handleEvent(e))
-                continue;
-
-            if (e.type == SDL_EVENT_QUIT)
-                running = false;
-
-            inputMgr->process(e);
+            WINDOW_W = e.window.data1;
+            WINDOW_H = e.window.data2;
+            Renderer2D::resize(WINDOW_W, WINDOW_H);
+            return;
         }
+
+        // keep the ImGui panels usable: while ImGui wants the mouse (or text input) the scene does not react.
+        // (WantCaptureKeyboard is always true here: SIMPEngine enables keyboard navigation.)
+        // (a button release always goes through so a grabbed body is never stuck to the cursor)
+        ImGuiIO &io = ImGui::GetIO();
+        const bool mouseEvent = e.type == SDL_EVENT_MOUSE_BUTTON_DOWN || e.type == SDL_EVENT_MOUSE_MOTION;
+        const bool keyEvent = e.type == SDL_EVENT_KEY_DOWN;
+        if ((mouseEvent && io.WantCaptureMouse) || (keyEvent && io.WantTextInput))
+            return;
+
+        Renderer2D::setCamera(camera);
+        SDL_Event copy = e;
+        inputMgr->process(copy);
+        Renderer2D::setCamera(camera);
     }
 
     void Game::update(float dt)
     {
 
         aProfileData.clear();
+        Renderer2D::setCamera(camera);
         spawnTimer -= dt;
 
         if (spawnTimer <= 0.0f)
@@ -142,7 +190,7 @@
             }
         }
 
-        const int substeps = 50;
+        const int substeps = physicsSubsteps;
         const real h = dt / (real)substeps;
 
         Uint64 startPhysics = SDL_GetPerformanceCounter();
@@ -161,6 +209,7 @@
             grabbed->position = target;
             grabbed->velocity = Vector2(0, 0);
             grabbed->rotation = 0;
+            grabbed->wakeUp(); // otherwise a held body (zero velocity) would fall asleep
         }
 
         for (int i = 0; i < substeps; ++i)
@@ -182,46 +231,53 @@
 
     void Game::render()
     {
-        Renderer2D::setCamera(camera);
         static int sampleCounter = 0;
 
         Uint64 startRender = SDL_GetPerformanceCounter();
-        ui.DrawAddBody(world, bodies);
 
-        SDL_SetRenderDrawColor(renderer, 176, 224, 230, 255);
-        SDL_RenderClear(renderer);
+        // many thousands of bodies: drop the extras that double the primitive count
+        const bool crowd = bodies.size() > 6000;
+        Renderer2D::Style &st = Renderer2D::style;
+        const Renderer2D::Style userStyle = st;
+        if (crowd) { st.shadows = false; st.shading = false; }
+        Renderer2D::beginFrame(camera);
 
         if (showBVH)
-            world.broadPhase.draw();
+            world.broadPhase.forEachNode([](const Vector2 &mn, const Vector2 &mx)
+                                         { Renderer2D::DrawAABBOutline(mn.x, mn.y, mx.x, mx.y, {255, 255, 0, 255}); });
 
         for (auto *b : bodies)
         {
-            SDL_Color c = {b->c.r, b->c.g, b->c.b, b->c.a};
-            // if(!b->isAwake){
-            //     c = {0,0,0,255};
-            // }
-
-            if (b->shapeType == ShapeType::AABB)
+            SDL_Color c = {(Uint8)b->c.r, (Uint8)b->c.g, (Uint8)b->c.b, (Uint8)b->c.a};
+            if (showSleeping && !b->isAwake && !b->isStatic())
             {
-                Renderer2D::DrawRectangle(b->position.x, b->position.y, b->aabb.halfSize.x * 2, b->aabb.halfSize.y * 2, b->orientation, c);
+                c.r = (Uint8)(c.r * 0.35f);
+                c.g = (Uint8)(c.g * 0.35f);
+                c.b = (Uint8)(c.b * 0.35f);
             }
-            else if (b->shapeType == ShapeType::CIRCLE)
-            {
-                Renderer2D::DrawCircle(b->position.x, b->position.y, b->circle.radius, b->orientation, c);
-            }
+            Renderer2D::DrawBody(*b, c);
         }
 
         Renderer2D::drawSprings(registry);
         Renderer2D::drawJoints(world.getJoints());
+        if (showContacts)
+            Renderer2D::DrawContacts(world.getContacts());
+        if (activeDemo)
+            activeDemo->drawWorld();
+        Renderer2D::endFrame(); // everything above is one batched GL draw; ImGui is drawn after this layer
+        st = userStyle;
+
+        ui.DrawAddBody(world, bodies);
 
         if (activeDemo)
         {
             activeDemo->drawImGui();
         }
 
+        ImGui::SetNextWindowPos(ImVec2(1560, 40), ImGuiCond_FirstUseEver);
         ImGui::Begin("Demo Selector", nullptr, ImGuiWindowFlags_AlwaysAutoResize);
 
-        static int selectedDemoIndex = 2;
+        int &selectedDemoIndex = startDemoIndex; // the demo started in Init
 
         ImGui::Text("Select Demo");
         ImGui::Separator();
@@ -236,6 +292,7 @@
                 world.clear();
                 bodies.clear();
                 registry.clear();
+                g->gravity = Vector2(0, -980); // some demos change the direction
 
                 activeDemo = demos[i];
                 activeDemo->init(world, bodies, registry, g);
@@ -251,7 +308,49 @@
         FindMinMax(physicsHistory, 200, minVal, maxVal);
 
 
-        if(ImGui::Begin("Profiler")){
+        ImGui::SetNextWindowPos(ImVec2(1210, 40), ImGuiCond_FirstUseEver);
+        ImGui::SetNextWindowSize(ImVec2(340, 560), ImGuiCond_FirstUseEver);
+        if (ImGui::Begin("Physics"))
+        {
+            PhysicsSettings &ps = world.settings;
+            ImGui::Text("Bodies: %zu  awake: %d / %d dynamic", bodies.size(), world.getAwakeBodyCount(), world.getDynamicBodyCount());
+            ImGui::Text("Physics: %.2f ms/update   Render (CPU): %.2f ms", physicsTimeMs, renderTimeMs);
+            ImGui::Checkbox("Sleeping", &ps.enableSleep);
+            ImGui::SameLine();
+            ImGui::Checkbox("Dim sleeping bodies", &showSleeping);
+            if (ImGui::CollapsingHeader("Rendering (SIMPEngine)"))
+            {
+                Renderer2D::Style &rs = Renderer2D::style;
+                ImGui::Checkbox("Shadows", &rs.shadows);
+                ImGui::SameLine();
+                ImGui::Checkbox("Shading", &rs.shading);
+                ImGui::Checkbox("Grid", &rs.grid);
+                ImGui::SameLine();
+                ImGui::Checkbox("Joint details", &rs.jointDetails);
+                ImGui::Checkbox("Show contacts", &showContacts);
+                ImGui::Checkbox("Show BVH", &showBVH);
+                ImGui::TextDisabled("(shadows/shading switch off above 6000 bodies)");
+            }
+            if (ImGui::Button("Wake all"))
+                world.wakeAll();
+            ImGui::SliderFloat("Sleep lin. tol (px/s)", &ps.sleepLinearTolerance, 0.5f, 30.0f);
+            ImGui::SliderFloat("Sleep ang. tol (rad/s)", &ps.sleepAngularTolerance, 0.005f, 0.5f);
+            ImGui::SliderFloat("Time to sleep (s)", &ps.timeToSleep, 0.1f, 3.0f);
+            ImGui::Separator();
+            ImGui::SliderInt("Substeps per update", &physicsSubsteps, 1, 50);
+            ImGui::SliderInt("Worker threads (-1 auto)", &ps.workerThreads, -1, 31);
+            ImGui::SliderInt("Velocity iterations", &ps.velocityIterations, 1, 20);
+            ImGui::SliderInt("Position iterations", &ps.positionIterations, 0, 10);
+            ImGui::Checkbox("Warm starting", &ps.warmStarting);
+            ImGui::SliderFloat("Linear slop (px)", &ps.linearSlop, 0.0f, 3.0f);
+            ImGui::SliderFloat("Baumgarte", &ps.baumgarte, 0.0f, 1.0f);
+            ImGui::SliderFloat("Restitution threshold (px/s)", &ps.restitutionThreshold, 0.0f, 300.0f);
+        }
+        ImGui::End();
+
+        ImGui::SetNextWindowPos(ImVec2(1210, 620), ImGuiCond_FirstUseEver);
+        ImGui::SetNextWindowSize(ImVec2(340, 300), ImGuiCond_FirstUseEver);
+        if (ImGui::Begin("Profiler")){
             for(auto & [name, data] : aProfileData){
                 double avg = data.totalTime / (double)data.callCount;
 
@@ -268,7 +367,8 @@
 
         if (showDebugCoords)
         {
-            ImGui::Begin("Mouse World", nullptr, ImGuiWindowFlags_AlwaysAutoResize);
+            ImGui::SetNextWindowPos(ImVec2(10, 40), ImGuiCond_FirstUseEver);
+        ImGui::Begin("Mouse World", nullptr, ImGuiWindowFlags_AlwaysAutoResize);
 
             ImGui::Text("World X: %.2f", debugMouseWorld.x);
             ImGui::Text("World Y: %.2f", debugMouseWorld.y);
@@ -280,9 +380,8 @@
             ImGui::End();
         }
 
-        ui.DrawFrame();
-
         Uint64 endRender = SDL_GetPerformanceCounter();
+        renderTimeMs = (float)(endRender - startRender) * 1000.0f / SDL_GetPerformanceFrequency();
 
         sampleCounter++;
 
@@ -296,7 +395,6 @@
             sampleCounter = 0; // reset
         }
 
-        SDL_RenderPresent(renderer);
     }
 
     void FindMinMax(const float *data, int size, float &outMin, float &outMax)
@@ -454,33 +552,12 @@
 
     void Game::gradBodies(float mx, float my)
     {
-        for (auto *b : bodies)
+        // queryPoint handles every shape (and rotated boxes) and prefers dynamic bodies over static ones
+        RigidBody *b = world.queryPoint(Vector2(mx, my));
+        if (b && b->inverseMass > 0.0f) // static bodies are not draggable
         {
-            if (b->inverseMass == 0.0f)
-                continue; // static bodies not draggable
-
-            if (b->shapeType == ShapeType::AABB)
-            {
-                if (mx >= b->position.x - b->aabb.halfSize.x &&
-                    mx <= b->position.x + b->aabb.halfSize.x &&
-                    my >= b->position.y - b->aabb.halfSize.y &&
-                    my <= b->position.y + b->aabb.halfSize.y)
-                {
-                    grabbed = b;
-                    grabOffset = b->position - Vector2(mx, my);
-                    break;
-                }
-            }
-            else if (b->shapeType == ShapeType::CIRCLE)
-            {
-                Vector2 d = b->position - Vector2(mx, my);
-                if (d.magnitude() <= b->circle.radius)
-                {
-                    grabbed = b;
-                    grabOffset = d;
-                    break;
-                }
-            }
+            grabbed = b;
+            grabOffset = b->position - Vector2(mx, my);
         }
     }
 
@@ -511,9 +588,11 @@
             float msx, msy;
             SDL_GetMouseState(&msx, &msy);
 
+            Renderer2D::setCamera(camera);
             SDL_FPoint before = Renderer2D::screenToWorld(msx, msy);
 
             camera.zoom *= 1.1f;
+            Renderer2D::setCamera(camera);
             SDL_FPoint after = Renderer2D::screenToWorld(msx, msy);
 
             camera.x += before.x - after.x;
@@ -526,15 +605,18 @@
             float msx, msy;
             SDL_GetMouseState(&msx, &msy);
 
+            Renderer2D::setCamera(camera);
             SDL_FPoint before = Renderer2D::screenToWorld(msx, msy);
 
             camera.zoom /= 1.1f;
+            Renderer2D::setCamera(camera);
 
             SDL_FPoint after = Renderer2D::screenToWorld(msx, msy);
 
             camera.x += before.x - after.x;
             camera.y += before.y - after.y;
         }
+        break;
         case SDLK_A:
         {
             eraserActive = !eraserActive;

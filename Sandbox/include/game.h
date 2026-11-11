@@ -20,7 +20,7 @@ public:
     Game(int W_W, int W_H);
 
     bool Init(const char *title);
-    void handleEvent();
+    void processEvent(const SDL_Event &e); // already filtered by the application layer
     void cameraControls(const SDL_KeyboardEvent &  e);
     void update(float dt);
     void render();
@@ -29,6 +29,7 @@ public:
     {
         return running;
     }
+    void setWindowSize(int w, int h) { WINDOW_W = w; WINDOW_H = h; Renderer2D::resize(w, h); }
     void showFPS(float realDt, float fixedDt);
     Vector2 WorldToScreen(const Vector2 &w, float screenHeight);
     Vector2 ScreenToWorld(const Vector2 &s, float screenHeight);
@@ -52,7 +53,6 @@ public:
 private:
     int WINDOW_W, WINDOW_H;
     SDL_Window *window = nullptr;
-    SDL_Renderer *renderer = nullptr;
 
     UI ui;
 

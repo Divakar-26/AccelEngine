@@ -1,6 +1,8 @@
 #pragma once
 
 #include "precision.h"
+#include <cmath>
+#include <utility>
 
 namespace AccelEngine
 {

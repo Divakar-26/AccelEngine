@@ -58,4 +58,5 @@ void InputActions::onMouseMove(const SDL_MouseMotionEvent& e) {
     game->grabbed->position = target;
     game->grabbed->velocity = {0,0};
     game->grabbed->rotation = 0;
+    game->grabbed->wakeUp();
 }

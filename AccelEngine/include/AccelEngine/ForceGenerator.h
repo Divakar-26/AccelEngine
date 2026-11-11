@@ -76,6 +76,13 @@ namespace AccelEngine
             if (A_static && B_static)
                 return;
 
+            // A sleeping body pulled by an awake one must respond. Wake it without resetting its
+            // sleep timer, so it falls back asleep if the pull turns out to be negligible.
+            if (!bodyA->isAwake && !bodyB->isStatic() && bodyB->isAwake)
+                bodyA->isAwake = true;
+            if (!bodyB->isAwake && !bodyA->isStatic() && bodyA->isAwake)
+                bodyB->isAwake = true;
+
             // World points
             Vector2 pA = bodyA->getPointInWorldSpace(localA);
             Vector2 pB = bodyB->getPointInWorldSpace(localB);

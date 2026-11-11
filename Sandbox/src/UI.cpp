@@ -9,61 +9,10 @@
 
 using namespace AccelEngine;
 
-bool UI::init(SDL_Window *window, SDL_Renderer *renderer)
-{
-    this->renderer = renderer;
-
-    IMGUI_CHECKVERSION();
-    ImGui::CreateContext();
-    ImGuiIO &io = ImGui::GetIO();
-    (void)io;
-    ImGui::StyleColorsDark();
-
-    if (!ImGui_ImplSDL3_InitForSDLRenderer(window, renderer))
-    {
-        // SDL_Log("ImGui SDL3 init failed!");
-        return false;
-    }
-    if (!ImGui_ImplSDLRenderer3_Init(renderer))
-    {
-        // SDL_Log("ImGui SDL3 renderer init failed!");
-        return false;
-    }
-
-    return true;
-}
-
-bool UI::handleEvent(SDL_Event &e)
-{
-    // First pass event to ImGui's backend
-    ImGui_ImplSDL3_ProcessEvent(&e);
-
-    ImGuiIO &io = ImGui::GetIO();
-
-    if (io.WantCaptureMouse)
-        return true;
-
-    if (io.WantCaptureKeyboard)
-        return true;
-
-    return false;
-}
-
-
-void UI::DrawFrame()
-{
-
-    ImGui::Render();
-    ImGui_ImplSDLRenderer3_RenderDrawData(ImGui::GetDrawData(), renderer);
-}
-
 void UI::DrawAddBody(World &world, std::vector<RigidBody *> &bodies)
 {
-    ImGui_ImplSDLRenderer3_NewFrame();
-    ImGui_ImplSDL3_NewFrame();
-    ImGui::NewFrame();
-
-    ImGui::Begin("Scene Editor", nullptr, ImGuiWindowFlags_AlwaysAutoResize);
+    ImGui::SetNextWindowPos(ImVec2(1560, 620), ImGuiCond_FirstUseEver); ImGui::SetNextWindowSize(ImVec2(340, 420), ImGuiCond_FirstUseEver);
+        ImGui::Begin("Scene Editor", nullptr, ImGuiWindowFlags_AlwaysAutoResize);
 
     // ============================================================
     // TOP: Creation + Global Controls
@@ -146,16 +95,25 @@ void UI::DrawAddBody(World &world, std::vector<RigidBody *> &bodies)
 
         ImGui::Text("Body %d", selectedIndex);
 
-        ImGui::Checkbox("Enable Collision", &b->enableCollision);
+        bool edited = false; // any edit must wake the body, or a sleeping body ignores it
+        edited |= ImGui::Checkbox("Enable Collision", &b->enableCollision);
+        ImGui::Text(b->isAwake ? "Awake" : "Sleeping");
+        ImGui::SameLine();
+        ImGui::Checkbox("Can sleep", &b->canSleep);
 
-        ImGui::DragFloat2("Position", (float*)&b->position, 0.5f);
+        edited |= ImGui::DragFloat2("Position", (float*)&b->position, 0.5f);
 
         float degrees = b->orientation * 180.0f / 3.14159265f;
-        ImGui::DragFloat("Rotation (deg)", &degrees, 0.2f, -180.f, 180.f, "%.2f");
-        b->orientation = degrees * 3.14159265f / 180.f;
+        if (ImGui::DragFloat("Rotation (deg)", &degrees, 0.2f, -180.f, 180.f, "%.2f"))
+        {
+            b->orientation = degrees * 3.14159265f / 180.f;
+            edited = true;
+        }
 
-        ImGui::DragFloat2("Velocity", (float*)&b->velocity, 0.2f);
-        ImGui::DragFloat("Angular Vel", &b->rotation, 0.1f);
+        edited |= ImGui::DragFloat2("Velocity", (float*)&b->velocity, 0.2f);
+        edited |= ImGui::DragFloat("Angular Vel", &b->rotation, 0.1f);
+        if (edited)
+            b->wakeUp();
         ImGui::DragFloat("Angular Damping", &b->angularDamping, 0.01f, 0.f, 1.f);
 
         float mass = 1.f / b->inverseMass;
@@ -175,11 +133,27 @@ void UI::DrawAddBody(World &world, std::vector<RigidBody *> &bodies)
             ImGui::Text("AABB");
             ImGui::DragFloat2("Half Size", (float*)&b->aabb.halfSize, 1.f);
         }
-        else
+        else if (b->shapeType == ShapeType::CIRCLE)
         {
             ImGui::Text("Circle");
             ImGui::DragFloat("Radius", &b->circle.radius, 1.f, 1.f, 500.f);
         }
+        else
+        {
+            const char *kind = b->shapeType == ShapeType::POLYGON ? "Polygon" : b->shapeType == ShapeType::CAPSULE ? "Capsule" : "Compound";
+            ImGui::Text("%s (%d convex part%s)", kind, (int)b->parts.size(), b->parts.size() == 1 ? "" : "s");
+        }
+
+        ImGui::Separator();
+        ImGui::Text("Collision");
+        ImGui::Checkbox("Sensor", &b->isSensor);
+        ImGui::SameLine();
+        ImGui::Checkbox("One-way", &b->oneWay);
+        int category = b->categoryBits, mask = b->maskBits, group = b->groupIndex;
+        if (ImGui::InputInt("Category bits", &category)) b->categoryBits = (uint16_t)category;
+        if (ImGui::InputInt("Mask bits", &mask)) b->maskBits = (uint16_t)mask;
+        if (ImGui::InputInt("Group", &group)) b->groupIndex = (int16_t)group;
+        ImGui::Separator();
 
         ImGui::ColorEdit4("Color", (float*)&b->c);
 
